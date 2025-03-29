@@ -1,1376 +1,672 @@
 <!DOCTYPE html>
-<html dir="ltr" lang="en">
+<html lang="en">
 
 <head>
-{% block title %}
+
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <!-- Tell the browser to be responsive to screen width -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="{{assets('assets/images/favicon.png')}}">
-    <title>HR360</title>
-{% endblock %}
-{% block css%}
-    <!-- Custom CSS -->
-    <link href="{{assets('assets/libs/chartist/dist/chartist.min.css')}}" rel="stylesheet">
-    <link href="{{assets('assets/extra-libs/c3/c3.min.css')}}" rel="stylesheet">
-    <link href="{{assets('assets/extra-libs/jvector/jquery-jvectormap-2.0.2.css')}}" rel="stylesheet" />
-    <!-- Custom CSS -->
-    <link href="{{assets('dist/css/style.min.css')}}" rel="stylesheet">
-{% endblock %}
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-<![endif]-->
+
+    <title>{% block title %}HR360{% endblock %}</title>
+    {% block css%}
+    <!-- Custom fonts for this template-->
+    <link href="{{ asset('back/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="{{ asset('back/css/sb-admin-2.min.css') }}" rel="stylesheet">
+    {% endblock %}
 </head>
 
-<body>
-    <!-- ============================================================== -->
-    <!-- Preloader - style you can find in spinners.css -->
-    <!-- ============================================================== -->
-    {% block preloader %}
-    <div class="preloader">
-        <div class="lds-ripple">
-            <div class="lds-pos"></div>
-            <div class="lds-pos"></div>
-        </div>
-    </div>
-    {% endblock %}
-    <!-- ============================================================== -->
-    <!-- Main wrapper - style you can find in pages.scss -->
-    <!-- ============================================================== -->
-    <div id="main-wrapper">
-        <!-- ============================================================== -->
-        <!-- Topbar header - style you can find in pages.scss -->
-        <!-- ============================================================== -->
-        {% block header %}
-        <header class="topbar">
-            <nav class="navbar top-navbar navbar-expand-md navbar-dark">
-                <div class="navbar-header">
-                    <!-- This is for the sidebar toggle which is visible on mobile only -->
-                    <a class="nav-toggler waves-effect waves-light d-block d-md-none" href="javascript:void(0)">
-                        <i class="ti-menu ti-close"></i>
-                    </a>
-                    <!-- ============================================================== -->
-                    <!-- Logo -->
-                    <!-- ============================================================== -->
-                    <div class="navbar-brand">
-                        <a href="#" class="logo">
-                            <!-- Logo icon -->
-                            <b class="logo-icon">
-                                <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
-                                <!-- Dark Logo icon -->
-                                <img src="{{assets('assets/images/logoRH360.png')}}" alt="homepage" class="dark-logo" />
-                                <!-- Light Logo icon -->
-                                <img src="{{assets('assets/images/logoRH360.png')}}" alt="homepage" class="light-logo" />
-                            </b>
-                            <!--End Logo icon -->
-                            <!-- Logo text -->
-                            <span class="logo-text">
-                                <!-- dark Logo text -->
-                                <img src="{{assets('assets/images/logo-text.png')}}" alt="homepage" class="dark-logo" />
-                                <!-- Light Logo text -->
-                                <img src="{{assets('assets/images/logo-light-text.png')}}" class="light-logo" alt="homepage" />
-                            </span>
-                        </a>
-                        <a class="sidebartoggler d-none d-md-block" href="javascript:void(0)" data-sidebartype="mini-sidebar">
-                            <i class="mdi mdi-toggle-switch mdi-toggle-switch-off font-20"></i>
-                        </a>
-                    </div>
-                    <!-- ============================================================== -->
-                    <!-- End Logo -->
-                    <!-- ============================================================== -->
-                    <!-- ============================================================== -->
-                    <!-- Toggle which is visible on mobile only -->
-                    <!-- ============================================================== -->
-                    <a class="topbartoggler d-block d-md-none waves-effect waves-light" href="javascript:void(0)" data-toggle="collapse" data-target="#navbarSupportedContent"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <i class="ti-more"></i>
-                    </a>
-                </div>
-                <!-- ============================================================== -->
-                <!-- End Logo -->
-                <!-- ============================================================== -->
-                <div class="navbar-collapse collapse" id="navbarSupportedContent">
-                    <!-- ============================================================== -->
-                    <!-- toggle and nav items -->
-                    <!-- ============================================================== -->
-                    <ul class="navbar-nav float-left mr-auto">
-                        <!-- <li class="nav-item d-none d-md-block">
-                            <a class="nav-link sidebartoggler waves-effect waves-light" href="javascript:void(0)" data-sidebartype="mini-sidebar">
-                                <i class="mdi mdi-menu font-24"></i>
-                            </a>
-                        </li> -->
-                        <!-- ============================================================== -->
-                        <!-- Search -->
-                        <!-- ============================================================== -->
-                        <li class="nav-item search-box">
-                            <a class="nav-link waves-effect waves-dark" href="javascript:void(0)">
-                                <div class="d-flex align-items-center">
-                                    <i class="mdi mdi-magnify font-20 mr-1"></i>
-                                    <div class="ml-1 d-none d-sm-block">
-                                        <span>Search</span>
-                                    </div>
-                                </div>
-                            </a>
-                            <form class="app-search position-absolute">
-                                <input type="text" class="form-control" placeholder="Search &amp; enter">
-                                <a class="srh-btn">
-                                    <i class="ti-close"></i>
-                                </a>
-                            </form>
-                        </li>
-                    </ul>
-                    <!-- ============================================================== -->
-                    <!-- Right side toggle and nav items -->
-                    <!-- ============================================================== -->
-                    <ul class="navbar-nav float-right">
-                        <!-- ============================================================== -->
-                        <!-- Messages -->
-                        <!-- ============================================================== -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle waves-effect waves-dark" href="" id="2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="font-22 mdi mdi-email-outline"></i>
+<body id="page-top">
 
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right mailbox animated bounceInDown" aria-labelledby="2">
-                                <span class="with-arrow">
-                                    <span class="bg-danger"></span>
-                                </span>
-                                <ul class="list-style-none">
-                                    <li>
-                                        <div class="drop-title text-white bg-danger">
-                                            <h4 class="m-b-0 m-t-5">5 New</h4>
-                                            <span class="font-light">Messages</span>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="message-center message-body">
-                                            <!-- Message -->
-                                            <a href="javascript:void(0)" class="message-item">
-                                                <span class="user-img">
-                                                    <img src="{{assets('assets/images/users/1.jpg')}}" alt="user" class="rounded-circle">
-                                                    <span class="profile-status online pull-right"></span>
-                                                </span>
-                                                <div class="mail-contnet">
-                                                    <h5 class="message-title">Pavan kumar</h5>
-                                                    <span class="mail-desc">Just see the my admin!</span>
-                                                    <span class="time">9:30 AM</span>
-                                                </div>
-                                            </a>
-                                            <!-- Message -->
-                                            <a href="javascript:void(0)" class="message-item">
-                                                <span class="user-img">
-                                                    <img src="{{assets('assets/images/users/2.jpg')}}" alt="user" class="rounded-circle">
-                                                    <span class="profile-status busy pull-right"></span>
-                                                </span>
-                                                <div class="mail-contnet">
-                                                    <h5 class="message-title">Sonu Nigam</h5>
-                                                    <span class="mail-desc">I've sung a song! See you at</span>
-                                                    <span class="time">9:10 AM</span>
-                                                </div>
-                                            </a>
-                                            <!-- Message -->
-                                            <a href="javascript:void(0)" class="message-item">
-                                                <span class="user-img">
-                                                    <img src="{{assets('assets/images/users/3.jpg')}}" alt="user" class="rounded-circle">
-                                                    <span class="profile-status away pull-right"></span>
-                                                </span>
-                                                <div class="mail-contnet">
-                                                    <h5 class="message-title">Arijit Sinh</h5>
-                                                    <span class="mail-desc">I am a singer!</span>
-                                                    <span class="time">9:08 AM</span>
-                                                </div>
-                                            </a>
-                                            <!-- Message -->
-                                            <a href="javascript:void(0)" class="message-item">
-                                                <span class="user-img">
-                                                    <img src="{{assets('assets/images/users/4.jpg')}}" alt="user" class="rounded-circle">
-                                                    <span class="profile-status offline pull-right"></span>
-                                                </span>
-                                                <div class="mail-contnet">
-                                                    <h5 class="message-title">Pavan kumar</h5>
-                                                    <span class="mail-desc">Just see the my admin!</span>
-                                                    <span class="time">9:02 AM</span>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a class="nav-link text-center link text-dark" href="javascript:void(0);">
-                                            <b>See all e-Mails</b>
-                                            <i class="fa fa-angle-right"></i>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <!-- ============================================================== -->
-                        <!-- End Messages -->
-                        <!-- ============================================================== -->
-                        <!-- ============================================================== -->
-                        <!-- Comment -->
-                        <!-- ============================================================== -->
-                        <li class="nav-item dropdown border-right">
-                            <a class="nav-link dropdown-toggle waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="mdi mdi-bell-outline font-22"></i>
-                                <span class="badge badge-pill badge-info noti">3</span>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right mailbox animated bounceInDown">
-                                <span class="with-arrow">
-                                    <span class="bg-primary"></span>
-                                </span>
-                                <ul class="list-style-none">
-                                    <li>
-                                        <div class="drop-title bg-primary text-white">
-                                            <h4 class="m-b-0 m-t-5">4 New</h4>
-                                            <span class="font-light">Notifications</span>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="message-center notifications">
-                                            <!-- Message -->
-                                            <a href="javascript:void(0)" class="message-item">
-                                                <span class="btn btn-danger btn-circle">
-                                                    <i class="fa fa-link"></i>
-                                                </span>
-                                                <div class="mail-contnet">
-                                                    <h5 class="message-title">Luanch Admin</h5>
-                                                    <span class="mail-desc">Just see the my new admin!</span>
-                                                    <span class="time">9:30 AM</span>
-                                                </div>
-                                            </a>
-                                            <!-- Message -->
-                                            <a href="javascript:void(0)" class="message-item">
-                                                <span class="btn btn-success btn-circle">
-                                                    <i class="ti-calendar"></i>
-                                                </span>
-                                                <div class="mail-contnet">
-                                                    <h5 class="message-title">Event today</h5>
-                                                    <span class="mail-desc">Just a reminder that you have event</span>
-                                                    <span class="time">9:10 AM</span>
-                                                </div>
-                                            </a>
-                                            <!-- Message -->
-                                            <a href="javascript:void(0)" class="message-item">
-                                                <span class="btn btn-info btn-circle">
-                                                    <i class="ti-settings"></i>
-                                                </span>
-                                                <div class="mail-contnet">
-                                                    <h5 class="message-title">Settings</h5>
-                                                    <span class="mail-desc">You can customize this template as you want</span>
-                                                    <span class="time">9:08 AM</span>
-                                                </div>
-                                            </a>
-                                            <!-- Message -->
-                                            <a href="javascript:void(0)" class="message-item">
-                                                <span class="btn btn-primary btn-circle">
-                                                    <i class="ti-user"></i>
-                                                </span>
-                                                <div class="mail-contnet">
-                                                    <h5 class="message-title">Pavan kumar</h5>
-                                                    <span class="mail-desc">Just see the my admin!</span>
-                                                    <span class="time">9:02 AM</span>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a class="nav-link text-center m-b-5 text-dark" href="javascript:void(0);">
-                                            <strong>Check all notifications</strong>
-                                            <i class="fa fa-angle-right"></i>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <!-- ============================================================== -->
-                        <!-- End Comment -->
-                        <!-- ============================================================== -->
-                        <!-- ============================================================== -->
-                        <!-- User profile and search -->
-                        <!-- ============================================================== -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle waves-effect waves-dark pro-pic" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img src="{{assets('assets/images/users/2.jpg')}}" alt="user" class="rounded-circle" width="40">
-                                <span class="m-l-5 font-medium d-none d-sm-inline-block">Jonathan Doe <i class="mdi mdi-chevron-down"></i></span>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right user-dd animated flipInY">
-                                <span class="with-arrow">
-                                    <span class="bg-primary"></span>
-                                </span>
-                                <div class="d-flex no-block align-items-center p-15 bg-primary text-white m-b-10">
-                                    <div class="">
-                                        <img src="{{assets('assets/images/users/2.jpg')}}" alt="user" class="rounded-circle" width="60">
-                                    </div>
-                                    <div class="m-l-10">
-                                        <h4 class="m-b-0">Jonathan Doe</h4>
-                                        <p class=" m-b-0">jon@gmail.com</p>
-                                    </div>
-                                </div>
-                                <div class="profile-dis scrollable">
-                                    <a class="dropdown-item" href="javascript:void(0)">
-                                        <i class="ti-user m-r-5 m-l-5"></i> My Profile</a>
-                                    <a class="dropdown-item" href="javascript:void(0)">
-                                        <i class="ti-wallet m-r-5 m-l-5"></i> My Balance</a>
-                                    <a class="dropdown-item" href="javascript:void(0)">
-                                        <i class="ti-email m-r-5 m-l-5"></i> Inbox</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="javascript:void(0)">
-                                        <i class="ti-settings m-r-5 m-l-5"></i> Account Setting</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="javascript:void(0)">
-                                        <i class="fa fa-power-off m-r-5 m-l-5"></i> Logout</a>
-                                    <div class="dropdown-divider"></div>
-                                </div>
-                                <div class="p-l-30 p-10">
-                                    <a href="javascript:void(0)" class="btn btn-sm btn-success btn-rounded">View Profile</a>
-                                </div>
-                            </div>
-                        </li>
-                        <!-- ============================================================== -->
-                        <!-- User profile and search -->
-                        <!-- ============================================================== -->
-                    </ul>
-                </div>
-            </nav>
-        </header>
-        {% endblock %}
-        <!-- ============================================================== -->
-        <!-- End Topbar header -->
-        <!-- ============================================================== -->
-        <!-- ============================================================== -->
-        <!-- Left Sidebar - style you can find in sidebar.scss  -->
-        <!-- ============================================================== -->
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
         {% block sidebar %}
-        <aside class="left-sidebar">
-            <!-- Sidebar scroll-->
-            <div class="scroll-sidebar">
-                <!-- Sidebar navigation-->
-                <nav class="sidebar-nav">
-                    <ul id="sidebarnav">
-                        <li class="sidebar-item">
-                            <a href="index.html" class="sidebar-link">
-                                <i class="mdi mdi-adjust"></i>
-                                <span class="hide-menu"> Dashboard </span>
-                            </a>
-                        </li>
-                        <li class="nav-small-cap">
-                            <i class="mdi mdi-dots-horizontal"></i>
-                            <span class="hide-menu"> Entreprise </span>
-                        </li>
-                        <li class="sidebar-item">
-                            <a href="index.html" class="sidebar-link">
-                                <i class="mdi mdi-adjust"></i>
-                                <span class="hide-menu"> Employees </span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a href="index.html" class="sidebar-link">
-                                <i class="mdi mdi-adjust"></i>
-                                <span class="hide-menu"> Projets </span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a href="index.html" class="sidebar-link">
-                                <i class="mdi mdi-adjust"></i>
-                                <span class="hide-menu"> Equipes </span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a href="index.html" class="sidebar-link">
-                                <i class="mdi mdi-adjust"></i>
-                                <span class="hide-menu"> Formations </span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a href="index.html" class="sidebar-link">
-                                <i class="mdi mdi-adjust"></i>
-                                <span class="hide-menu"> Ressources </span>
-                            </a>
-                        </li>
-                        <li class="nav-small-cap">
-                            <i class="mdi mdi-dots-horizontal"></i>
-                            <span class="hide-menu"> Candidtures </span>
-                        </li>
-                        <li class="sidebar-item">
-                            <a href="index.html" class="sidebar-link">
-                                <i class="mdi mdi-adjust"></i>
-                                <span class="hide-menu"> Offres </span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a href="index.html" class="sidebar-link">
-                                <i class="mdi mdi-adjust"></i>
-                                <span class="hide-menu"> Candidatures </span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a href="index.html" class="sidebar-link">
-                                <i class="mdi mdi-adjust"></i>
-                                <span class="hide-menu"> Log out </span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-                <!-- End Sidebar navigation -->
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center " href="index.html">
+                <img src="{{asset('logoRH360.png')}}" alt="" height="100px" width="100px">
+                <div class="sidebar-brand-text mx-3">HR360</div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active">
+                <a class="nav-link" href="index.html">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Entreprise
             </div>
-            <!-- End Sidebar scroll-->
-        </aside>
+
+            <!-- Nav Item - Charts -->
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Employees</span></a>
+            </li>
+            <!-- Nav Item - Charts -->
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Projets</span></a>
+            </li>
+
+            <!-- Nav Item - Tables -->
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Equipes</span></a>
+            </li>
+            <!-- Nav Item - Tables -->
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Formations</span></a>
+            </li>
+            <!-- Nav Item - Tables -->
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Ressources</span></a>
+            </li>
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Candidatures
+            </div>
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Offres</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Candidatures</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Entretiens</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Evaluations</span></a>
+            </li>
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
         {% endblock %}
-        <!-- ============================================================== -->
-        <!-- End Left Sidebar - style you can find in sidebar.scss  -->
-        <!-- ============================================================== -->
-        <!-- ============================================================== -->
-        <!-- Page wrapper  -->
-        <!-- ============================================================== -->
-        <div class="page-wrapper">
-            <!-- ============================================================== -->
-            <!-- Bread crumb and right sidebar toggle -->
-            <!-- ============================================================== -->
-            {% block sous_header %}
-            <div class="page-breadcrumb">
-                <div class="row">
-                    <div class="col-5 align-self-center">
-                        <h4 class="page-title">Dashboard</h4>
+        </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                {% block topbar %}
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Search -->
+                    <form
+                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <div class="input-group">
+                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                                aria-label="Search" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+                        <li class="nav-item dropdown no-arrow d-sm-none">
+                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-search fa-fw"></i>
+                            </a>
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
+                                aria-labelledby="searchDropdown">
+                                <form class="form-inline mr-auto w-100 navbar-search">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control bg-light border-0 small"
+                                            placeholder="Search for..." aria-label="Search"
+                                            aria-describedby="basic-addon2">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button">
+                                                <i class="fas fa-search fa-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </li>
+
+                        <!-- Nav Item - Alerts -->
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-bell fa-fw"></i>
+                                <!-- Counter - Alerts -->
+                                <span class="badge badge-danger badge-counter">3+</span>
+                            </a>
+                            <!-- Dropdown - Alerts -->
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="alertsDropdown">
+                                <h6 class="dropdown-header">
+                                    Alerts Center
+                                </h6>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-primary">
+                                            <i class="fas fa-file-alt text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">December 12, 2019</div>
+                                        <span class="font-weight-bold">A new monthly report is ready to download!</span>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-success">
+                                            <i class="fas fa-donate text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">December 7, 2019</div>
+                                        $290.29 has been deposited into your account!
+                                    </div>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-exclamation-triangle text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">December 2, 2019</div>
+                                        Spending Alert: We've noticed unusually high spending for your account.
+                                    </div>
+                                </a>
+                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                            </div>
+                        </li>
+
+                        <!-- Nav Item - Messages -->
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-envelope fa-fw"></i>
+                                <!-- Counter - Messages -->
+                                <span class="badge badge-danger badge-counter">7</span>
+                            </a>
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="messagesDropdown">
+                                <h6 class="dropdown-header">
+                                    Message Center
+                                </h6>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="dropdown-list-image mr-3">
+                                        <img class="rounded-circle" src="{{ asset('back/img/undraw_profile_1.svg') }}"
+                                            alt="...">
+                                        <div class="status-indicator bg-success"></div>
+                                    </div>
+                                    <div class="font-weight-bold">
+                                        <div class="text-truncate">Hi there! I am wondering if you can help me with a
+                                            problem I've been having.</div>
+                                        <div class="small text-gray-500">Emily Fowler · 58m</div>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="dropdown-list-image mr-3">
+                                        <img class="rounded-circle" src="{{ asset('back/img/undraw_profile_2.svg') }}"
+                                            alt="...">
+                                        <div class="status-indicator"></div>
+                                    </div>
+                                    <div>
+                                        <div class="text-truncate">I have the photos that you ordered last month, how
+                                            would you like them sent to you?</div>
+                                        <div class="small text-gray-500">Jae Chun · 1d</div>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="dropdown-list-image mr-3">
+                                        <img class="rounded-circle" src="{{ asset('back/img/undraw_profile_3.svg') }}"
+                                            alt="...">
+                                        <div class="status-indicator bg-warning"></div>
+                                    </div>
+                                    <div>
+                                        <div class="text-truncate">Last month's report looks great, I am very happy with
+                                            the progress so far, keep up the good work!</div>
+                                        <div class="small text-gray-500">Morgan Alvarez · 2d</div>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="dropdown-list-image mr-3">
+                                        <img class="rounded-circle" src="https://source.unsplash.com/Mv9hjnEUHR4/60x60"
+                                            alt="...">
+                                        <div class="status-indicator bg-success"></div>
+                                    </div>
+                                    <div>
+                                        <div class="text-truncate">Am I a good boy? The reason I ask is because someone
+                                            told me that people say this to all dogs, even if they aren't good...</div>
+                                        <div class="small text-gray-500">Chicken the Dog · 2w</div>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
+                            </div>
+                        </li>
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
+                                <img class="img-profile rounded-circle"
+                                    src="{{ asset('back/img/undraw_profile.svg') }}">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profile
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Settings
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Activity Log
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#ogoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+                {% endblock %}
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    {% block heading %}
+                    <!-- Page Heading -->
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
                     </div>
-                    <div class="col-7 align-self-center">
-                        <div class="d-flex align-items-center justify-content-end">
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item">
-                                        <a href="#">Home</a>
-                                    </li>
-                                    <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
-                                </ol>
-                            </nav>
+                    {% endblock %}
+                    <!-- Content Row -->
+                    <div class="row">
+                    {% block statsCards %}
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                Earnings (Monthly)</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                Earnings (Annual)</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks
+                                            </div>
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col-auto">
+                                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="progress progress-sm mr-2">
+                                                        <div class="progress-bar bg-info" role="progressbar"
+                                                            style="width: 50%" aria-valuenow="50" aria-valuemin="0"
+                                                            aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pending Requests Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Pending Requests</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-comments fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endblock %}
+                    </div>
+
+                    <!-- Content Row -->
+
+                    <div class="row">
+                        {% block charts %}
+                        <!-- Area Chart -->
+                        <div class="col-xl-8 col-lg-7">
+                        {% block areaChart %}
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Earnings Overview</h6>
+                                    <div class="dropdown no-arrow">
+                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                                            aria-labelledby="dropdownMenuLink">
+                                            <div class="dropdown-header">Dropdown Header:</div>
+                                            <a class="dropdown-item" href="#">Action</a>
+                                            <a class="dropdown-item" href="#">Another action</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="#">Something else here</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    <div class="chart-area">
+                                        <canvas id="myAreaChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endblock %}
+                        </div>
+
+                        <!-- Pie Chart -->
+                        <div class="col-xl-4 col-lg-5">
+                        {% block pieChart %}
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Revenue Sources</h6>
+                                    <div class="dropdown no-arrow">
+                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                                            aria-labelledby="dropdownMenuLink">
+                                            <div class="dropdown-header">Dropdown Header:</div>
+                                            <a class="dropdown-item" href="#">Action</a>
+                                            <a class="dropdown-item" href="#">Another action</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="#">Something else here</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    <div class="chart-pie pt-4 pb-2">
+                                        <canvas id="myPieChart"></canvas>
+                                    </div>
+                                    <div class="mt-4 text-center small">
+                                        <span class="mr-2">
+                                            <i class="fas fa-circle text-primary"></i> Direct
+                                        </span>
+                                        <span class="mr-2">
+                                            <i class="fas fa-circle text-success"></i> Social
+                                        </span>
+                                        <span class="mr-2">
+                                            <i class="fas fa-circle text-info"></i> Referral
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endblock %}
+                        </div>
+                        {% endblock %}
+                    </div>
+
+                    <!-- Content Row -->
+                    <div class="row">
+
+                        <!-- Content Column -->
+                        <div class="col-lg-6 mb-4">
+    {% block PercentageCard %}
+                            <!-- Project Card Example -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Projects</h6>
+                                </div>
+                                <div class="card-body">
+                                    <h4 class="small font-weight-bold">Server Migration <span
+                                            class="float-right">20%</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 20%"
+                                            aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <h4 class="small font-weight-bold">Sales Tracking <span
+                                            class="float-right">40%</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 40%"
+                                            aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <h4 class="small font-weight-bold">Customer Database <span
+                                            class="float-right">60%</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar" role="progressbar" style="width: 60%"
+                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <h4 class="small font-weight-bold">Payout Details <span
+                                            class="float-right">80%</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-info" role="progressbar" style="width: 80%"
+                                            aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <h4 class="small font-weight-bold">Account Setup <span
+                                            class="float-right">Complete!</span></h4>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 100%"
+                                            aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+{% endblock %}
+                        </div>
+
+                        <div class="col-lg-6 mb-4">
+                            <!-- Illustrations -->
+                            <div class="card shadow mb-4">
+                                    {% block illustrations %}
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Illustrations</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 25rem;"
+                                            src="{{ asset('back/img/undraw_posting_photo.svg') }}" alt="...">
+                                    </div>
+                                    <p>Add some quality, svg illustrations to your project courtesy of <a
+                                            target="_blank" rel="nofollow" href="https://undraw.co/">unDraw</a>, a
+                                        constantly updated collection of beautiful svg images that you can use
+                                        completely free and without attribution!</p>
+                                    <a target="_blank" rel="nofollow" href="https://undraw.co/">Browse Illustrations on
+                                        unDraw &rarr;</a>
+                                </div>
+                                {% endblock %}
+                            </div>
+
+                            <!-- Approach -->
+                            <div class="card shadow mb-4">
+                            {% block approach %}
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Development Approach</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p>SB Admin 2 makes extensive use of Bootstrap 4 utility classes in order to reduce
+                                        CSS bloat and poor page performance. Custom CSS classes are used to create
+                                        custom components and custom utility classes.</p>
+                                    <p class="mb-0">Before working with this theme, you should become familiar with the
+                                        Bootstrap framework, especially the utility classes.</p>
+                                </div>
+                            {% endblock %}
+                            </div>
+
                         </div>
                     </div>
+
                 </div>
+                <!-- /.container-fluid -->
+
             </div>
-            {% endblock %}
-            <!-- ============================================================== -->
-            <!-- End Bread crumb and right sidebar toggle -->
-            <!-- ============================================================== -->
-            <!-- ============================================================== -->
-            <!-- Container fluid  -->
-            <!-- ============================================================== -->
-            <div class="container-fluid">
-                <!-- ============================================================== -->
-                <!-- Sales chart -->
-                <!-- ============================================================== -->
-                {% block stats_cards%}
-                <div class="card-group">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="d-flex no-block align-items-center">
-                                        <div>
-                                            <i class="mdi mdi-emoticon font-20 text-muted"></i>
-                                            <p class="font-16 m-b-5">New Clients</p>
-                                        </div>
-                                        <div class="ml-auto">
-                                            <h1 class="font-light text-right">23</h1>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="progress">
-                                        <div class="progress-bar bg-info" role="progressbar" style="width: 75%; height: 6px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Column -->
-                    <!-- Column -->
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="d-flex no-block align-items-center">
-                                        <div>
-                                            <i class="mdi mdi-image font-20  text-muted"></i>
-                                            <p class="font-16 m-b-5">New Projects</p>
-                                        </div>
-                                        <div class="ml-auto">
-                                            <h1 class="font-light text-right">169</h1>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="progress">
-                                        <div class="progress-bar bg-success" role="progressbar" style="width: 60%; height: 6px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Column -->
-                    <!-- Column -->
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="d-flex no-block align-items-center">
-                                        <div>
-                                            <i class="mdi mdi-currency-eur font-20 text-muted"></i>
-                                            <p class="font-16 m-b-5">New Invoices</p>
-                                        </div>
-                                        <div class="ml-auto">
-                                            <h1 class="font-light text-right">157</h1>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="progress">
-                                        <div class="progress-bar bg-purple" role="progressbar" style="width: 65%; height: 6px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Column -->
-                    <!-- Column -->
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="d-flex no-block align-items-center">
-                                        <div>
-                                            <i class="mdi mdi-poll font-20 text-muted"></i>
-                                            <p class="font-16 m-b-5">New Sales</p>
-                                        </div>
-                                        <div class="ml-auto">
-                                            <h1 class="font-light text-right">236</h1>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="progress">
-                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 70%; height: 6px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+            {% block footer %}
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Your Website 2021</span>
                     </div>
                 </div>
                 {% endblock %}
-                <!-- ============================================================== -->
-                <!-- Sales chart -->
-                <!-- ============================================================== -->
-                <!-- ============================================================== -->
-                <!-- Email campaign chart -->
-                <!-- ============================================================== -->
-                <div class="row">
-                    <div class="col-lg-3 col-md-6">
-                    {% block pie_chart %}
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title">Campaign</h4>
-                                <div id="campaign" style="height: 168px; width: 100%;" class="m-t-10"></div>
-                                <!-- row -->
-                                <div class="row text-center text-lg-left">
-                                    <!-- column -->
-                                    <div class="col-4">
-                                        <h4 class="m-b-0 font-medium">60%</h4>
-                                        <span class="text-muted">Open</span>
-                                    </div>
-                                    <!-- column -->
-                                    <div class="col-4">
-                                        <h4 class="m-b-0 font-medium">26%</h4>
-                                        <span class="text-muted">Click</span>
-                                    </div>
-                                    <!-- column -->
-                                    <div class="col-4">
-                                        <h4 class="m-b-0 font-medium">18%</h4>
-                                        <span class="text-muted">Bounce</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endblock %}
-                    {% block bar_chart%}
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title m-b-5">Referral Earnings</h5>
-                                <h3 class="font-light">$769.08</h3>
-                                <div class="m-t-20 text-center">
-                                    <div id="earnings"></div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endblock %}
-                    </div>
-                    {% block line_chart %}
-                    <div class="col-lg-6 col-md-12 order-lg-2 order-md-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div>
-                                        <h4 class="card-title">Sales Ratio</h4>
-                                    </div>
-                                    <div class="ml-auto">
-                                        <div class="dl m-b-10">
-                                            <select class="custom-select border-0 text-muted">
-                                                <option value="0" selected="">August 2018</option>
-                                                <option value="1">May 2018</option>
-                                                <option value="2">March 2018</option>
-                                                <option value="3">June 2018</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center no-block">
-                                    <div>
-                                        <span class="text-muted">This Week</span>
-                                        <h3 class="mb-0 text-info font-light">$23.5K <span class="text-muted font-12"><i class="mdi mdi-arrow-up text-success"></i>18.6</span></h3>
-                                    </div>
-                                    <div class="ml-4">
-                                        <span class="text-muted">Last Week</span>
-                                        <h3 class="mb-0 text-muted font-light">$945 <span class="text-muted font-12"><i class="mdi mdi-arrow-down text-danger"></i>46.3</span></h3>
-                                    </div>
-                                </div>
-                                <div class="sales ct-charts mt-5"></div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endblock %}
-                    <div class="col-lg-3 col-md-6 order-lg-3 order-md-2">
-                    {% block weather_card %}
-                        <div class="card">
-                            <div class="card-body m-b-0">
-                                <h4 class="card-title">Thursday <span class="font-14 font-normal text-muted">12th April, 2018</span></h4>
-                                    <div class="d-flex align-items-center flex-row m-t-30">
-                                    <h1 class="font-light"><i class="wi wi-day-sleet"></i> <span>35<sup>°</sup></span></h1>
-                                </div>
-                            </div>
-                            <div class="weather-report" style="height:120px; width:100%;"></div>
-                        </div>
-                        {% endblock %}
-                        {% block user_card %}
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title m-b-0">Users</h4>
-                                <h2 class="font-light">35,658 <span class="font-16 text-success font-medium">+23%</span></h2>
-                                <div class="m-t-30">
-                                    <div class="row text-center">
-                                        <div class="col-6 border-right">
-                                            <h4 class="m-b-0">58%</h4>
-                                            <span class="font-14 text-muted">New Users</span>
-                                        </div>
-                                        <div class="col-6">
-                                            <h4 class="m-b-0">42%</h4>
-                                            <span class="font-14 text-muted">Repeat Users</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endblock %}
-                    </div>       
-                </div>
-                <!-- ============================================================== -->
-                <!-- Email campaign chart -->
-                <!-- ============================================================== -->
-                <!-- ============================================================== -->
-                <!-- Ravenue - page-view-bounce rate -->
-                <!-- ============================================================== -->
-                <div class="row">
-                    <!-- column -->
-                    <div class="col-lg-6 col-md-12">
-                    {% block table %}
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div>
-                                        <h4 class="card-title mb-0">Latest Sales</h4>
-                                    </div>
-                                    <div class="ml-auto">
-                                        <select class="custom-select border-0 text-muted">
-                                            <option value="0" selected="">August 2018</option>
-                                            <option value="1">May 2018</option>
-                                            <option value="2">March 2018</option>
-                                            <option value="3">June 2018</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body bg-light">
-                                <div class="row align-items-center">
-                                    <div class="col-xs-12 col-md-6">
-                                        <h3 class="m-b-0 font-light">August 2018</h3>
-                                        <span class="font-14 text-muted">Sales Report</span>
-                                    </div>
-                                    <div class="col-xs-12 col-md-6 align-self-center display-6 text-info text-right">$3,690</div>
-                                </div>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th class="border-top-0">NAME</th>
-                                            <th class="border-top-0">STATUS</th>
-                                            <th class="border-top-0">DATE</th>
-                                            <th class="border-top-0">PRICE</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            
-                                            <td class="txt-oflo">Elite admin</td>
-                                            <td><span class="label label-success label-rounded">SALE</span> </td>
-                                            <td class="txt-oflo">April 18, 2017</td>
-                                            <td><span class="font-medium">$24</span></td>
-                                        </tr>
-                                        <tr>
-                                            
-                                            <td class="txt-oflo">Real Homes WP Theme</td>
-                                            <td><span class="label label-info label-rounded">EXTENDED</span></td>
-                                            <td class="txt-oflo">April 19, 2017</td>
-                                            <td><span class="font-medium">$1250</span></td>
-                                        </tr>
-                                        <tr>
-                                            
-                                            <td class="txt-oflo">Ample Admin</td>
-                                            <td><span class="label label-purple label-rounded">Tax</span></td>
-                                            <td class="txt-oflo">April 19, 2017</td>
-                                            <td><span class="font-medium">$1250</span></td>
-                                        </tr>
-                                        <tr>
-                                            
-                                            <td class="txt-oflo">Medical Pro WP Theme</td>
-                                            <td><span class="label label-success label-rounded">Sale</span></td>
-                                            <td class="txt-oflo">April 20, 2017</td>
-                                            <td><span class="font-medium">-$24</span></td>
-                                        </tr>
-                                        <tr>
-                                            
-                                            <td class="txt-oflo">Hosting press html</td>
-                                            <td><span class="label label-success label-rounded">SALE</span></td>
-                                            <td class="txt-oflo">April 21, 2017</td>
-                                            <td><span class="font-medium">$24</span></td>
-                                        </tr>
-                                        <tr>
-                                            
-                                            <td class="txt-oflo">Digital Agency PSD</td>
-                                            <td><span class="label label-danger label-rounded">Tax</span> </td>
-                                            <td class="txt-oflo">April 23, 2017</td>
-                                            <td><span class="font-medium">-$14</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    {% endblock %}
-                <!-- ============================================================== -->
-                <!-- Ravenue - page-view-bounce rate -->
-                <!-- ============================================================== -->
-                <!-- ============================================================== -->
-                <!-- Recent comment and chats -->
-                <!-- ============================================================== -->
-                <div class="row">
-                    <!-- column -->
-                    {% block comments %}
-                    <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title">Recent Comments</h4>
-                            </div>
-                            <div class="comment-widgets scrollable" style="height:430px;">
-                                <!-- Comment Row -->
-                                <div class="d-flex flex-row comment-row m-t-0">
-                                    <div class="p-2">
-                                        <img src="{{assets('assets/images/users/1.jpg')}}" alt="user" width="50" class="rounded-circle">
-                                    </div>
-                                    <div class="comment-text w-100">
-                                        <h6 class="font-medium">James Anderson</h6>
-                                        <span class="m-b-15 d-block">Lorem Ipsum is simply dummy text of the printing and type setting industry. </span>
-                                        <div class="comment-footer">
-                                            <span class="text-muted float-right">April 14, 2016</span>
-                                            <span class="label label-rounded label-primary">Pending</span>
-                                            <span class="action-icons">
-                                                <a href="javascript:void(0)">
-                                                    <i class="ti-pencil-alt"></i>
-                                                </a>
-                                                <a href="javascript:void(0)">
-                                                    <i class="ti-check"></i>
-                                                </a>
-                                                <a href="javascript:void(0)">
-                                                    <i class="ti-heart"></i>
-                                                </a>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Comment Row -->
-                                <div class="d-flex flex-row comment-row">
-                                    <div class="p-2">
-                                        <img src="{{assets('assets/images/users/4.jpg')}}" alt="user" width="50" class="rounded-circle">
-                                    </div>
-                                    <div class="comment-text active w-100">
-                                        <h6 class="font-medium">Michael Jorden</h6>
-                                        <span class="m-b-15 d-block">Lorem Ipsum is simply dummy text of the printing and type setting industry. </span>
-                                        <div class="comment-footer ">
-                                            <span class="text-muted float-right">April 14, 2016</span>
-                                            <span class="label label-success label-rounded">Approved</span>
-                                            <span class="action-icons active">
-                                                <a href="javascript:void(0)">
-                                                    <i class="ti-pencil-alt"></i>
-                                                </a>
-                                                <a href="javascript:void(0)">
-                                                    <i class="icon-close"></i>
-                                                </a>
-                                                <a href="javascript:void(0)">
-                                                    <i class="ti-heart text-danger"></i>
-                                                </a>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Comment Row -->
-                                <div class="d-flex flex-row comment-row">
-                                    <div class="p-2">
-                                        <img src="{{assets('assets/images/users/5.')}}" alt="user" width="50" class="rounded-circle">
-                                    </div>
-                                    <div class="comment-text w-100">
-                                        <h6 class="font-medium">Johnathan Doeting</h6>
-                                        <span class="m-b-15 d-block">Lorem Ipsum is simply dummy text of the printing and type setting industry. </span>
-                                        <div class="comment-footer">
-                                            <span class="text-muted float-right">April 14, 2016</span>
-                                            <span class="label label-rounded label-danger">Rejected</span>
-                                            <span class="action-icons">
-                                                <a href="javascript:void(0)">
-                                                    <i class="ti-pencil-alt"></i>
-                                                </a>
-                                                <a href="javascript:void(0)">
-                                                    <i class="ti-check"></i>
-                                                </a>
-                                                <a href="javascript:void(0)">
-                                                    <i class="ti-heart"></i>
-                                                </a>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Comment Row -->
-                                <div class="d-flex flex-row comment-row m-t-0">
-                                    <div class="p-2">
-                                        <img src="{{assets('assets/images/users/2.jpg')}}" alt="user" width="50" class="rounded-circle">
-                                    </div>
-                                    <div class="comment-text w-100">
-                                        <h6 class="font-medium">Steve Jobs</h6>
-                                        <span class="m-b-15 d-block">Lorem Ipsum is simply dummy text of the printing and type setting industry. </span>
-                                        <div class="comment-footer">
-                                            <span class="text-muted float-right">April 14, 2016</span>
-                                            <span class="label label-rounded label-primary">Pending</span>
-                                            <span class="action-icons">
-                                                <a href="javascript:void(0)">
-                                                    <i class="ti-pencil-alt"></i>
-                                                </a>
-                                                <a href="javascript:void(0)">
-                                                    <i class="ti-check"></i>
-                                                </a>
-                                                <a href="javascript:void(0)">
-                                                    <i class="ti-heart"></i>
-                                                </a>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endblock %}
-                    <!-- column -->
-                    {% block todo_list %}
-                    <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center p-b-15">
-                                    <div>
-                                        <h4 class="card-title m-b-0">To Do List</h4>
-                                    </div>
-                                    <div class="ml-auto">
-                                        <div class="dl">
-                                            <select class="custom-select border-0 text-muted">
-                                                <option value="0" selected="">August 2018</option>
-                                                <option value="1">May 2018</option>
-                                                <option value="2">March 2018</option>
-                                                <option value="3">June 2018</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="todo-widget scrollable" style="height:422px;">
-                                    <ul class="list-task todo-list list-group m-b-0" data-role="tasklist">
-                                        <li class="list-group-item todo-item" data-role="task">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck">
-                                                <label class="custom-control-label todo-label" for="customCheck">
-                                                    <span class="todo-desc">Simply dummy text of the printing and typesetting</span> <span class="badge badge-pill badge-success float-right">Project</span>
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="list-group-item todo-item" data-role="task">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck1">
-                                                <label class="custom-control-label todo-label" for="customCheck1">
-                                                    <span class="todo-desc">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been.</span><span class="badge badge-pill badge-danger float-right">Project</span>
-                                                </label>
-                                            </div>
-                                            
-                                        </li>
-                                        <li class="list-group-item todo-item" data-role="task">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck2">
-                                                <label class="custom-control-label todo-label" for="customCheck2">
-                                                    <span class="todo-desc">Ipsum is simply dummy text of the printing</span> <span class="badge badge-pill badge-info float-right">Project</span>
-                                                </label>
-                                            </div>
-                                            
-                                        </li>
-                                        <li class="list-group-item todo-item" data-role="task">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck3">
-                                                <label class="custom-control-label todo-label" for="customCheck3">
-                                                    <span class="todo-desc">Simply dummy text of the printing and typesetting</span> <span class="badge badge-pill badge-info float-right">Project</span>
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="list-group-item todo-item" data-role="task">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck4">
-                                                <label class="custom-control-label todo-label" for="customCheck4">
-                                                    <span class="todo-desc">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been.</span> <span class="badge badge-pill badge-purple float-right">Project</span>
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="list-group-item todo-item" data-role="task">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck5">
-                                                <label class="custom-control-label todo-label" for="customCheck5">
-                                                    <span class="todo-desc">Ipsum is simply dummy text of the printing</span> <span class="badge badge-pill badge-success float-right">Project</span>
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="list-group-item todo-item" data-role="task">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck6">
-                                                <label class="custom-control-label todo-label" for="customCheck6">
-                                                    <span class="todo-desc">Simply dummy text of the printing and typesetting</span> <span class="badge badge-pill badge-primary float-right">Project</span>
-                                                </label>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endblock %}
-                </div>
-                <!-- ============================================================== -->
-                <!-- Recent comment and chats -->
-                <!-- ============================================================== -->
-            </div>
-            <!-- ============================================================== -->
-            <!-- End Container fluid  -->
-            <!-- ============================================================== -->
-            <!-- ============================================================== -->
-            <!-- footer -->
-            <!-- ============================================================== -->
-            {% block footer %}
-            <footer class="footer text-center">
-                All Rights Reserved by Nice admin. Designed and Developed by
-                <a href="https://wrappixel.com">WrapPixel</a>.
             </footer>
-            {% endblock %}
-            <!-- ============================================================== -->
-            <!-- End footer -->
-            <!-- ============================================================== -->
+            <!-- End of Footer -->
+
         </div>
-        <!-- ============================================================== -->
-        <!-- End Page wrapper  -->
-        <!-- ============================================================== -->
+        <!-- End of Content Wrapper -->
+
     </div>
-    <!-- ============================================================== -->
-    <!-- End Wrapper -->
-    <!-- ============================================================== -->
-    <!-- ============================================================== -->
-    <!-- customizer Panel -->
-    <!-- ============================================================== -->
-    {% block customiser %}
-    <aside class="customizer">
-        <a href="javascript:void(0)" class="service-panel-toggle">
-            <i class="fa fa-spin fa-cog"></i>
-        </a>
-        <div class="customizer-body">
-            <ul class="nav customizer-tab" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home"
-                        aria-selected="true">
-                        <i class="mdi mdi-wrench font-20"></i>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#chat" role="tab" aria-controls="chat" aria-selected="false">
-                        <i class="mdi mdi-message-reply font-20"></i>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact"
-                        aria-selected="false">
-                        <i class="mdi mdi-star-circle font-20"></i>
-                    </a>
-                </li>
-            </ul>
-            <div class="tab-content" id="pills-tabContent">
-                <!-- Tab 1 -->
-                <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                    <div class="p-15 border-bottom">
-                        <!-- Sidebar -->
-                        <h5 class="font-medium m-b-10 m-t-10">Layout Settings</h5>
-                        <div class="custom-control custom-checkbox m-t-10">
-                            <input type="checkbox" class="custom-control-input" name="theme-view" id="theme-view">
-                            <label class="custom-control-label" for="theme-view">Dark Theme</label>
-                        </div>
-                        <div class="custom-control custom-checkbox m-t-10">
-                            <input type="checkbox" class="custom-control-input sidebartoggler" name="collapssidebar" id="collapssidebar">
-                            <label class="custom-control-label" for="collapssidebar">Collapse Sidebar</label>
-                        </div>
-                        <div class="custom-control custom-checkbox m-t-10">
-                            <input type="checkbox" class="custom-control-input" name="sidebar-position" id="sidebar-position">
-                            <label class="custom-control-label" for="sidebar-position">Fixed Sidebar</label>
-                        </div>
-                        <div class="custom-control custom-checkbox m-t-10">
-                            <input type="checkbox" class="custom-control-input" name="header-position" id="header-position">
-                            <label class="custom-control-label" for="header-position">Fixed Header</label>
-                        </div>
-                        <div class="custom-control custom-checkbox m-t-10">
-                            <input type="checkbox" class="custom-control-input" name="boxed-layout" id="boxed-layout">
-                            <label class="custom-control-label" for="boxed-layout">Boxed Layout</label>
-                        </div>
-                    </div>
-                    <div class="p-15 border-bottom">
-                        <!-- Logo BG -->
-                        <h5 class="font-medium m-b-10 m-t-10">Logo Backgrounds</h5>
-                        <ul class="theme-color">
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-logobg="skin1"></a>
-                            </li>
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-logobg="skin2"></a>
-                            </li>
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-logobg="skin3"></a>
-                            </li>
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-logobg="skin4"></a>
-                            </li>
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-logobg="skin5"></a>
-                            </li>
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-logobg="skin6"></a>
-                            </li>
-                        </ul>
-                        <!-- Logo BG -->
-                    </div>
-                    <div class="p-15 border-bottom">
-                        <!-- Navbar BG -->
-                        <h5 class="font-medium m-b-10 m-t-10">Navbar Backgrounds</h5>
-                        <ul class="theme-color">
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-navbarbg="skin1"></a>
-                            </li>
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-navbarbg="skin2"></a>
-                            </li>
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-navbarbg="skin3"></a>
-                            </li>
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-navbarbg="skin4"></a>
-                            </li>
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-navbarbg="skin5"></a>
-                            </li>
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-navbarbg="skin6"></a>
-                            </li>
-                        </ul>
-                        <!-- Navbar BG -->
-                    </div>
-                    <div class="p-15 border-bottom">
-                        <!-- Logo BG -->
-                        <h5 class="font-medium m-b-10 m-t-10">Sidebar Backgrounds</h5>
-                        <ul class="theme-color">
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-sidebarbg="skin1"></a>
-                            </li>
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-sidebarbg="skin2"></a>
-                            </li>
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-sidebarbg="skin3"></a>
-                            </li>
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-sidebarbg="skin4"></a>
-                            </li>
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-sidebarbg="skin5"></a>
-                            </li>
-                            <li class="theme-item">
-                                <a href="javascript:void(0)" class="theme-link" data-sidebarbg="skin6"></a>
-                            </li>
-                        </ul>
-                        <!-- Logo BG -->
-                    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
                 </div>
-                <!-- End Tab 1 -->
-                <!-- Tab 2 -->
-                <div class="tab-pane fade" id="chat" role="tabpanel" aria-labelledby="pills-profile-tab">
-                    <ul class="mailbox list-style-none m-t-20">
-                        <li>
-                            <div class="message-center chat-scroll">
-                                <a href="javascript:void(0)" class="message-item" id='chat_user_1' data-user-id='1'>
-                                    <span class="user-img">
-                                        <img src="{{assets('assets/images/users/1.jpg')}}" alt="user" class="rounded-circle">
-                                        <span class="profile-status online pull-right"></span>
-                                    </span>
-                                    <div class="mail-contnet">
-                                        <h5 class="message-title">Pavan kumar</h5>
-                                        <span class="mail-desc">Just see the my admin!</span>
-                                        <span class="time">9:30 AM</span>
-                                    </div>
-                                </a>
-                                <!-- Message -->
-                                <a href="javascript:void(0)" class="message-item" id='chat_user_2' data-user-id='2'>
-                                    <span class="user-img">
-                                        <img src="{{assets('assets/images/users/2.jpg')}}" alt="user" class="rounded-circle">
-                                        <span class="profile-status busy pull-right"></span>
-                                    </span>
-                                    <div class="mail-contnet">
-                                        <h5 class="message-title">Sonu Nigam</h5>
-                                        <span class="mail-desc">I've sung a song! See you at</span>
-                                        <span class="time">9:10 AM</span>
-                                    </div>
-                                </a>
-                                <!-- Message -->
-                                <a href="javascript:void(0)" class="message-item" id='chat_user_3' data-user-id='3'>
-                                    <span class="user-img">
-                                        <img src="{{assets('assets/images/users/3.jpg')}}" alt="user" class="rounded-circle">
-                                        <span class="profile-status away pull-right"></span>
-                                    </span>
-                                    <div class="mail-contnet">
-                                        <h5 class="message-title">Arijit Sinh</h5>
-                                        <span class="mail-desc">I am a singer!</span>
-                                        <span class="time">9:08 AM</span>
-                                    </div>
-                                </a>
-                                <!-- Message -->
-                                <a href="javascript:void(0)" class="message-item" id='chat_user_4' data-user-id='4'>
-                                    <span class="user-img">
-                                        <img src="{{assets('assets/images/users/4.jpg')}}" alt="user" class="rounded-circle">
-                                        <span class="profile-status offline pull-right"></span>
-                                    </span>
-                                    <div class="mail-contnet">
-                                        <h5 class="message-title">Nirav Joshi</h5>
-                                        <span class="mail-desc">Just see the my admin!</span>
-                                        <span class="time">9:02 AM</span>
-                                    </div>
-                                </a>
-                                <!-- Message -->
-                                <!-- Message -->
-                                <a href="javascript:void(0)" class="message-item" id='chat_user_5' data-user-id='5'>
-                                    <span class="user-img">
-                                        <img src="{{assets('assets/images/users/5.jpg')}}" alt="user" class="rounded-circle">
-                                        <span class="profile-status offline pull-right"></span>
-                                    </span>
-                                    <div class="mail-contnet">
-                                        <h5 class="message-title">Sunil Joshi</h5>
-                                        <span class="mail-desc">Just see the my admin!</span>
-                                        <span class="time">9:02 AM</span>
-                                    </div>
-                                </a>
-                                <!-- Message -->
-                                <!-- Message -->
-                                <a href="javascript:void(0)" class="message-item" id='chat_user_6' data-user-id='6'>
-                                    <span class="user-img">
-                                        <img src="{{assets('assets/images/users/6.jpg')}}" alt="user" class="rounded-circle">
-                                        <span class="profile-status offline pull-right"></span>
-                                    </span>
-                                    <div class="mail-contnet">
-                                        <h5 class="message-title">Akshay Kumar</h5>
-                                        <span class="mail-desc">Just see the my admin!</span>
-                                        <span class="time">9:02 AM</span>
-                                    </div>
-                                </a>
-                                <!-- Message -->
-                                <!-- Message -->
-                                <a href="javascript:void(0)" class="message-item" id='chat_user_7' data-user-id='7'>
-                                    <span class="user-img">
-                                        <img src="{{assets('assets/images/users/7.jpg')}}" alt="user" class="rounded-circle">
-                                        <span class="profile-status offline pull-right"></span>
-                                    </span>
-                                    <div class="mail-contnet">
-                                        <h5 class="message-title">Pavan kumar</h5>
-                                        <span class="mail-desc">Just see the my admin!</span>
-                                        <span class="time">9:02 AM</span>
-                                    </div>
-                                </a>
-                                <!-- Message -->
-                                <!-- Message -->
-                                <a href="javascript:void(0)" class="message-item" id='chat_user_8' data-user-id='8'>
-                                    <span class="user-img">
-                                        <img src="{{assets('assets/images/users/8.jpg')}}" alt="user" class="rounded-circle">
-                                        <span class="profile-status offline pull-right"></span>
-                                    </span>
-                                    <div class="mail-contnet">
-                                        <h5 class="message-title">Varun Dhavan</h5>
-                                        <span class="mail-desc">Just see the my admin!</span>
-                                        <span class="time">9:02 AM</span>
-                                    </div>
-                                </a>
-                                <!-- Message -->
-                            </div>
-                        </li>
-                    </ul>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="login.html">Logout</a>
                 </div>
-                <!-- End Tab 2 -->
-                <!-- Tab 3 -->
-                <div class="tab-pane fade p-15" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
-                    <h6 class="m-t-20 m-b-20">Activity Timeline</h6>
-                    <div class="steamline">
-                        <div class="sl-item">
-                            <div class="sl-left bg-success">
-                                <i class="ti-user"></i>
-                            </div>
-                            <div class="sl-right">
-                                <div class="font-medium">Meeting today
-                                    <span class="sl-date"> 5pm</span>
-                                </div>
-                                <div class="desc">you can write anything </div>
-                            </div>
-                        </div>
-                        <div class="sl-item">
-                            <div class="sl-left bg-info">
-                                <i class="fas fa-image"></i>
-                            </div>
-                            <div class="sl-right">
-                                <div class="font-medium">Send documents to Clark</div>
-                                <div class="desc">Lorem Ipsum is simply </div>
-                            </div>
-                        </div>
-                        <div class="sl-item">
-                            <div class="sl-left">
-                                <img class="rounded-circle" alt="user" src="{{assets('assets/images/users/2.jpg')}}"> </div>
-                            <div class="sl-right">
-                                <div class="font-medium">Go to the Doctor
-                                    <span class="sl-date">5 minutes ago</span>
-                                </div>
-                                <div class="desc">Contrary to popular belief</div>
-                            </div>
-                        </div>
-                        <div class="sl-item">
-                            <div class="sl-left">
-                                <img class="rounded-circle" alt="user" src="{{assets('assets/images/users/1.jpg')}}"> </div>
-                            <div class="sl-right">
-                                <div>
-                                    <a href="javascript:void(0)">Stephen</a>
-                                    <span class="sl-date">5 minutes ago</span>
-                                </div>
-                                <div class="desc">Approve meeting with tiger</div>
-                            </div>
-                        </div>
-                        <div class="sl-item">
-                            <div class="sl-left bg-primary">
-                                <i class="ti-user"></i>
-                            </div>
-                            <div class="sl-right">
-                                <div class="font-medium">Meeting today
-                                    <span class="sl-date"> 5pm</span>
-                                </div>
-                                <div class="desc">you can write anything </div>
-                            </div>
-                        </div>
-                        <div class="sl-item">
-                            <div class="sl-left bg-info">
-                                <i class="fas fa-image"></i>
-                            </div>
-                            <div class="sl-right">
-                                <div class="font-medium">Send documents to Clark</div>
-                                <div class="desc">Lorem Ipsum is simply </div>
-                            </div>
-                        </div>
-                        <div class="sl-item">
-                            <div class="sl-left">
-                                <img class="rounded-circle" alt="user" src="{{assets('assets/images/users/4.jpg')}}"> </div>
-                            <div class="sl-right">
-                                <div class="font-medium">Go to the Doctor
-                                    <span class="sl-date">5 minutes ago</span>
-                                </div>
-                                <div class="desc">Contrary to popular belief</div>
-                            </div>
-                        </div>
-                        <div class="sl-item">
-                            <div class="sl-left">
-                                <img class="rounded-circle" alt="user" src="{{assets('assets/images/users/6.jpg')}}"> </div>
-                            <div class="sl-right">
-                                <div>
-                                    <a href="javascript:void(0)">Stephen</a>
-                                    <span class="sl-date">5 minutes ago</span>
-                                </div>
-                                <div class="desc">Approve meeting with tiger</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- End Tab 3 -->
             </div>
         </div>
-    </aside>
-    {% endblock %}
-    <div class="chat-windows"></div>
-    <!-- ============================================================== -->
-    <!-- All Jquery -->
-    <!-- ============================================================== -->
-    {% block js %}
-    <script src="{{assets('assets/libs/jquery/dist/jquery.min.js')}}"></script>
-    <!-- Bootstrap tether Core JavaScript -->
-    <script src="{{assets('assets/libs/popper.js/dist/umd/popper.min.js')}}"></script>
-    <script src="{{assets('assets/libs/bootstrap/dist/js/bootstrap.min.js')}}"></script>
-    <!-- apps -->
-    <script src="{{assets('dist/js/app.min.js')}}"></script>
-    <script src="{{assets('dist/js/app.init.js')}}"></script>
-    <script src="{{assets('dist/js/app-style-switcher.js')}}"></script>
-    <!-- slimscrollbar scrollbar JavaScript -->
-    <script src="{{assets('assets/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js')}}"></script>
-    <script src="{{assets('assets/extra-libs/sparkline/sparkline.js')}}"></script>
-    <!--Wave Effects -->
-    <script src="{{assets('dist/js/waves.js')}}"></script>
-    <!--Menu sidebar -->
-    <script src="{{assets('dist/js/sidebarmenu.js')}}"></script>
-    <!--Custom JavaScript -->
-    <script src="{{assets('dist/js/custom.min.js')}}"></script>
-    <!--This page JavaScript -->
-    <!--chartis chart-->
-    <script src="{{assets('assets/libs/chartist/dist/chartist.min.js')}}"></script>
-    <script src="{{assets('assets/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js')}}"></script>
-    <!--c3 charts -->
-    <script src="{{assets('assets/extra-libs/c3/d3.min.js')}}"></script>
-    <script src="{{assets('assets/extra-libs/c3/c3.min.js')}}"></script>
-    <script src="{{assets('assets/extra-libs/jvector/jquery-jvectormap-2.0.2.min.js')}}"></script>
-    <script src="{{assets('assets/extra-libs/jvector/jquery-jvectormap-world-mill-en.js')}}"></script>
-    <script src="{{assets('dist/js/pages/dashboards/dashboard1.js')}}"></script>
-    {% endblock %}
+    </div>
+{% block js %}
+    <!-- Bootstrap core JavaScript-->
+    <script src="{{ asset('back/vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('back/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{{ asset('back/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{{ asset('back/js/sb-admin-2.min.js') }}"></script>
+
+    <!-- Page level plugins -->
+    <script src="{{ asset('back/vendor/chart.js/Chart.min.js') }}"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="{{ asset('back/js/demo/chart-area-demo.js') }}"></script>
+    <script src="{{ asset('back/js/demo/chart-pie-demo.js') }}"></script>
+{% endblock %}
 </body>
 
 </html>

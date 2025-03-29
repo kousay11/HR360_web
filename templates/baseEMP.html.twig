@@ -2,34 +2,30 @@
 <html lang="en">
 
 <head>
-{% block title %}
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>HR360</title>
+  <title>{% block title %}HR360{% endblock %}</title>
   <meta name="description" content="">
   <meta name="keywords" content="">
-{% endblock %}
-{% block images %}
+
   <!-- Favicons -->
-  <link href="{{assets('img/favicon.png')}}" rel="icon">
-  <link href="{{assets('img/apple-touch-icon.png')}}" rel="apple-touch-icon">
-{% endblock %}
-{% block fonts %}
+  <link href="img/favicon.png" rel="icon">
+  <link href="{{ asset('front/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-{% endblock %}
-{% block css %}
+{% block css%}
   <!-- Vendor CSS Files -->
-  <link href="{{assets('vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
-  <link href="{{assets('vendor/bootstrap-icons/bootstrap-icons.css')}}" rel="stylesheet">
-  <link href="{{assets('vendor/aos/aos.css')}}" rel="stylesheet">
-  <link href="{{assets('vendor/glightbox/css/glightbox.min.css')}}" rel="stylesheet">
-  <link href="{{assets('vendor/swiper/swiper-bundle.min.css')}}" rel="stylesheet">
+  <link href="{{ asset('front/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ asset('front/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ asset('front/vendor/aos/aos.css') }}" rel="stylesheet">
+  <link href="{{ asset('front/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+  <link href="{{ asset('front/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
 
   <!-- Main CSS File -->
-  <link href="{{assets('css/main.css')}}" rel="stylesheet">
+  <link href="{{ asset('front/css/main.css') }}" rel="stylesheet">
 {% endblock %}
   <!-- =======================================================
   * Template Name: Dewi
@@ -41,17 +37,19 @@
 </head>
 
 <body class="index-page">
-  {% block header %}
+
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
 
       <a href="index.html" class="logo d-flex align-items-center me-auto">
-        <!-- Uncomment the line below if you also wish to use an image logo -->
-        <img src="{{assets('img/logoRH360.png')}}" alt="">
+      {% block logo %}
+        <img src="{{asset('logoRH360.png')}}" alt="">
         <h1 class="sitename">HR360</h1>
+    {% endblock %}
       </a>
 
       <nav id="navmenu" class="navmenu">
+      {% block navmenu %}
         <ul>
           <li><a href="#hero" class="active">Home</a></li>
           <li><a href="#about">About</a></li>
@@ -71,25 +69,8 @@
             </ul>
           </li>
           <li><a href="#contact">Participations</a></li>
-          <!--
-          <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="#">Dropdown 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                <ul>
-                  <li><a href="#">Deep Dropdown 1</a></li>
-                  <li><a href="#">Deep Dropdown 2</a></li>
-                  <li><a href="#">Deep Dropdown 3</a></li>
-                  <li><a href="#">Deep Dropdown 4</a></li>
-                  <li><a href="#">Deep Dropdown 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Dropdown 2</a></li>
-              <li><a href="#">Dropdown 3</a></li>
-              <li><a href="#">Dropdown 4</a></li>
-            </ul>
-          </li>-->
         </ul>
+        {% endblock %}
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
 
@@ -97,13 +78,13 @@
 
     </div>
   </header>
-{% endblock %}
+
   <main class="main">
-  {% block firstPage %}
+
     <!-- Hero Section -->
     <section id="hero" class="hero section dark-background">
-
-      <img src="{{assets('img/hero-bg.jpg')}}" alt="" data-aos="fade-in">
+      {% block firstPage %}
+      <img src="{{ asset('front/img/hero-bg.jpg') }}" alt="" data-aos="fade-in">
 
       <div class="container d-flex flex-column align-items-center">
         <h2 data-aos="fade-up" data-aos-delay="100">PLAN. LAUNCH. GROW.</h2>
@@ -113,19 +94,18 @@
           <a href="https://www.youtube.com/watch?v=Y7f98aduVJ8" class="glightbox btn-watch-video d-flex align-items-center"><i class="bi bi-play-circle"></i><span>Watch Video</span></a>
         </div>
       </div>
-
+      {% endblock %}
     </section><!-- /Hero Section -->
-{% endblock %}
-    <!-- About Section -->
-    {% block about %}
-    <section id="about" class="about section">
 
+    <!-- About Section -->
+    <section id="about" class="about section">
+    {% block about %}
       <div class="container">
 
         <div class="row gy-4">
           <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
             <h3>Voluptatem dignissimos provident laboris nisi ut aliquip ex ea commodo</h3>
-            <img src="{{assets('img/about.jpg')}}" class="img-fluid rounded-4 mb-4" alt="">
+            <img src="{{ asset('front/img/about.jpg') }}" class="img-fluid rounded-4 mb-4" alt="">
             <p>Ut fugiat ut sunt quia veniam. Voluptate perferendis perspiciatis quod nisi et. Placeat debitis quia recusandae odit et consequatur voluptatem. Dignissimos pariatur consectetur fugiat voluptas ea.</p>
             <p>Temporibus nihil enim deserunt sed ea. Provident sit expedita aut cupiditate nihil vitae quo officia vel. Blanditiis eligendi possimus et in cum. Quidem eos ut sint rem veniam qui. Ut ut repellendus nobis tempore doloribus debitis explicabo similique sit. Accusantium sed ut omnis beatae neque deleniti repellendus.</p>
           </div>
@@ -146,7 +126,7 @@
               </p>
 
               <div class="position-relative mt-4">
-                <img src="{{assets('img/about-2.jpg')}}" class="img-fluid rounded-4" alt="">
+                <img src="{{ asset('front/img/about-2.jpg') }}" class="img-fluid rounded-4" alt="">
                 <a href="https://www.youtube.com/watch?v=Y7f98aduVJ8" class="glightbox pulsating-play-btn"></a>
               </div>
             </div>
@@ -154,13 +134,12 @@
         </div>
 
       </div>
-
+    {% endblock %}
     </section><!-- /About Section -->
-{% endblock %}
-    <!-- Stats Section -->
-{% block stats %}
-    <section id="stats" class="stats section light-background">
 
+    <!-- Stats Section -->
+    <section id="stats" class="stats section light-background">
+      {% block stats %}
       <div class="container" data-aos="fade-up" data-aos-delay="100">
 
         <div class="row gy-4">
@@ -208,13 +187,12 @@
         </div>
 
       </div>
-
+      {% endblock %}
     </section><!-- /Stats Section -->
-{% endblock %}
-{% block services %}
+
     <!-- Services Section -->
     <section id="services" class="services section">
-
+    {% block services %}
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
         <h2>Services</h2>
@@ -228,7 +206,7 @@
           <div class="col-xl-4 col-md-6" data-aos="zoom-in" data-aos-delay="200">
             <div class="service-item">
               <div class="img">
-                <img src="{{assets('img/services-1.jpg')}}" class="img-fluid" alt="">
+                <img src="{{ asset('front/img/services-1.jpg') }}" class="img-fluid" alt="">
               </div>
               <div class="details position-relative">
                 <div class="icon">
@@ -245,7 +223,7 @@
           <div class="col-xl-4 col-md-6" data-aos="zoom-in" data-aos-delay="300">
             <div class="service-item">
               <div class="img">
-                <img src="{{assets('img/services-2.jpg')}}" class="img-fluid" alt="">
+                <img src="{{ asset('front/img/services-2.jpg') }}" class="img-fluid" alt="">
               </div>
               <div class="details position-relative">
                 <div class="icon">
@@ -262,7 +240,7 @@
           <div class="col-xl-4 col-md-6" data-aos="zoom-in" data-aos-delay="400">
             <div class="service-item">
               <div class="img">
-                <img src="{{assets('img/services-3.jpg')}}" class="img-fluid" alt="">
+                <img src="{{ asset('front/img/services-3.jpg') }}" class="img-fluid" alt="">
               </div>
               <div class="details position-relative">
                 <div class="icon">
@@ -279,51 +257,49 @@
         </div>
 
       </div>
-
+    {% endblock %}
     </section><!-- /Services Section -->
-{% endblock %}
-{% block clients %}
+
     <!-- Clients Section -->
     <section id="clients" class="clients section light-background">
-
+    {% block clients %}
       <div class="container" data-aos="fade-up">
 
         <div class="row gy-4">
 
           <div class="col-xl-2 col-md-3 col-6 client-logo">
-            <img src="{{assets('img/clients/client-1.png')}}" class="img-fluid" alt="">
+            <img src="{{ asset('front/img/clients/client-1.png') }}" class="img-fluid" alt="">
           </div><!-- End Client Item -->
 
           <div class="col-xl-2 col-md-3 col-6 client-logo">
-            <img src="{{assets('img/clients/client-2.png')}}" class="img-fluid" alt="">
+            <img src="{{ asset('front/img/clients/client-2.png') }}" class="img-fluid" alt="">
           </div><!-- End Client Item -->
 
           <div class="col-xl-2 col-md-3 col-6 client-logo">
-            <img src="{{assets('img/clients/client-3.png')}}" class="img-fluid" alt="">
+            <img src="{{ asset('front/img/clients/client-3.png') }}" class="img-fluid" alt="">
           </div><!-- End Client Item -->
 
           <div class="col-xl-2 col-md-3 col-6 client-logo">
-            <img src="{{assets('img/clients/client-4.png')}}" class="img-fluid" alt="">
+            <img src="{{ asset('front/img/clients/client-4.png') }}" class="img-fluid" alt="">
           </div><!-- End Client Item -->
 
           <div class="col-xl-2 col-md-3 col-6 client-logo">
-            <img src="{{assets('img/clients/client-5.png')}}" class="img-fluid" alt="">
+            <img src="{{ asset('front/img/clients/client-5.png') }}" class="img-fluid" alt="">
           </div><!-- End Client Item -->
 
           <div class="col-xl-2 col-md-3 col-6 client-logo">
-            <img src="{{assets('img/clients/client-6.png')}}" class="img-fluid" alt="">
+            <img src="{{ asset('front/img/clients/client-6.png') }}" class="img-fluid" alt="">
           </div><!-- End Client Item -->
 
         </div>
 
       </div>
-
+  {% endblock %}
     </section><!-- /Clients Section -->
-{% endblock %}
-{% block features %}
+
     <!-- Features Section -->
     <section id="features" class="features section">
-
+{% block features %}
       <div class="container">
 
         <ul class="nav nav-tabs row  d-flex" data-aos="fade-up" data-aos-delay="100">
@@ -377,7 +353,7 @@
                 </p>
               </div>
               <div class="col-lg-6 order-1 order-lg-2 text-center">
-                <img src="{{assets('img/working-1.jpg')}}" alt="" class="img-fluid">
+                <img src="{{ asset('front/img/working-1.jpg') }}" alt="" class="img-fluid">
               </div>
             </div>
           </div><!-- End Tab Content Item -->
@@ -403,7 +379,7 @@
                 </ul>
               </div>
               <div class="col-lg-6 order-1 order-lg-2 text-center">
-                <img src="{{assets('img/working-2.jpg')}}" alt="" class="img-fluid">
+                <img src="{{ asset('front/img/working-2.jpg') }}" alt="" class="img-fluid">
               </div>
             </div>
           </div><!-- End Tab Content Item -->
@@ -428,7 +404,7 @@
                 </p>
               </div>
               <div class="col-lg-6 order-1 order-lg-2 text-center">
-                <img src="{{assets('img/working-3.jpg')}}" alt="" class="img-fluid">
+                <img src="{{ asset('front/img/working-3.jpg') }}" alt="" class="img-fluid">
               </div>
             </div>
           </div><!-- End Tab Content Item -->
@@ -453,7 +429,7 @@
                 </ul>
               </div>
               <div class="col-lg-6 order-1 order-lg-2 text-center">
-                <img src="{{assets('img/working-4.jpg')}}" alt="" class="img-fluid">
+                <img src="{{ asset('front/img/working-4.jpg') }}" alt="" class="img-fluid">
               </div>
             </div>
           </div><!-- End Tab Content Item -->
@@ -461,13 +437,12 @@
         </div>
 
       </div>
-
-    </section><!-- /Features Section -->
 {% endblock %}
-{% block services2 %}
+    </section><!-- /Features Section -->
+
     <!-- Services 2 Section -->
     <section id="services-2" class="services-2 section light-background">
-
+{% block services2 %}
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
         <h2>Services</h2>
@@ -541,14 +516,13 @@
         </div>
 
       </div>
-
-    </section><!-- /Services 2 Section -->
 {% endblock %}
-    <!-- Testimonials Section -->
-    {% block testimonials %}
-    <section id="testimonials" class="testimonials section dark-background">
+    </section><!-- /Services 2 Section -->
 
-      <img src="{{assets('img/testimonials-bg.jpg')}}" class="testimonials-bg" alt="">
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials section dark-background">
+{% block testimonials %}
+      <img src="{{ asset('front/img/testimonials-bg.jpg') }}" class="testimonials-bg" alt="">
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
 
@@ -572,7 +546,7 @@
 
             <div class="swiper-slide">
               <div class="testimonial-item">
-                <img src="{{assets('img/testimonials/testimonials-1.jpg')}}" class="testimonial-img" alt="">
+                <img src="{{ asset('front/img/testimonials/testimonials-1.jpg') }}" class="testimonial-img" alt="">
                 <h3>Saul Goodman</h3>
                 <h4>Ceo &amp; Founder</h4>
                 <div class="stars">
@@ -588,7 +562,7 @@
 
             <div class="swiper-slide">
               <div class="testimonial-item">
-                <img src="{{assets('img/testimonials/testimonials-2.jpg')}}" class="testimonial-img" alt="">
+                <img src="{{ asset('front/img/testimonials/testimonials-2.jpg') }}" class="testimonial-img" alt="">
                 <h3>Sara Wilsson</h3>
                 <h4>Designer</h4>
                 <div class="stars">
@@ -604,7 +578,7 @@
 
             <div class="swiper-slide">
               <div class="testimonial-item">
-                <img src="{{assets('img/testimonials/testimonials-3.jpg')}}" class="testimonial-img" alt="">
+                <img src="{{ asset('front/img/testimonials/testimonials-3.jpg') }}" class="testimonial-img" alt="">
                 <h3>Jena Karlis</h3>
                 <h4>Store Owner</h4>
                 <div class="stars">
@@ -620,7 +594,7 @@
 
             <div class="swiper-slide">
               <div class="testimonial-item">
-                <img src="{{assets('img/testimonials/testimonials-4.jpg')}}" class="testimonial-img" alt="">
+                <img src="{{ asset('front/img/testimonials/testimonials-4.jpg') }}" class="testimonial-img" alt="">
                 <h3>Matt Brandon</h3>
                 <h4>Freelancer</h4>
                 <div class="stars">
@@ -636,7 +610,7 @@
 
             <div class="swiper-slide">
               <div class="testimonial-item">
-                <img src="{{assets('img/testimonials/testimonials-5.jpg')}}" class="testimonial-img" alt="">
+                <img src="{{ asset('front/img/testimonials/testimonials-5.jpg') }}" class="testimonial-img" alt="">
                 <h3>John Larson</h3>
                 <h4>Entrepreneur</h4>
                 <div class="stars">
@@ -655,13 +629,12 @@
         </div>
 
       </div>
-
-    </section><!-- /Testimonials Section -->
 {% endblock %}
-{% block portfolio %}
+    </section><!-- /Testimonials Section -->
+
     <!-- Portfolio Section -->
     <section id="portfolio" class="portfolio section">
-
+{% block portfolio %}
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
         <h2>Portfolio</h2>
@@ -684,11 +657,11 @@
 
             <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app">
               <div class="portfolio-content h-100">
-                <img src="{{assets('img/portfolio/app-1.jpg')}}" class="img-fluid" alt="">
+                <img src="{{ asset('front/img/portfolio/app-1.jpg') }}" class="img-fluid" alt="">
                 <div class="portfolio-info">
                   <h4>App 1</h4>
                   <p>Lorem ipsum, dolor sit amet consectetur</p>
-                  <a href="{{assets('img/portfolio/app-1.jpg')}}" title="App 1" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                  <a href="{{ asset('front/img/portfolio/app-1.jpg') }}" title="App 1" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                   <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                 </div>
               </div>
@@ -696,11 +669,11 @@
 
             <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-product">
               <div class="portfolio-content h-100">
-                <img src="{{assets('img/portfolio/product-1.jpg')}}" class="img-fluid" alt="">
+                <img src="{{ asset('front/img/portfolio/product-1.jpg') }}" class="img-fluid" alt="">
                 <div class="portfolio-info">
                   <h4>Product 1</h4>
                   <p>Lorem ipsum, dolor sit amet consectetur</p>
-                  <a href="{{assets('img/portfolio/product-1.jpg')}}" title="Product 1" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                  <a href="{{ asset('front/img/portfolio/product-1.jpg') }}" title="Product 1" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                   <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                 </div>
               </div>
@@ -708,11 +681,11 @@
 
             <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-branding">
               <div class="portfolio-content h-100">
-                <img src="{{assets('img/portfolio/branding-1.jpg')}}" class="img-fluid" alt="">
+                <img src="{{ asset('front/img/portfolio/branding-1.jpg') }}" class="img-fluid" alt="">
                 <div class="portfolio-info">
                   <h4>Branding 1</h4>
                   <p>Lorem ipsum, dolor sit amet consectetur</p>
-                  <a href="{{assets('img/portfolio/branding-1.jpg')}}" title="Branding 1" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                  <a href="{{ asset('front/img/portfolio/branding-1.jpg') }}" title="Branding 1" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                   <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                 </div>
               </div>
@@ -720,11 +693,11 @@
 
             <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-books">
               <div class="portfolio-content h-100">
-                <img src="{{assets('img/portfolio/books-1.jpg')}}" class="img-fluid" alt="">
+                <img src="{{ asset('front/img/portfolio/books-1.jpg') }}" class="img-fluid" alt="">
                 <div class="portfolio-info">
                   <h4>Books 1</h4>
                   <p>Lorem ipsum, dolor sit amet consectetur</p>
-                  <a href="{{assets('img/portfolio/books-1.jpg')}}" title="Branding 1" data-gallery="portfolio-gallery-book" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                  <a href="{{ asset('front/img/portfolio/books-1.jpg') }}" title="Branding 1" data-gallery="portfolio-gallery-book" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                   <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                 </div>
               </div>
@@ -732,11 +705,11 @@
 
             <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app">
               <div class="portfolio-content h-100">
-                <img src="{{assets('img/portfolio/app-2.jpg')}}" class="img-fluid" alt="">
+                <img src="{{ asset('front/img/portfolio/app-2.jpg') }}" class="img-fluid" alt="">
                 <div class="portfolio-info">
                   <h4>App 2</h4>
                   <p>Lorem ipsum, dolor sit amet consectetur</p>
-                  <a href="{{assets('img/portfolio/app-2.jpg')}}" title="App 2" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                  <a href="{{ asset('front/img/portfolio/app-2.jpg') }}" title="App 2" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                   <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                 </div>
               </div>
@@ -744,11 +717,11 @@
 
             <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-product">
               <div class="portfolio-content h-100">
-                <img src="{{assets('img/portfolio/product-2.jpg')}}" class="img-fluid" alt="">
+                <img src="{{ asset('front/img/portfolio/product-2.jpg') }}" class="img-fluid" alt="">
                 <div class="portfolio-info">
                   <h4>Product 2</h4>
                   <p>Lorem ipsum, dolor sit amet consectetur</p>
-                  <a href="{{assets('img/portfolio/product-2.jpg')}}" title="Product 2" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                  <a href="{{ asset('front/img/portfolio/product-2.jpg') }}" title="Product 2" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                   <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                 </div>
               </div>
@@ -756,11 +729,11 @@
 
             <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-branding">
               <div class="portfolio-content h-100">
-                <img src="{{assets('img/portfolio/branding-2.jpg')}}" class="img-fluid" alt="">
+                <img src="{{ asset('front/img/portfolio/branding-2.jpg') }}" class="img-fluid" alt="">
                 <div class="portfolio-info">
                   <h4>Branding 2</h4>
                   <p>Lorem ipsum, dolor sit amet consectetur</p>
-                  <a href="{{assets('img/portfolio/branding-2.jpg')}}" title="Branding 2" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                  <a href="{{ asset('front/img/portfolio/branding-2.jpg') }}" title="Branding 2" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                   <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                 </div>
               </div>
@@ -768,11 +741,11 @@
 
             <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-books">
               <div class="portfolio-content h-100">
-                <img src="{{assets('img/portfolio/books-2.jpg')}}" class="img-fluid" alt="">
+                <img src="{{ asset('front/img/portfolio/books-2.jpg') }}" class="img-fluid" alt="">
                 <div class="portfolio-info">
                   <h4>Books 2</h4>
                   <p>Lorem ipsum, dolor sit amet consectetur</p>
-                  <a href="{{assets('img/portfolio/books-2.jpg')}}" title="Branding 2" data-gallery="portfolio-gallery-book" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                  <a href="{{ asset('front/img/portfolio/books-2.jpg') }}" title="Branding 2" data-gallery="portfolio-gallery-book" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                   <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                 </div>
               </div>
@@ -780,11 +753,11 @@
 
             <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app">
               <div class="portfolio-content h-100">
-                <img src="{{assets('img/portfolio/app-3.jpg')}}" class="img-fluid" alt="">
+                <img src="{{ asset('front/img/portfolio/app-3.jpg') }}" class="img-fluid" alt="">
                 <div class="portfolio-info">
                   <h4>App 3</h4>
                   <p>Lorem ipsum, dolor sit amet consectetur</p>
-                  <a href="{{assets('img/portfolio/app-3.jpg')}}" title="App 3" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                  <a href="{{ asset('front/img/portfolio/app-3.jpg') }}" title="App 3" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                   <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                 </div>
               </div>
@@ -792,11 +765,11 @@
 
             <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-product">
               <div class="portfolio-content h-100">
-                <img src="{{assets('img/portfolio/product-3.jpg')}}" class="img-fluid" alt="">
+                <img src="{{ asset('front/img/portfolio/product-3.jpg') }}" class="img-fluid" alt="">
                 <div class="portfolio-info">
                   <h4>Product 3</h4>
                   <p>Lorem ipsum, dolor sit amet consectetur</p>
-                  <a href="{{assets('img/portfolio/product-3.jpg')}}" title="Product 3" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                  <a href="{{ asset('front/img/portfolio/product-3.jpg') }}" title="Product 3" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                   <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                 </div>
               </div>
@@ -804,11 +777,11 @@
 
             <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-branding">
               <div class="portfolio-content h-100">
-                <img src="{{assets('img/portfolio/branding-3.jpg')}}" class="img-fluid" alt="">
+                <img src="{{ asset('front/img/portfolio/branding-3.jpg') }}" class="img-fluid" alt="">
                 <div class="portfolio-info">
                   <h4>Branding 3</h4>
                   <p>Lorem ipsum, dolor sit amet consectetur</p>
-                  <a href="{{assets('img/portfolio/branding-3.jpg')}}" title="Branding 2" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                  <a href="{{ asset('front/img/portfolio/branding-3.jpg') }}" title="Branding 2" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                   <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                 </div>
               </div>
@@ -816,11 +789,11 @@
 
             <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-books">
               <div class="portfolio-content h-100">
-                <img src="{{assets('img/portfolio/books-3.jpg')}}" class="img-fluid" alt="">
+                <img src="{{ asset('front/img/portfolio/books-3.jpg') }}" class="img-fluid" alt="">
                 <div class="portfolio-info">
                   <h4>Books 3</h4>
                   <p>Lorem ipsum, dolor sit amet consectetur</p>
-                  <a href="{{assets('img/portfolio/books-3.jpg')}}" title="Branding 3" data-gallery="portfolio-gallery-book" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                  <a href="{{ asset('front/img/portfolio/books-3.jpg') }}" title="Branding 3" data-gallery="portfolio-gallery-book" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                   <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                 </div>
               </div>
@@ -831,13 +804,12 @@
         </div>
 
       </div>
-
-    </section><!-- /Portfolio Section -->
 {% endblock %}
-{% block team %}
+    </section><!-- /Portfolio Section -->
+
     <!-- Team Section -->
     <section id="team" class="team section light-background">
-
+{% block team %}
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
         <h2>Team</h2>
@@ -850,7 +822,7 @@
 
           <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
             <div class="member">
-              <div class="pic"><img src="{{assets('img/team/team-1.jpg')}}" class="img-fluid" alt=""></div>
+              <div class="pic"><img src="{{ asset('front/img/team/team-1.jpg') }}" class="img-fluid" alt=""></div>
               <div class="member-info">
                 <h4>Walter White</h4>
                 <span>Chief Executive Officer</span>
@@ -866,7 +838,7 @@
 
           <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
             <div class="member">
-              <div class="pic"><img src="{{assets('img/team/team-2.jpg')}}" class="img-fluid" alt=""></div>
+              <div class="pic"><img src="{{ asset('front/img/team/team-2.jpg') }}" class="img-fluid" alt=""></div>
               <div class="member-info">
                 <h4>Sarah Jhonson</h4>
                 <span>Product Manager</span>
@@ -882,7 +854,7 @@
 
           <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
             <div class="member">
-              <div class="pic"><img src="{{assets('img/team/team-3.jpg')}}" class="img-fluid" alt=""></div>
+              <div class="pic"><img src="{{ asset('front/img/team/team-3.jpg') }}" class="img-fluid" alt=""></div>
               <div class="member-info">
                 <h4>William Anderson</h4>
                 <span>CTO</span>
@@ -899,13 +871,12 @@
         </div>
 
       </div>
-
-    </section><!-- /Team Section -->
 {% endblock %}
-{% block contact %}
+    </section><!-- /Team Section -->
+
     <!-- Contact Section -->
     <section id="contact" class="contact section">
-
+{% block contact %}
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
         <h2>Contact</h2>
@@ -980,13 +951,13 @@
         </div>
 
       </div>
-
-    </section><!-- /Contact Section -->
 {% endblock %}
-  </main>
-{% block footer %}
-  <footer id="footer" class="footer dark-background">
+    </section><!-- /Contact Section -->
 
+  </main>
+
+  <footer id="footer" class="footer dark-background">
+{% block footer %}
     <div class="container footer-top">
       <div class="row gy-4">
         <div class="col-lg-4 col-md-6 footer-about">
@@ -1053,28 +1024,28 @@
         Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
       </div>
     </div>
-
-  </footer>
 {% endblock %}
+  </footer>
+
   <!-- Scroll Top -->
   <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Preloader -->
   <div id="preloader"></div>
-{% block js %}
+
   <!-- Vendor JS Files -->
-  <script src="{{assets('vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-  <script src="{{assets('vendor/php-email-form/validate.js')}}"></script>
-  <script src="{{assets('vendor/aos/aos.js')}}"></script>
-  <script src="{{assets('vendor/glightbox/js/glightbox.min.js')}}"></script>
-  <script src="{{assets('vendor/purecounter/purecounter_vanilla.js')}}"></script>
-  <script src="{{assets('vendor/swiper/swiper-bundle.min.js')}}"></script>
-  <script src="{{assets('vendor/imagesloaded/imagesloaded.pkgd.min.js')}}"></script>
-  <script src="{{assets('vendor/isotope-layout/isotope.pkgd.min.js')}}"></script>
+  <script src="{{ asset('front/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ asset('front/vendor/php-email-form/validate.js') }}"></script>
+  <script src="{{ asset('front/vendor/aos/aos.js') }}"></script>
+  <script src="{{ asset('front/vendor/glightbox/js/glightbox.min.js') }}"></script>
+  <script src="{{ asset('front/vendor/purecounter/purecounter_vanilla.js') }}"></script>
+  <script src="{{ asset('front/vendor/swiper/swiper-bundle.min.js') }}"></script>
+  <script src="{{ asset('front/vendor/imagesloaded/imagesloaded.pkgd.min.js') }}"></script>
+  <script src="{{ asset('front/vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
 
   <!-- Main JS File -->
-  <script src="{{assets('js/main.js')}}"></script>
-{% endblock %}
+  <script src="{{ asset('front/js/main.js') }}"></script>
+
 </body>
 
 </html>
