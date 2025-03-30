@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<title>Offre index</title>
+
+{% block body %}
+    <h1>Offre index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Idoffre</th>
+                <th>Titre</th>
+                <th>Description</th>
+                <th>DatePublication</th>
+                <th>DateExpiration</th>
+                <th>Statut</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for offre in offres %}
+            <tr>
+                <td>{{ offre.idoffre }}</td>
+                <td>{{ offre.titre }}</td>
+                <td>{{ offre.description }}</td>
+                <td>{{ offre.datePublication ? offre.datePublication|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ offre.dateExpiration ? offre.dateExpiration|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ offre.statut }}</td>
+                <td>
+                    <a href="{{ path('app_offre_show', {'idoffre': offre.idoffre}) }}">show</a>
+                    <a href="{{ path('app_offre_edit', {'idoffre': offre.idoffre}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_offre_new') }}">Create new</a>
+{% endblock %}

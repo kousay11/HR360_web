@@ -34,7 +34,7 @@ class Tache
     private Projet $idProjet;
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $trello_board_id;
+    private string $trelloboardid;
 
     public function getId()
     {
@@ -106,13 +106,13 @@ class Tache
         $this->idProjet = $value;
     }
 
-    public function getTrello_board_id()
+    public function getTrelloboardid()
     {
-        return $this->trello_board_id;
+        return $this->trelloboardid;
     }
 
-    public function setTrello_board_id($value)
+    public function setTrelloboardid($value)
     {
-        $this->trello_board_id = $value;
+        $this->trelloboardid = $value;
     }
 }

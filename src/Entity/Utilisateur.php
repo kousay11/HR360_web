@@ -142,6 +142,36 @@ class Utilisateur
         $this->competence = $value;
     }
 
+    #[ORM\OneToMany(mappedBy: "idemploye", targetEntity: Equipeemploye::class)]
+    private Collection $equipeemployes;
+
+        public function getEquipeemployes(): Collection
+        {
+            return $this->equipeemployes;
+        }
+    
+        public function addEquipeemploye(Equipeemploye $equipeemploye): self
+        {
+            if (!$this->equipeemployes->contains($equipeemploye)) {
+                $this->equipeemployes[] = $equipeemploye;
+                $equipeemploye->setIdemploye($this);
+            }
+    
+            return $this;
+        }
+    
+        public function removeEquipeemploye(Equipeemploye $equipeemploye): self
+        {
+            if ($this->equipeemployes->removeElement($equipeemploye)) {
+                // set the owning side to null (unless already changed)
+                if ($equipeemploye->getIdemploye() === $this) {
+                    $equipeemploye->setIdemploye(null);
+                }
+            }
+    
+            return $this;
+        }
+
     #[ORM\OneToMany(mappedBy: "iduser", targetEntity: Notification::class)]
     private Collection $notifications;
 
@@ -166,66 +196,6 @@ class Utilisateur
                 // set the owning side to null (unless already changed)
                 if ($notification->getIduser() === $this) {
                     $notification->setIduser(null);
-                }
-            }
-    
-            return $this;
-        }
-
-    #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Candidature::class)]
-    private Collection $candidatures;
-
-        public function getCandidatures(): Collection
-        {
-            return $this->candidatures;
-        }
-    
-        public function addCandidature(Candidature $candidature): self
-        {
-            if (!$this->candidatures->contains($candidature)) {
-                $this->candidatures[] = $candidature;
-                $candidature->setId_user($this);
-            }
-    
-            return $this;
-        }
-    
-        public function removeCandidature(Candidature $candidature): self
-        {
-            if ($this->candidatures->removeElement($candidature)) {
-                // set the owning side to null (unless already changed)
-                if ($candidature->getId_user() === $this) {
-                    $candidature->setId_user(null);
-                }
-            }
-    
-            return $this;
-        }
-
-    #[ORM\OneToMany(mappedBy: "id_employe", targetEntity: Equipe_employe::class)]
-    private Collection $equipe_employes;
-
-        public function getEquipe_employes(): Collection
-        {
-            return $this->equipe_employes;
-        }
-    
-        public function addEquipe_employe(Equipe_employe $equipe_employe): self
-        {
-            if (!$this->equipe_employes->contains($equipe_employe)) {
-                $this->equipe_employes[] = $equipe_employe;
-                $equipe_employe->setId_employe($this);
-            }
-    
-            return $this;
-        }
-    
-        public function removeEquipe_employe(Equipe_employe $equipe_employe): self
-        {
-            if ($this->equipe_employes->removeElement($equipe_employe)) {
-                // set the owning side to null (unless already changed)
-                if ($equipe_employe->getId_employe() === $this) {
-                    $equipe_employe->setId_employe(null);
                 }
             }
     
@@ -261,6 +231,9 @@ class Utilisateur
     
             return $this;
         }
+
+    #[ORM\OneToMany(mappedBy: "iduser", targetEntity: Candidature::class)]
+    private Collection $candidatures;
 
     #[ORM\OneToMany(mappedBy: "iduser", targetEntity: Reservation::class)]
     private Collection $reservations;

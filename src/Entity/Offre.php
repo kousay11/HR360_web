@@ -13,7 +13,7 @@ class Offre
 
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
-    private int $id_offre;
+    private int $idoffre;
 
     #[ORM\Column(type: "string", length: 255)]
     private string $titre;
@@ -30,14 +30,14 @@ class Offre
     #[ORM\Column(type: "string", length: 50)]
     private string $statut;
 
-    public function getId_offre()
+    public function getIdoffre()
     {
-        return $this->id_offre;
+        return $this->idoffre;
     }
 
-    public function setId_offre($value)
+    public function setIdoffre($value)
     {
-        $this->id_offre = $value;
+        $this->idoffre = $value;
     }
 
     public function getTitre()
@@ -90,7 +90,7 @@ class Offre
         $this->statut = $value;
     }
 
-    #[ORM\OneToMany(mappedBy: "id_offre", targetEntity: Candidature::class)]
+    #[ORM\OneToMany(mappedBy: "idoffre", targetEntity: Candidature::class)]
     private Collection $candidatures;
 
         public function getCandidatures(): Collection
@@ -102,7 +102,7 @@ class Offre
         {
             if (!$this->candidatures->contains($candidature)) {
                 $this->candidatures[] = $candidature;
-                $candidature->setId_offre($this);
+                $candidature->setIdoffre($this);
             }
     
             return $this;
@@ -112,8 +112,8 @@ class Offre
         {
             if ($this->candidatures->removeElement($candidature)) {
                 // set the owning side to null (unless already changed)
-                if ($candidature->getId_offre() === $this) {
-                    $candidature->setId_offre(null);
+                if ($candidature->getIdoffre() === $this) {
+                    $candidature->setIdoffre(null);
                 }
             }
     

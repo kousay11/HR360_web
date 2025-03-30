@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<title>Evaluation index</title>
+
+{% block body %}
+    <h1>Evaluation index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>IdEvaluation</th>
+                <th>TitreEva</th>
+                <th>NoteTechnique</th>
+                <th>NoteSoftSkills</th>
+                <th>Commentaire</th>
+                <th>DateEvaluation</th>
+                <th>Scorequiz</th>
+                <th>Questions</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for evaluation in evaluations %}
+            <tr>
+                <td>{{ evaluation.idEvaluation }}</td>
+                <td>{{ evaluation.titreEva }}</td>
+                <td>{{ evaluation.noteTechnique }}</td>
+                <td>{{ evaluation.noteSoftSkills }}</td>
+                <td>{{ evaluation.commentaire }}</td>
+                <td>{{ evaluation.dateEvaluation ? evaluation.dateEvaluation|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ evaluation.scorequiz }}</td>
+                <td>{{ evaluation.questions }}</td>
+                <td>
+                    <a href="{{ path('app_evaluation_show', {'idEvaluation': evaluation.idEvaluation}) }}">show</a>
+                    <a href="{{ path('app_evaluation_edit', {'idEvaluation': evaluation.idEvaluation}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_evaluation_new') }}">Create new</a>
+{% endblock %}

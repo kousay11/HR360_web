@@ -19,7 +19,7 @@ class Notification
     private Utilisateur $iduser;
 
     #[ORM\Column(type: "integer")]
-    private int $reservation_id;
+    private int $reservationid;
 
     #[ORM\Column(type: "text")]
     private string $message;
@@ -47,14 +47,14 @@ class Notification
         $this->iduser = $value;
     }
 
-    public function getReservation_id()
+    public function getReservationid()
     {
-        return $this->reservation_id;
+        return $this->reservationid;
     }
 
-    public function setReservation_id($value)
+    public function setReservationid($value)
     {
-        $this->reservation_id = $value;
+        $this->reservationid = $value;
     }
 
     public function getMessage()

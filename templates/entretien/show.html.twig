@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+<title>Entretien</title>
+
+{% block body %}
+    <h1>Entretien</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>IdEntretien</th>
+                <td>{{ entretien.idEntretien }}</td>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <td>{{ entretien.date ? entretien.date|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Heure</th>
+                <td>{{ entretien.heure }}</td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td>{{ entretien.type }}</td>
+            </tr>
+            <tr>
+                <th>Statut</th>
+                <td>{{ entretien.statut }}</td>
+            </tr>
+            <tr>
+                <th>Lienmeet</th>
+                <td>{{ entretien.lienmeet }}</td>
+            </tr>
+            <tr>
+                <th>Localisation</th>
+                <td>{{ entretien.localisation }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_entretien_index') }}">back to list</a>
+
+    <a href="{{ path('app_entretien_edit', {'idEntretien': entretien.idEntretien}) }}">edit</a>
+
+    {{ include('entretien/_delete_form.html.twig') }}
+{% endblock %}

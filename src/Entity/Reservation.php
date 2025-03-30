@@ -15,18 +15,18 @@ class Reservation
     private int $id;
 
         #[ORM\ManyToOne(targetEntity: Ressource::class, inversedBy: "reservations")]
-    #[ORM\JoinColumn(name: 'id_ressource', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private Ressource $id_ressource;
+    #[ORM\JoinColumn(name: 'idressource', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private Ressource $idressource;
 
         #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: "reservations")]
     #[ORM\JoinColumn(name: 'iduser', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private Utilisateur $iduser;
 
     #[ORM\Column(type: "date")]
-    private \DateTimeInterface $date_debut;
+    private \DateTimeInterface $datedebut;
 
     #[ORM\Column(type: "date")]
-    private \DateTimeInterface $date_fin;
+    private \DateTimeInterface $datefin;
 
     public function getId()
     {
@@ -38,14 +38,14 @@ class Reservation
         $this->id = $value;
     }
 
-    public function getId_ressource()
+    public function getIdressource()
     {
-        return $this->id_ressource;
+        return $this->idressource;
     }
 
-    public function setId_ressource($value)
+    public function setIdressource($value)
     {
-        $this->id_ressource = $value;
+        $this->idressource = $value;
     }
 
     public function getIduser()
@@ -58,23 +58,23 @@ class Reservation
         $this->iduser = $value;
     }
 
-    public function getDate_debut()
+    public function getDatedebut()
     {
-        return $this->date_debut;
+        return $this->datedebut;
     }
 
-    public function setDate_debut($value)
+    public function setDatedebut($value)
     {
-        $this->date_debut = $value;
+        $this->datedebut = $value;
     }
 
-    public function getDate_fin()
+    public function getDatefin()
     {
-        return $this->date_fin;
+        return $this->datefin;
     }
 
-    public function setDate_fin($value)
+    public function setDatefin($value)
     {
-        $this->date_fin = $value;
+        $this->datefin = $value;
     }
 }

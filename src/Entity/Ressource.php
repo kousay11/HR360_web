@@ -77,7 +77,7 @@ class Ressource
         $this->prix = $value;
     }
 
-    #[ORM\OneToMany(mappedBy: "id_ressource", targetEntity: Reservation::class)]
+    #[ORM\OneToMany(mappedBy: "idressource", targetEntity: Reservation::class)]
     private Collection $reservations;
 
         public function getReservations(): Collection
@@ -89,7 +89,7 @@ class Ressource
         {
             if (!$this->reservations->contains($reservation)) {
                 $this->reservations[] = $reservation;
-                $reservation->setId_ressource($this);
+                $reservation->setIdressource($this);
             }
     
             return $this;
@@ -99,8 +99,8 @@ class Ressource
         {
             if ($this->reservations->removeElement($reservation)) {
                 // set the owning side to null (unless already changed)
-                if ($reservation->getId_ressource() === $this) {
-                    $reservation->setId_ressource(null);
+                if ($reservation->getIdressource() === $this) {
+                    $reservation->setIdressource(null);
                 }
             }
     

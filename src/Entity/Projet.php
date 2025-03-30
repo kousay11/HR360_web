@@ -5,7 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Projet_equipe;
+use App\Entity\Tache;
 
 #[ORM\Entity]
 class Projet
@@ -77,6 +77,36 @@ class Projet
         $this->dateFin = $value;
     }
 
+    #[ORM\OneToMany(mappedBy: "idprojet", targetEntity: Projetequipe::class)]
+    private Collection $projetequipes;
+
+        public function getProjetequipes(): Collection
+        {
+            return $this->projetequipes;
+        }
+    
+        public function addProjetequipe(Projetequipe $projetequipe): self
+        {
+            if (!$this->projetequipes->contains($projetequipe)) {
+                $this->projetequipes[] = $projetequipe;
+                $projetequipe->setIdprojet($this);
+            }
+    
+            return $this;
+        }
+    
+        public function removeProjetequipe(Projetequipe $projetequipe): self
+        {
+            if ($this->projetequipes->removeElement($projetequipe)) {
+                // set the owning side to null (unless already changed)
+                if ($projetequipe->getIdprojet() === $this) {
+                    $projetequipe->setIdprojet(null);
+                }
+            }
+    
+            return $this;
+        }
+
     #[ORM\OneToMany(mappedBy: "idProjet", targetEntity: Tache::class)]
     private Collection $taches;
 
@@ -101,36 +131,6 @@ class Projet
                 // set the owning side to null (unless already changed)
                 if ($tache->getIdProjet() === $this) {
                     $tache->setIdProjet(null);
-                }
-            }
-    
-            return $this;
-        }
-
-    #[ORM\OneToMany(mappedBy: "id_projet", targetEntity: Projet_equipe::class)]
-    private Collection $projet_equipes;
-
-        public function getProjet_equipes(): Collection
-        {
-            return $this->projet_equipes;
-        }
-    
-        public function addProjet_equipe(Projet_equipe $projet_equipe): self
-        {
-            if (!$this->projet_equipes->contains($projet_equipe)) {
-                $this->projet_equipes[] = $projet_equipe;
-                $projet_equipe->setId_projet($this);
-            }
-    
-            return $this;
-        }
-    
-        public function removeProjet_equipe(Projet_equipe $projet_equipe): self
-        {
-            if ($this->projet_equipes->removeElement($projet_equipe)) {
-                // set the owning side to null (unless already changed)
-                if ($projet_equipe->getId_projet() === $this) {
-                    $projet_equipe->setId_projet(null);
                 }
             }
     

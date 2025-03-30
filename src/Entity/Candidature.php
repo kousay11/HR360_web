@@ -12,17 +12,17 @@ use App\Entity\Entretien;
 class Candidature
 {
 
-    #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $id_candidature;
-
         #[ORM\ManyToOne(targetEntity: Offre::class, inversedBy: "candidatures")]
-    #[ORM\JoinColumn(name: 'id_offre', referencedColumnName: 'id_offre', onDelete: 'CASCADE')]
-    private Offre $id_offre;
+    #[ORM\JoinColumn(name: 'idoffre', referencedColumnName: 'idoffre', onDelete: 'CASCADE')]
+    private Offre $idoffre;
 
         #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: "candidatures")]
-    #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private Utilisateur $id_user;
+    #[ORM\JoinColumn(name: 'iduser', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private Utilisateur $iduser;
+
+    #[ORM\Id]
+    #[ORM\Column(type: "integer")]
+    private int $idCandidature;
 
     #[ORM\Column(type: "datetime")]
     private \DateTimeInterface $dateCandidature;
@@ -42,34 +42,34 @@ class Candidature
     #[ORM\Column(type: "datetime")]
     private \DateTimeInterface $dateModification;
 
-    public function getId_candidature()
+    public function getIdoffre()
     {
-        return $this->id_candidature;
+        return $this->idoffre;
     }
 
-    public function setId_candidature($value)
+    public function setIdoffre($value)
     {
-        $this->id_candidature = $value;
+        $this->idoffre = $value;
     }
 
-    public function getId_offre()
+    public function getIduser()
     {
-        return $this->id_offre;
+        return $this->iduser;
     }
 
-    public function setId_offre($value)
+    public function setIduser($value)
     {
-        $this->id_offre = $value;
+        $this->iduser = $value;
     }
 
-    public function getId_user()
+    public function getIdCandidature()
     {
-        return $this->id_user;
+        return $this->idCandidature;
     }
 
-    public function setId_user($value)
+    public function setIdCandidature($value)
     {
-        $this->id_user = $value;
+        $this->idCandidature = $value;
     }
 
     public function getDateCandidature()

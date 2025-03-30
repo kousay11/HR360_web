@@ -19,7 +19,7 @@ class Entretien
     #[ORM\Column(type: "date")]
     private \DateTimeInterface $date;
 
-    #[ORM\Column(type: "string")]
+    #[ORM\Column(type: "string", length: 255)]
     private string $heure;
 
     #[ORM\Column(type: "string")]
@@ -29,13 +29,13 @@ class Entretien
     private string $statut;
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $lien_meet;
+    private string $lienmeet;
 
     #[ORM\Column(type: "string", length: 255)]
     private string $localisation;
 
         #[ORM\ManyToOne(targetEntity: Candidature::class, inversedBy: "entretiens")]
-    #[ORM\JoinColumn(name: 'idCandidature', referencedColumnName: 'id_candidature', onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'idCandidature', referencedColumnName: 'idCandidature', onDelete: 'CASCADE')]
     private Candidature $idCandidature;
 
     public function getIdEntretien()
@@ -88,14 +88,14 @@ class Entretien
         $this->statut = $value;
     }
 
-    public function getLien_meet()
+    public function getLienmeet()
     {
-        return $this->lien_meet;
+        return $this->lienmeet;
     }
 
-    public function setLien_meet($value)
+    public function setLienmeet($value)
     {
-        $this->lien_meet = $value;
+        $this->lienmeet = $value;
     }
 
     public function getLocalisation()

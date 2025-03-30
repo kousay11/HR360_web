@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<title>Entretien index</title>
+
+{% block body %}
+    <h1>Entretien index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>IdEntretien</th>
+                <th>Date</th>
+                <th>Heure</th>
+                <th>Type</th>
+                <th>Statut</th>
+                <th>Lienmeet</th>
+                <th>Localisation</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entretien in entretiens %}
+            <tr>
+                <td>{{ entretien.idEntretien }}</td>
+                <td>{{ entretien.date ? entretien.date|date('Y-m-d') : '' }}</td>
+                <td>{{ entretien.heure }}</td>
+                <td>{{ entretien.type }}</td>
+                <td>{{ entretien.statut }}</td>
+                <td>{{ entretien.lienmeet }}</td>
+                <td>{{ entretien.localisation }}</td>
+                <td>
+                    <a href="{{ path('app_entretien_show', {'idEntretien': entretien.idEntretien}) }}">show</a>
+                    <a href="{{ path('app_entretien_edit', {'idEntretien': entretien.idEntretien}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_entretien_new') }}">Create new</a>
+{% endblock %}
