@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Notification;
 use App\Form\NotificationType;
+use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,14 +15,10 @@ use Symfony\Component\Routing\Attribute\Route;
 final class NotificationController extends AbstractController
 {
     #[Route(name: 'app_notification_index', methods: ['GET'])]
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(NotificationRepository $notificationRepository): Response
     {
-        $notifications = $entityManager
-            ->getRepository(Notification::class)
-            ->findAll();
-
         return $this->render('notification/index.html.twig', [
-            'notifications' => $notifications,
+            'notifications' => $notificationRepository->findAll(),
         ]);
     }
 

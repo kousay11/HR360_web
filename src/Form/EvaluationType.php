@@ -14,7 +14,6 @@ class EvaluationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('idEvaluation')
             ->add('titreEva')
             ->add('noteTechnique')
             ->add('noteSoftSkills')
@@ -24,9 +23,9 @@ class EvaluationType extends AbstractType
             ])
             ->add('scorequiz')
             ->add('questions')
-            ->add('idEntretien', EntityType::class, [
+            ->add('entretien', EntityType::class, [
                 'class' => Entretien::class,
-                'choice_label' => 'id',
+                'choice_label' => 'idEntretien',
             ])
         ;
     }

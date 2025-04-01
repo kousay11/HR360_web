@@ -3,78 +3,87 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
-use App\Entity\Utilisateur;
+use App\Repository\ReservationRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ReservationRepository::class)]
+#[ORM\Table(name: 'reservation')]
 class Reservation
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $id;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-        #[ORM\ManyToOne(targetEntity: Ressource::class, inversedBy: "reservations")]
-    #[ORM\JoinColumn(name: 'idressource', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private Ressource $idressource;
-
-        #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: "reservations")]
-    #[ORM\JoinColumn(name: 'iduser', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private Utilisateur $iduser;
-
-    #[ORM\Column(type: "date")]
-    private \DateTimeInterface $datedebut;
-
-    #[ORM\Column(type: "date")]
-    private \DateTimeInterface $datefin;
-
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId($value)
+    public function setId(int $id): self
     {
-        $this->id = $value;
+        $this->id = $id;
+        return $this;
     }
 
-    public function getIdressource()
+    #[ORM\ManyToOne(targetEntity: Ressource::class, inversedBy: 'reservations')]
+    #[ORM\JoinColumn(name: 'id_ressource', referencedColumnName: 'id')]
+    private ?Ressource $ressource = null;
+
+    public function getRessource(): ?Ressource
     {
-        return $this->idressource;
+        return $this->ressource;
     }
 
-    public function setIdressource($value)
+    public function setRessource(?Ressource $ressource): self
     {
-        $this->idressource = $value;
+        $this->ressource = $ressource;
+        return $this;
     }
 
-    public function getIduser()
-    {
-        return $this->iduser;
-    }
+    #[ORM\Column(name:'date_debut',type: 'date', nullable: false)]
+    private ?\DateTimeInterface $datedebut = null;
 
-    public function setIduser($value)
-    {
-        $this->iduser = $value;
-    }
-
-    public function getDatedebut()
+    public function getDatedebut(): ?\DateTimeInterface
     {
         return $this->datedebut;
     }
 
-    public function setDatedebut($value)
+    public function setDatedebut(\DateTimeInterface $datedebut): self
     {
-        $this->datedebut = $value;
+        $this->datedebut = $datedebut;
+        return $this;
     }
 
-    public function getDatefin()
+    #[ORM\Column(name:'date_fin',type: 'date', nullable: false)]
+    private ?\DateTimeInterface $datefin = null;
+
+    public function getDatefin(): ?\DateTimeInterface
     {
         return $this->datefin;
     }
 
-    public function setDatefin($value)
+    public function setDatefin(\DateTimeInterface $datefin): self
     {
-        $this->datefin = $value;
+        $this->datefin = $datefin;
+        return $this;
     }
+
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'reservations')]
+    #[ORM\JoinColumn(name: 'iduser', referencedColumnName: 'id')]
+    private ?Utilisateur $utilisateur = null;
+
+    public function getUtilisateur(): ?Utilisateur
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(?Utilisateur $utilisateur): self
+    {
+        $this->utilisateur = $utilisateur;
+        return $this;
+    }
+
 }

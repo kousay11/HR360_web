@@ -3,137 +3,141 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Tache;
 
-#[ORM\Entity]
+use App\Repository\ProjetRepository;
+
+#[ORM\Entity(repositoryClass: ProjetRepository::class)]
+#[ORM\Table(name: 'projet')]
 class Projet
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $id;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    #[ORM\Column(type: "string", length: 60)]
-    private string $nom;
-
-    #[ORM\Column(type: "string", length: 500)]
-    private string $description;
-
-    #[ORM\Column(type: "date")]
-    private \DateTimeInterface $dateDebut;
-
-    #[ORM\Column(type: "date")]
-    private \DateTimeInterface $dateFin;
-
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId($value)
+    public function setId(int $id): self
     {
-        $this->id = $value;
+        $this->id = $id;
+        return $this;
     }
 
-    public function getNom()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $nom = null;
+
+    public function getNom(): ?string
     {
         return $this->nom;
     }
 
-    public function setNom($value)
+    public function setNom(string $nom): self
     {
-        $this->nom = $value;
+        $this->nom = $nom;
+        return $this;
     }
 
-    public function getDescription()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $description = null;
+
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription($value)
+    public function setDescription(string $description): self
     {
-        $this->description = $value;
+        $this->description = $description;
+        return $this;
     }
 
-    public function getDateDebut()
+    #[ORM\Column(name:'dateDebut',type: 'date', nullable: false)]
+    private ?\DateTimeInterface $dateDebut = null;
+
+    public function getDateDebut(): ?\DateTimeInterface
     {
         return $this->dateDebut;
     }
 
-    public function setDateDebut($value)
+    public function setDateDebut(\DateTimeInterface $dateDebut): self
     {
-        $this->dateDebut = $value;
+        $this->dateDebut = $dateDebut;
+        return $this;
     }
 
-    public function getDateFin()
+    #[ORM\Column(name:'dateFin',type: 'date', nullable: false)]
+    private ?\DateTimeInterface $dateFin = null;
+
+    public function getDateFin(): ?\DateTimeInterface
     {
         return $this->dateFin;
     }
 
-    public function setDateFin($value)
+    public function setDateFin(\DateTimeInterface $dateFin): self
     {
-        $this->dateFin = $value;
+        $this->dateFin = $dateFin;
+        return $this;
     }
 
-    #[ORM\OneToMany(mappedBy: "idprojet", targetEntity: Projetequipe::class)]
+    #[ORM\OneToMany(targetEntity: Projetequipe::class, mappedBy: 'projet')]
     private Collection $projetequipes;
 
-        public function getProjetequipes(): Collection
-        {
-            return $this->projetequipes;
+    /**
+     * @return Collection<int, Projetequipe>
+     */
+    public function getProjetequipes(): Collection
+    {
+        if (!$this->projetequipes instanceof Collection) {
+            $this->projetequipes = new ArrayCollection();
         }
-    
-        public function addProjetequipe(Projetequipe $projetequipe): self
-        {
-            if (!$this->projetequipes->contains($projetequipe)) {
-                $this->projetequipes[] = $projetequipe;
-                $projetequipe->setIdprojet($this);
-            }
-    
-            return $this;
-        }
-    
-        public function removeProjetequipe(Projetequipe $projetequipe): self
-        {
-            if ($this->projetequipes->removeElement($projetequipe)) {
-                // set the owning side to null (unless already changed)
-                if ($projetequipe->getIdprojet() === $this) {
-                    $projetequipe->setIdprojet(null);
-                }
-            }
-    
-            return $this;
-        }
+        return $this->projetequipes;
+    }
 
-    #[ORM\OneToMany(mappedBy: "idProjet", targetEntity: Tache::class)]
+    public function addProjetequipe(Projetequipe $projetequipe): self
+    {
+        if (!$this->getProjetequipes()->contains($projetequipe)) {
+            $this->getProjetequipes()->add($projetequipe);
+        }
+        return $this;
+    }
+
+    public function removeProjetequipe(Projetequipe $projetequipe): self
+    {
+        $this->getProjetequipes()->removeElement($projetequipe);
+        return $this;
+    }
+
+    #[ORM\OneToMany(targetEntity: Tache::class, mappedBy: 'projet')]
     private Collection $taches;
 
-        public function getTaches(): Collection
-        {
-            return $this->taches;
+    /**
+     * @return Collection<int, Tache>
+     */
+    public function getTaches(): Collection
+    {
+        if (!$this->taches instanceof Collection) {
+            $this->taches = new ArrayCollection();
         }
-    
-        public function addTache(Tache $tache): self
-        {
-            if (!$this->taches->contains($tache)) {
-                $this->taches[] = $tache;
-                $tache->setIdProjet($this);
-            }
-    
-            return $this;
+        return $this->taches;
+    }
+
+    public function addTache(Tache $tache): self
+    {
+        if (!$this->getTaches()->contains($tache)) {
+            $this->getTaches()->add($tache);
         }
-    
-        public function removeTache(Tache $tache): self
-        {
-            if ($this->taches->removeElement($tache)) {
-                // set the owning side to null (unless already changed)
-                if ($tache->getIdProjet() === $this) {
-                    $tache->setIdProjet(null);
-                }
-            }
-    
-            return $this;
-        }
+        return $this;
+    }
+
+    public function removeTache(Tache $tache): self
+    {
+        $this->getTaches()->removeElement($tache);
+        return $this;
+    }
+
 }

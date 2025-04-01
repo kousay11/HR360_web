@@ -3,129 +3,142 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
-use App\Entity\Entretien;
+use App\Repository\EvaluationRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: EvaluationRepository::class)]
+#[ORM\Table(name: 'evaluation')]
 class Evaluation
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $idEvaluation;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name:'idEvaluation',type: 'integer')]
+    private ?int $idEvaluation = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $titreEva;
-
-    #[ORM\Column(type: "float")]
-    private float $noteTechnique;
-
-    #[ORM\Column(type: "float")]
-    private float $noteSoftSkills;
-
-    #[ORM\Column(type: "string")]
-    private string $commentaire;
-
-    #[ORM\Column(type: "datetime")]
-    private \DateTimeInterface $dateEvaluation;
-
-    #[ORM\Column(type: "integer")]
-    private int $scorequiz;
-
-    #[ORM\Column(type: "text")]
-    private string $questions;
-
-        #[ORM\ManyToOne(targetEntity: Entretien::class, inversedBy: "evaluations")]
-    #[ORM\JoinColumn(name: 'idEntretien', referencedColumnName: 'idEntretien', onDelete: 'CASCADE')]
-    private Entretien $idEntretien;
-
-    public function getIdEvaluation()
+    public function getIdEvaluation(): ?int
     {
         return $this->idEvaluation;
     }
 
-    public function setIdEvaluation($value)
+    public function setIdEvaluation(int $idEvaluation): self
     {
-        $this->idEvaluation = $value;
+        $this->idEvaluation = $idEvaluation;
+        return $this;
     }
 
-    public function getTitreEva()
+    #[ORM\Column(name:'titreEva',type: 'string', nullable: false)]
+    private ?string $titreEva = null;
+
+    public function getTitreEva(): ?string
     {
         return $this->titreEva;
     }
 
-    public function setTitreEva($value)
+    public function setTitreEva(string $titreEva): self
     {
-        $this->titreEva = $value;
+        $this->titreEva = $titreEva;
+        return $this;
     }
 
-    public function getNoteTechnique()
+    #[ORM\Column(name:'noteTechnique',type: 'float', nullable: false)]
+    private ?float $noteTechnique = null;
+
+    public function getNoteTechnique(): ?float
     {
         return $this->noteTechnique;
     }
 
-    public function setNoteTechnique($value)
+    public function setNoteTechnique(float $noteTechnique): self
     {
-        $this->noteTechnique = $value;
+        $this->noteTechnique = $noteTechnique;
+        return $this;
     }
 
-    public function getNoteSoftSkills()
+    #[ORM\Column(name:'noteSoftSkills',type: 'float', nullable: false)]
+    private ?float $noteSoftSkills = null;
+
+    public function getNoteSoftSkills(): ?float
     {
         return $this->noteSoftSkills;
     }
 
-    public function setNoteSoftSkills($value)
+    public function setNoteSoftSkills(float $noteSoftSkills): self
     {
-        $this->noteSoftSkills = $value;
+        $this->noteSoftSkills = $noteSoftSkills;
+        return $this;
     }
 
-    public function getCommentaire()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $commentaire = null;
+
+    public function getCommentaire(): ?string
     {
         return $this->commentaire;
     }
 
-    public function setCommentaire($value)
+    public function setCommentaire(string $commentaire): self
     {
-        $this->commentaire = $value;
+        $this->commentaire = $commentaire;
+        return $this;
     }
 
-    public function getDateEvaluation()
+    #[ORM\Column(name:'dateEvaluation',type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $dateEvaluation = null;
+
+    public function getDateEvaluation(): ?\DateTimeInterface
     {
         return $this->dateEvaluation;
     }
 
-    public function setDateEvaluation($value)
+    public function setDateEvaluation(\DateTimeInterface $dateEvaluation): self
     {
-        $this->dateEvaluation = $value;
+        $this->dateEvaluation = $dateEvaluation;
+        return $this;
     }
 
-    public function getScorequiz()
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $scorequiz = null;
+
+    public function getScorequiz(): ?int
     {
         return $this->scorequiz;
     }
 
-    public function setScorequiz($value)
+    public function setScorequiz(?int $scorequiz): self
     {
-        $this->scorequiz = $value;
+        $this->scorequiz = $scorequiz;
+        return $this;
     }
 
-    public function getQuestions()
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $questions = null;
+
+    public function getQuestions(): ?string
     {
         return $this->questions;
     }
 
-    public function setQuestions($value)
+    public function setQuestions(?string $questions): self
     {
-        $this->questions = $value;
+        $this->questions = $questions;
+        return $this;
     }
 
-    public function getIdEntretien()
+    #[ORM\ManyToOne(targetEntity: Entretien::class, inversedBy: 'evaluations')]
+    #[ORM\JoinColumn(name: 'idEntretien', referencedColumnName: 'idEntretien')]
+    private ?Entretien $entretien = null;
+
+    public function getEntretien(): ?Entretien
     {
-        return $this->idEntretien;
+        return $this->entretien;
     }
 
-    public function setIdEntretien($value)
+    public function setEntretien(?Entretien $entretien): self
     {
-        $this->idEntretien = $value;
+        $this->entretien = $entretien;
+        return $this;
     }
+
 }

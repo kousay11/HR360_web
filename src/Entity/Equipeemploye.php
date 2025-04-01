@@ -3,39 +3,44 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
-use App\Entity\Utilisateur;
+use App\Repository\EquipeemployeRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: EquipeemployeRepository::class)]
+#[ORM\Table(name: 'equipe_employe')]
 class Equipeemploye
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $idequipe;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $idequipe = null;
 
-    #[ORM\Id]
-        #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: "equipeemployes")]
-    #[ORM\JoinColumn(name: 'idemploye', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private Utilisateur $idemploye;
-
-    public function getIdequipe()
+    public function getIdequipe(): ?int
     {
         return $this->idequipe;
     }
 
-    public function setIdequipe($value)
+    public function setIdequipe(int $idequipe): self
     {
-        $this->idequipe = $value;
+        $this->idequipe = $idequipe;
+        return $this;
     }
 
-    public function getIdemploye()
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'equipeemployes')]
+    #[ORM\JoinColumn(name: 'idemploye', referencedColumnName: 'id')]
+    private ?Utilisateur $utilisateur = null;
+
+    public function getUtilisateur(): ?Utilisateur
     {
-        return $this->idemploye;
+        return $this->utilisateur;
     }
 
-    public function setIdemploye($value)
+    public function setUtilisateur(?Utilisateur $utilisateur): self
     {
-        $this->idemploye = $value;
+        $this->utilisateur = $utilisateur;
+        return $this;
     }
+
 }

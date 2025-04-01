@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+<title>Candidature</title>
+
+{% block body %}
+    <h1>Candidature</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>IdCandidature</th>
+                <td>{{ candidature.idCandidature }}</td>
+            </tr>
+            <tr>
+                <th>DateCandidature</th>
+                <td>{{ candidature.dateCandidature ? candidature.dateCandidature|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Statut</th>
+                <td>{{ candidature.statut }}</td>
+            </tr>
+            <tr>
+                <th>Cv</th>
+                <td>{{ candidature.cv }}</td>
+            </tr>
+            <tr>
+                <th>LettreMotivation</th>
+                <td>{{ candidature.lettreMotivation }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ candidature.description }}</td>
+            </tr>
+            <tr>
+                <th>DateModification</th>
+                <td>{{ candidature.dateModification ? candidature.dateModification|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Iduser</th>
+                <td>{{ candidature.iduser }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_candidature_index') }}">back to list</a>
+
+    <a href="{{ path('app_candidature_edit', {'idCandidature': candidature.idCandidature}) }}">edit</a>
+
+    {{ include('candidature/_delete_form.html.twig') }}
+{% endblock %}

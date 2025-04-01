@@ -3,36 +3,43 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
+use App\Repository\EquipeRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: EquipeRepository::class)]
+#[ORM\Table(name: 'equipe')]
 class Equipe
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $id;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $nom;
-
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId($value)
+    public function setId(int $id): self
     {
-        $this->id = $value;
+        $this->id = $id;
+        return $this;
     }
 
-    public function getNom()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $nom = null;
+
+    public function getNom(): ?string
     {
         return $this->nom;
     }
 
-    public function setNom($value)
+    public function setNom(string $nom): self
     {
-        $this->nom = $value;
+        $this->nom = $nom;
+        return $this;
     }
+
 }

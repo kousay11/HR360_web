@@ -3,148 +3,156 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
-use App\Entity\Candidature;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Evaluation;
 
-#[ORM\Entity]
+use App\Repository\EntretienRepository;
+
+#[ORM\Entity(repositoryClass: EntretienRepository::class)]
+#[ORM\Table(name: 'entretien')]
 class Entretien
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $idEntretien;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name:'idEntretien',type: 'integer')]
+    private ?int $idEntretien = null;
 
-    #[ORM\Column(type: "date")]
-    private \DateTimeInterface $date;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $heure;
-
-    #[ORM\Column(type: "string")]
-    private string $type;
-
-    #[ORM\Column(type: "string")]
-    private string $statut;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $lienmeet;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $localisation;
-
-        #[ORM\ManyToOne(targetEntity: Candidature::class, inversedBy: "entretiens")]
-    #[ORM\JoinColumn(name: 'idCandidature', referencedColumnName: 'idCandidature', onDelete: 'CASCADE')]
-    private Candidature $idCandidature;
-
-    public function getIdEntretien()
+    public function getIdEntretien(): ?int
     {
         return $this->idEntretien;
     }
 
-    public function setIdEntretien($value)
+    public function setIdEntretien(int $idEntretien): self
     {
-        $this->idEntretien = $value;
+        $this->idEntretien = $idEntretien;
+        return $this;
     }
 
-    public function getDate()
+    #[ORM\Column(type: 'date', nullable: false)]
+    private ?\DateTimeInterface $date = null;
+
+    public function getDate(): ?\DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate($value)
+    public function setDate(\DateTimeInterface $date): self
     {
-        $this->date = $value;
+        $this->date = $date;
+        return $this;
     }
 
-    public function getHeure()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $heure = null;
+
+    public function getHeure(): ?string
     {
         return $this->heure;
     }
 
-    public function setHeure($value)
+    public function setHeure(string $heure): self
     {
-        $this->heure = $value;
+        $this->heure = $heure;
+        return $this;
     }
 
-    public function getType()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $type = null;
+
+    public function getType(): ?string
     {
         return $this->type;
     }
 
-    public function setType($value)
+    public function setType(string $type): self
     {
-        $this->type = $value;
+        $this->type = $type;
+        return $this;
     }
 
-    public function getStatut()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $statut = null;
+
+    public function getStatut(): ?string
     {
         return $this->statut;
     }
 
-    public function setStatut($value)
+    public function setStatut(string $statut): self
     {
-        $this->statut = $value;
+        $this->statut = $statut;
+        return $this;
     }
 
-    public function getLienmeet()
+    #[ORM\Column(name:'lien_meet',type: 'string', nullable: false)]
+    private ?string $lienmeet = null;
+
+    public function getLienmeet(): ?string
     {
         return $this->lienmeet;
     }
 
-    public function setLienmeet($value)
+    public function setLienmeet(string $lienmeet): self
     {
-        $this->lienmeet = $value;
+        $this->lienmeet = $lienmeet;
+        return $this;
     }
 
-    public function getLocalisation()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $localisation = null;
+
+    public function getLocalisation(): ?string
     {
         return $this->localisation;
     }
 
-    public function setLocalisation($value)
+    public function setLocalisation(string $localisation): self
     {
-        $this->localisation = $value;
+        $this->localisation = $localisation;
+        return $this;
     }
 
-    public function getIdCandidature()
+    #[ORM\ManyToOne(targetEntity: Candidature::class, inversedBy: 'entretiens')]
+    #[ORM\JoinColumn(name: 'idCandidature', referencedColumnName: 'id_candidature')]
+    private ?Candidature $candidature = null;
+
+    public function getCandidature(): ?Candidature
     {
-        return $this->idCandidature;
+        return $this->candidature;
     }
 
-    public function setIdCandidature($value)
+    public function setCandidature(?Candidature $candidature): self
     {
-        $this->idCandidature = $value;
+        $this->candidature = $candidature;
+        return $this;
     }
 
-    #[ORM\OneToMany(mappedBy: "idEntretien", targetEntity: Evaluation::class)]
+    #[ORM\OneToMany(targetEntity: Evaluation::class, mappedBy: 'entretien')]
     private Collection $evaluations;
 
-        public function getEvaluations(): Collection
-        {
-            return $this->evaluations;
+    /**
+     * @return Collection<int, Evaluation>
+     */
+    public function getEvaluations(): Collection
+    {
+        if (!$this->evaluations instanceof Collection) {
+            $this->evaluations = new ArrayCollection();
         }
-    
-        public function addEvaluation(Evaluation $evaluation): self
-        {
-            if (!$this->evaluations->contains($evaluation)) {
-                $this->evaluations[] = $evaluation;
-                $evaluation->setIdEntretien($this);
-            }
-    
-            return $this;
+        return $this->evaluations;
+    }
+
+    public function addEvaluation(Evaluation $evaluation): self
+    {
+        if (!$this->getEvaluations()->contains($evaluation)) {
+            $this->getEvaluations()->add($evaluation);
         }
-    
-        public function removeEvaluation(Evaluation $evaluation): self
-        {
-            if ($this->evaluations->removeElement($evaluation)) {
-                // set the owning side to null (unless already changed)
-                if ($evaluation->getIdEntretien() === $this) {
-                    $evaluation->setIdEntretien(null);
-                }
-            }
-    
-            return $this;
-        }
+        return $this;
+    }
+
+    public function removeEvaluation(Evaluation $evaluation): self
+    {
+        $this->getEvaluations()->removeElement($evaluation);
+        return $this;
+    }
+
 }

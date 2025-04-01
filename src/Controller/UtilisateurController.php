@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Utilisateur;
 use App\Form\UtilisateurType;
+use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,14 +15,10 @@ use Symfony\Component\Routing\Attribute\Route;
 final class UtilisateurController extends AbstractController
 {
     #[Route(name: 'app_utilisateur_index', methods: ['GET'])]
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(UtilisateurRepository $utilisateurRepository): Response
     {
-        $utilisateurs = $entityManager
-            ->getRepository(Utilisateur::class)
-            ->findAll();
-
         return $this->render('utilisateur/index.html.twig', [
-            'utilisateurs' => $utilisateurs,
+            'utilisateurs' => $utilisateurRepository->findAll(),
         ]);
     }
 

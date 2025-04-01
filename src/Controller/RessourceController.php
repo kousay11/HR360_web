@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Ressource;
 use App\Form\RessourceType;
+use App\Repository\RessourceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,14 +15,10 @@ use Symfony\Component\Routing\Attribute\Route;
 final class RessourceController extends AbstractController
 {
     #[Route(name: 'app_ressource_index', methods: ['GET'])]
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(RessourceRepository $ressourceRepository): Response
     {
-        $ressources = $entityManager
-            ->getRepository(Ressource::class)
-            ->findAll();
-
         return $this->render('ressource/index.html.twig', [
-            'ressources' => $ressources,
+            'ressources' => $ressourceRepository->findAll(),
         ]);
     }
 

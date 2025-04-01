@@ -15,18 +15,17 @@ class ReservationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('id')
             ->add('datedebut', null, [
                 'widget' => 'single_text',
             ])
             ->add('datefin', null, [
                 'widget' => 'single_text',
             ])
-            ->add('idressource', EntityType::class, [
+            ->add('ressource', EntityType::class, [
                 'class' => Ressource::class,
                 'choice_label' => 'id',
             ])
-            ->add('iduser', EntityType::class, [
+            ->add('utilisateur', EntityType::class, [
                 'class' => Utilisateur::class,
                 'choice_label' => 'id',
             ])

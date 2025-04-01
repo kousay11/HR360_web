@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<title>Candidature index</title>
+
+{% block body %}
+    <h1>Candidature index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>IdCandidature</th>
+                <th>DateCandidature</th>
+                <th>Statut</th>
+                <th>Cv</th>
+                <th>LettreMotivation</th>
+                <th>Description</th>
+                <th>DateModification</th>
+                <th>Iduser</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for candidature in candidatures %}
+            <tr>
+                <td>{{ candidature.idCandidature }}</td>
+                <td>{{ candidature.dateCandidature ? candidature.dateCandidature|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ candidature.statut }}</td>
+                <td>{{ candidature.cv }}</td>
+                <td>{{ candidature.lettreMotivation }}</td>
+                <td>{{ candidature.description }}</td>
+                <td>{{ candidature.dateModification ? candidature.dateModification|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ candidature.iduser }}</td>
+                <td>
+                    <a href="{{ path('app_candidature_show', {'idCandidature': candidature.idCandidature}) }}">show</a>
+                    <a href="{{ path('app_candidature_edit', {'idCandidature': candidature.idCandidature}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_candidature_new') }}">Create new</a>
+{% endblock %}

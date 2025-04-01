@@ -14,7 +14,6 @@ class CandidatureType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('idCandidature')
             ->add('dateCandidature', null, [
                 'widget' => 'single_text',
             ])
@@ -26,9 +25,9 @@ class CandidatureType extends AbstractType
                 'widget' => 'single_text',
             ])
             ->add('iduser')
-            ->add('idoffre', EntityType::class, [
+            ->add('offre', EntityType::class, [
                 'class' => Offre::class,
-                'choice_label' => 'id',
+                'choice_label' => 'id_offre',
             ])
         ;
     }

@@ -14,7 +14,6 @@ class EntretienType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('idEntretien')
             ->add('date', null, [
                 'widget' => 'single_text',
             ])
@@ -23,9 +22,9 @@ class EntretienType extends AbstractType
             ->add('statut')
             ->add('lienmeet')
             ->add('localisation')
-            ->add('idCandidature', EntityType::class, [
+            ->add('candidature', EntityType::class, [
                 'class' => Candidature::class,
-                'choice_label' => 'id',
+                'choice_label' => 'id_candidature',
             ])
         ;
     }

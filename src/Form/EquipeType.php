@@ -12,7 +12,6 @@ class EquipeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('id')
             ->add('nom')
         ;
     }

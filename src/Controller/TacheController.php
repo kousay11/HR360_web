@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Tache;
 use App\Form\TacheType;
+use App\Repository\TacheRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,14 +15,10 @@ use Symfony\Component\Routing\Attribute\Route;
 final class TacheController extends AbstractController
 {
     #[Route(name: 'app_tache_index', methods: ['GET'])]
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(TacheRepository $tacheRepository): Response
     {
-        $taches = $entityManager
-            ->getRepository(Tache::class)
-            ->findAll();
-
         return $this->render('tache/index.html.twig', [
-            'taches' => $taches,
+            'taches' => $tacheRepository->findAll(),
         ]);
     }
 

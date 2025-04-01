@@ -3,204 +3,240 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Reservation;
 
-#[ORM\Entity]
+use App\Repository\UtilisateurRepository;
+
+#[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
+#[ORM\Table(name: 'utilisateur')]
 class Utilisateur
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $id;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $nom;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $prenom;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $email;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $password;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $role;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $image;
-
-    #[ORM\Column(type: "float")]
-    private float $salaire;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $poste;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $competence;
-
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId($value)
+    public function setId(int $id): self
     {
-        $this->id = $value;
+        $this->id = $id;
+        return $this;
     }
 
-    public function getNom()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $nom = null;
+
+    public function getNom(): ?string
     {
         return $this->nom;
     }
 
-    public function setNom($value)
+    public function setNom(string $nom): self
     {
-        $this->nom = $value;
+        $this->nom = $nom;
+        return $this;
     }
 
-    public function getPrenom()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $prenom = null;
+
+    public function getPrenom(): ?string
     {
         return $this->prenom;
     }
 
-    public function setPrenom($value)
+    public function setPrenom(string $prenom): self
     {
-        $this->prenom = $value;
+        $this->prenom = $prenom;
+        return $this;
     }
 
-    public function getEmail()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $email = null;
+
+    public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    public function setEmail($value)
+    public function setEmail(string $email): self
     {
-        $this->email = $value;
+        $this->email = $email;
+        return $this;
     }
 
-    public function getPassword()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $password = null;
+
+    public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    public function setPassword($value)
+    public function setPassword(string $password): self
     {
-        $this->password = $value;
+        $this->password = $password;
+        return $this;
     }
 
-    public function getRole()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $role = null;
+
+    public function getRole(): ?string
     {
         return $this->role;
     }
 
-    public function setRole($value)
+    public function setRole(string $role): self
     {
-        $this->role = $value;
+        $this->role = $role;
+        return $this;
     }
 
-    public function getImage()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $image = null;
+
+    public function getImage(): ?string
     {
         return $this->image;
     }
 
-    public function setImage($value)
+    public function setImage(string $image): self
     {
-        $this->image = $value;
+        $this->image = $image;
+        return $this;
     }
 
-    public function getSalaire()
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $salaire = null;
+
+    public function getSalaire(): ?float
     {
         return $this->salaire;
     }
 
-    public function setSalaire($value)
+    public function setSalaire(?float $salaire): self
     {
-        $this->salaire = $value;
+        $this->salaire = $salaire;
+        return $this;
     }
 
-    public function getPoste()
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $poste = null;
+
+    public function getPoste(): ?string
     {
         return $this->poste;
     }
 
-    public function setPoste($value)
+    public function setPoste(?string $poste): self
     {
-        $this->poste = $value;
+        $this->poste = $poste;
+        return $this;
     }
 
-    public function getCompetence()
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $competence = null;
+
+    public function getCompetence(): ?string
     {
         return $this->competence;
     }
 
-    public function setCompetence($value)
+    public function setCompetence(?string $competence): self
     {
-        $this->competence = $value;
+        $this->competence = $competence;
+        return $this;
     }
 
-    #[ORM\OneToMany(mappedBy: "idemploye", targetEntity: Equipeemploye::class)]
+    #[ORM\OneToMany(targetEntity: Equipeemploye::class, mappedBy: 'utilisateur')]
     private Collection $equipeemployes;
 
-        public function getEquipeemployes(): Collection
-        {
-            return $this->equipeemployes;
+    /**
+     * @return Collection<int, Equipeemploye>
+     */
+    public function getEquipeemployes(): Collection
+    {
+        if (!$this->equipeemployes instanceof Collection) {
+            $this->equipeemployes = new ArrayCollection();
         }
-    
-        public function addEquipeemploye(Equipeemploye $equipeemploye): self
-        {
-            if (!$this->equipeemployes->contains($equipeemploye)) {
-                $this->equipeemployes[] = $equipeemploye;
-                $equipeemploye->setIdemploye($this);
-            }
-    
-            return $this;
-        }
-    
-        public function removeEquipeemploye(Equipeemploye $equipeemploye): self
-        {
-            if ($this->equipeemployes->removeElement($equipeemploye)) {
-                // set the owning side to null (unless already changed)
-                if ($equipeemploye->getIdemploye() === $this) {
-                    $equipeemploye->setIdemploye(null);
-                }
-            }
-    
-            return $this;
-        }
+        return $this->equipeemployes;
+    }
 
-    #[ORM\OneToMany(mappedBy: "iduser", targetEntity: Notification::class)]
+    public function addEquipeemploye(Equipeemploye $equipeemploye): self
+    {
+        if (!$this->getEquipeemployes()->contains($equipeemploye)) {
+            $this->getEquipeemployes()->add($equipeemploye);
+        }
+        return $this;
+    }
+
+    public function removeEquipeemploye(Equipeemploye $equipeemploye): self
+    {
+        $this->getEquipeemployes()->removeElement($equipeemploye);
+        return $this;
+    }
+
+    #[ORM\OneToMany(targetEntity: Notification::class, mappedBy: 'utilisateur')]
     private Collection $notifications;
 
-        public function getNotifications(): Collection
-        {
-            return $this->notifications;
+    /**
+     * @return Collection<int, Notification>
+     */
+    public function getNotifications(): Collection
+    {
+        if (!$this->notifications instanceof Collection) {
+            $this->notifications = new ArrayCollection();
         }
-    
-        public function addNotification(Notification $notification): self
-        {
-            if (!$this->notifications->contains($notification)) {
-                $this->notifications[] = $notification;
-                $notification->setIduser($this);
-            }
-    
-            return $this;
+        return $this->notifications;
+    }
+
+    public function addNotification(Notification $notification): self
+    {
+        if (!$this->getNotifications()->contains($notification)) {
+            $this->getNotifications()->add($notification);
         }
-    
-        public function removeNotification(Notification $notification): self
-        {
-            if ($this->notifications->removeElement($notification)) {
-                // set the owning side to null (unless already changed)
-                if ($notification->getIduser() === $this) {
-                    $notification->setIduser(null);
-                }
-            }
-    
-            return $this;
+        return $this;
+    }
+
+    public function removeNotification(Notification $notification): self
+    {
+        $this->getNotifications()->removeElement($notification);
+        return $this;
+    }
+
+    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'utilisateur')]
+    private Collection $reservations;
+
+    /**
+     * @return Collection<int, Reservation>
+     */
+    public function getReservations(): Collection
+    {
+        if (!$this->reservations instanceof Collection) {
+            $this->reservations = new ArrayCollection();
         }
+        return $this->reservations;
+    }
+
+    public function addReservation(Reservation $reservation): self
+    {
+        if (!$this->getReservations()->contains($reservation)) {
+            $this->getReservations()->add($reservation);
+        }
+        return $this;
+    }
+
+    public function removeReservation(Reservation $reservation): self
+    {
+        $this->getReservations()->removeElement($reservation);
+        return $this;
+    }
 
     #[ORM\OneToMany(mappedBy: "idUser", targetEntity: Participation::class)]
     private Collection $participations;
@@ -232,9 +268,4 @@ class Utilisateur
             return $this;
         }
 
-    #[ORM\OneToMany(mappedBy: "iduser", targetEntity: Candidature::class)]
-    private Collection $candidatures;
-
-    #[ORM\OneToMany(mappedBy: "iduser", targetEntity: Reservation::class)]
-    private Collection $reservations;
 }

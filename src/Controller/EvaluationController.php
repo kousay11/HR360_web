@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Evaluation;
 use App\Form\EvaluationType;
+use App\Repository\EvaluationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,14 +15,10 @@ use Symfony\Component\Routing\Attribute\Route;
 final class EvaluationController extends AbstractController
 {
     #[Route(name: 'app_evaluation_index', methods: ['GET'])]
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(EvaluationRepository $evaluationRepository): Response
     {
-        $evaluations = $entityManager
-            ->getRepository(Evaluation::class)
-            ->findAll();
-
         return $this->render('evaluation/index.html.twig', [
-            'evaluations' => $evaluations,
+            'evaluations' => $evaluationRepository->findAll(),
         ]);
     }
 

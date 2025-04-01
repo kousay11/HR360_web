@@ -14,13 +14,12 @@ class NotificationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('id')
             ->add('reservationid')
             ->add('message')
             ->add('date', null, [
                 'widget' => 'single_text',
             ])
-            ->add('iduser', EntityType::class, [
+            ->add('utilisateur', EntityType::class, [
                 'class' => Utilisateur::class,
                 'choice_label' => 'id',
             ])

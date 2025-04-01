@@ -3,120 +3,136 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Participation;
 
-#[ORM\Entity]
+use App\Repository\FormationRepository;
+
+#[ORM\Entity(repositoryClass: FormationRepository::class)]
+#[ORM\Table(name: 'formation')]
 class Formation
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $id;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $titre;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $description;
-
-    #[ORM\Column(type: "integer")]
-    private int $duree;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $dateFormation;
-
-    #[ORM\Column(type: "boolean")]
-    private bool $isFavorite;
-
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId($value)
+    public function setId(int $id): self
     {
-        $this->id = $value;
+        $this->id = $id;
+        return $this;
     }
 
-    public function getTitre()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $titre = null;
+
+    public function getTitre(): ?string
     {
         return $this->titre;
     }
 
-    public function setTitre($value)
+    public function setTitre(string $titre): self
     {
-        $this->titre = $value;
+        $this->titre = $titre;
+        return $this;
     }
 
-    public function getDescription()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $description = null;
+
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription($value)
+    public function setDescription(string $description): self
     {
-        $this->description = $value;
+        $this->description = $description;
+        return $this;
     }
 
-    public function getDuree()
+    #[ORM\Column(type: 'integer', nullable: false)]
+    private ?int $duree = null;
+
+    public function getDuree(): ?int
     {
         return $this->duree;
     }
 
-    public function setDuree($value)
+    public function setDuree(int $duree): self
     {
-        $this->duree = $value;
+        $this->duree = $duree;
+        return $this;
     }
 
-    public function getDateFormation()
+    #[ORM\Column(name:'dateFormation',type: 'string', nullable: false)]
+    private ?string $dateFormation = null;
+
+    public function getDateFormation(): ?string
     {
         return $this->dateFormation;
     }
 
-    public function setDateFormation($value)
+    public function setDateFormation(string $dateFormation): self
     {
-        $this->dateFormation = $value;
+        $this->dateFormation = $dateFormation;
+        return $this;
     }
 
-    public function getIsFavorite()
+    #[ORM\Column(name:'isFavorite',type: 'boolean', nullable: false)]
+    private ?bool $isFavorite = null;
+
+    public function isIsFavorite(): ?bool
     {
         return $this->isFavorite;
     }
 
-    public function setIsFavorite($value)
+    public function setIsFavorite(bool $isFavorite): self
     {
-        $this->isFavorite = $value;
+        $this->isFavorite = $isFavorite;
+        return $this;
     }
 
-    #[ORM\OneToMany(mappedBy: "idFormation", targetEntity: Participation::class)]
-    private Collection $participations;
+    #[ORM\ManyToMany(targetEntity: Utilisateur::class, inversedBy: 'formations')]
+    #[ORM\JoinTable(
+        name: 'participation',
+        joinColumns: [
+            new ORM\JoinColumn(name: 'idFormation', referencedColumnName: 'id')
+        ],
+        inverseJoinColumns: [
+            new ORM\JoinColumn(name: 'idUser', referencedColumnName: 'id')
+        ]
+    )]
+    private Collection $utilisateurs;
 
-        public function getParticipations(): Collection
-        {
-            return $this->participations;
+    /**
+     * @return Collection<int, Utilisateur>
+     */
+    public function getUtilisateurs(): Collection
+    {
+        if (!$this->utilisateurs instanceof Collection) {
+            $this->utilisateurs = new ArrayCollection();
         }
-    
-        public function addParticipation(Participation $participation): self
-        {
-            if (!$this->participations->contains($participation)) {
-                $this->participations[] = $participation;
-                $participation->setIdFormation($this);
-            }
-    
-            return $this;
+        return $this->utilisateurs;
+    }
+
+    public function addUtilisateur(Utilisateur $utilisateur): self
+    {
+        if (!$this->getUtilisateurs()->contains($utilisateur)) {
+            $this->getUtilisateurs()->add($utilisateur);
         }
-    
-        public function removeParticipation(Participation $participation): self
-        {
-            if ($this->participations->removeElement($participation)) {
-                // set the owning side to null (unless already changed)
-                if ($participation->getIdFormation() === $this) {
-                    $participation->setIdFormation(null);
-                }
-            }
-    
-            return $this;
-        }
+        return $this;
+    }
+
+    public function removeUtilisateur(Utilisateur $utilisateur): self
+    {
+        $this->getUtilisateurs()->removeElement($utilisateur);
+        return $this;
+    }
+
 }

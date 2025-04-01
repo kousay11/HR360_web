@@ -3,77 +3,86 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
-use App\Entity\Utilisateur;
+use App\Repository\NotificationRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: NotificationRepository::class)]
+#[ORM\Table(name: 'notification')]
 class Notification
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $id;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-        #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: "notifications")]
-    #[ORM\JoinColumn(name: 'iduser', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private Utilisateur $iduser;
-
-    #[ORM\Column(type: "integer")]
-    private int $reservationid;
-
-    #[ORM\Column(type: "text")]
-    private string $message;
-
-    #[ORM\Column(type: "datetime")]
-    private \DateTimeInterface $date;
-
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId($value)
+    public function setId(int $id): self
     {
-        $this->id = $value;
+        $this->id = $id;
+        return $this;
     }
 
-    public function getIduser()
-    {
-        return $this->iduser;
-    }
+    #[ORM\Column(name:'reservation_id',type: 'integer', nullable: true)]
+    private ?int $reservationid = null;
 
-    public function setIduser($value)
-    {
-        $this->iduser = $value;
-    }
-
-    public function getReservationid()
+    public function getReservationid(): ?int
     {
         return $this->reservationid;
     }
 
-    public function setReservationid($value)
+    public function setReservationid(?int $reservationid): self
     {
-        $this->reservationid = $value;
+        $this->reservationid = $reservationid;
+        return $this;
     }
 
-    public function getMessage()
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'notifications')]
+    #[ORM\JoinColumn(name: 'iduser', referencedColumnName: 'id')]
+    private ?Utilisateur $utilisateur = null;
+
+    public function getUtilisateur(): ?Utilisateur
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(?Utilisateur $utilisateur): self
+    {
+        $this->utilisateur = $utilisateur;
+        return $this;
+    }
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $message = null;
+
+    public function getMessage(): ?string
     {
         return $this->message;
     }
 
-    public function setMessage($value)
+    public function setMessage(?string $message): self
     {
-        $this->message = $value;
+        $this->message = $message;
+        return $this;
     }
 
-    public function getDate()
+    #[ORM\Column(type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $date = null;
+
+    public function getDate(): ?\DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate($value)
+    public function setDate(\DateTimeInterface $date): self
     {
-        $this->date = $value;
+        $this->date = $date;
+        return $this;
     }
+
 }

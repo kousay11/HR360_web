@@ -3,107 +3,113 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Reservation;
 
-#[ORM\Entity]
+use App\Repository\RessourceRepository;
+
+#[ORM\Entity(repositoryClass: RessourceRepository::class)]
+#[ORM\Table(name: 'ressource')]
 class Ressource
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $id;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $nom;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $type;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $etat;
-
-    #[ORM\Column(type: "float")]
-    private float $prix;
-
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId($value)
+    public function setId(int $id): self
     {
-        $this->id = $value;
+        $this->id = $id;
+        return $this;
     }
 
-    public function getNom()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $nom = null;
+
+    public function getNom(): ?string
     {
         return $this->nom;
     }
 
-    public function setNom($value)
+    public function setNom(string $nom): self
     {
-        $this->nom = $value;
+        $this->nom = $nom;
+        return $this;
     }
 
-    public function getType()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $type = null;
+
+    public function getType(): ?string
     {
         return $this->type;
     }
 
-    public function setType($value)
+    public function setType(string $type): self
     {
-        $this->type = $value;
+        $this->type = $type;
+        return $this;
     }
 
-    public function getEtat()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $etat = null;
+
+    public function getEtat(): ?string
     {
         return $this->etat;
     }
 
-    public function setEtat($value)
+    public function setEtat(string $etat): self
     {
-        $this->etat = $value;
+        $this->etat = $etat;
+        return $this;
     }
 
-    public function getPrix()
+    #[ORM\Column(type: 'decimal', nullable: false)]
+    private ?string $prix = null;
+
+    public function getPrix(): ?string
     {
         return $this->prix;
     }
 
-    public function setPrix($value)
+    public function setPrix(string $prix): self
     {
-        $this->prix = $value;
+        $this->prix = $prix;
+        return $this;
     }
 
-    #[ORM\OneToMany(mappedBy: "idressource", targetEntity: Reservation::class)]
+    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'ressource')]
     private Collection $reservations;
 
-        public function getReservations(): Collection
-        {
-            return $this->reservations;
+    /**
+     * @return Collection<int, Reservation>
+     */
+    public function getReservations(): Collection
+    {
+        if (!$this->reservations instanceof Collection) {
+            $this->reservations = new ArrayCollection();
         }
-    
-        public function addReservation(Reservation $reservation): self
-        {
-            if (!$this->reservations->contains($reservation)) {
-                $this->reservations[] = $reservation;
-                $reservation->setIdressource($this);
-            }
-    
-            return $this;
+        return $this->reservations;
+    }
+
+    public function addReservation(Reservation $reservation): self
+    {
+        if (!$this->getReservations()->contains($reservation)) {
+            $this->getReservations()->add($reservation);
         }
-    
-        public function removeReservation(Reservation $reservation): self
-        {
-            if ($this->reservations->removeElement($reservation)) {
-                // set the owning side to null (unless already changed)
-                if ($reservation->getIdressource() === $this) {
-                    $reservation->setIdressource(null);
-                }
-            }
-    
-            return $this;
-        }
+        return $this;
+    }
+
+    public function removeReservation(Reservation $reservation): self
+    {
+        $this->getReservations()->removeElement($reservation);
+        return $this;
+    }
+
 }

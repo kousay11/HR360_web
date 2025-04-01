@@ -3,120 +3,127 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Candidature;
 
-#[ORM\Entity]
+use App\Repository\OffreRepository;
+
+#[ORM\Entity(repositoryClass: OffreRepository::class)]
+#[ORM\Table(name: 'offre')]
 class Offre
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $idoffre;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name:'id_offre',type: 'integer')]
+    private ?int $idoffre = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $titre;
-
-    #[ORM\Column(type: "text")]
-    private string $description;
-
-    #[ORM\Column(type: "datetime")]
-    private \DateTimeInterface $datePublication;
-
-    #[ORM\Column(type: "datetime")]
-    private \DateTimeInterface $dateExpiration;
-
-    #[ORM\Column(type: "string", length: 50)]
-    private string $statut;
-
-    public function getIdoffre()
+    public function getIdoffre(): ?int
     {
         return $this->idoffre;
     }
 
-    public function setIdoffre($value)
+    public function setIdoffre(int $idoffre): self
     {
-        $this->idoffre = $value;
+        $this->idoffre = $idoffre;
+        return $this;
     }
 
-    public function getTitre()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $titre = null;
+
+    public function getTitre(): ?string
     {
         return $this->titre;
     }
 
-    public function setTitre($value)
+    public function setTitre(string $titre): self
     {
-        $this->titre = $value;
+        $this->titre = $titre;
+        return $this;
     }
 
-    public function getDescription()
+    #[ORM\Column(type: 'text', nullable: false)]
+    private ?string $description = null;
+
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription($value)
+    public function setDescription(string $description): self
     {
-        $this->description = $value;
+        $this->description = $description;
+        return $this;
     }
 
-    public function getDatePublication()
+    #[ORM\Column(name:'datePublication',type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $datePublication = null;
+
+    public function getDatePublication(): ?\DateTimeInterface
     {
         return $this->datePublication;
     }
 
-    public function setDatePublication($value)
+    public function setDatePublication(\DateTimeInterface $datePublication): self
     {
-        $this->datePublication = $value;
+        $this->datePublication = $datePublication;
+        return $this;
     }
 
-    public function getDateExpiration()
+    #[ORM\Column(name:'dateExpiration',type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $dateExpiration = null;
+
+    public function getDateExpiration(): ?\DateTimeInterface
     {
         return $this->dateExpiration;
     }
 
-    public function setDateExpiration($value)
+    public function setDateExpiration(\DateTimeInterface $dateExpiration): self
     {
-        $this->dateExpiration = $value;
+        $this->dateExpiration = $dateExpiration;
+        return $this;
     }
 
-    public function getStatut()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $statut = null;
+
+    public function getStatut(): ?string
     {
         return $this->statut;
     }
 
-    public function setStatut($value)
+    public function setStatut(string $statut): self
     {
-        $this->statut = $value;
+        $this->statut = $statut;
+        return $this;
     }
 
-    #[ORM\OneToMany(mappedBy: "idoffre", targetEntity: Candidature::class)]
+    #[ORM\OneToMany(targetEntity: Candidature::class, mappedBy: 'offre')]
     private Collection $candidatures;
 
-        public function getCandidatures(): Collection
-        {
-            return $this->candidatures;
+    /**
+     * @return Collection<int, Candidature>
+     */
+    public function getCandidatures(): Collection
+    {
+        if (!$this->candidatures instanceof Collection) {
+            $this->candidatures = new ArrayCollection();
         }
-    
-        public function addCandidature(Candidature $candidature): self
-        {
-            if (!$this->candidatures->contains($candidature)) {
-                $this->candidatures[] = $candidature;
-                $candidature->setIdoffre($this);
-            }
-    
-            return $this;
+        return $this->candidatures;
+    }
+
+    public function addCandidature(Candidature $candidature): self
+    {
+        if (!$this->getCandidatures()->contains($candidature)) {
+            $this->getCandidatures()->add($candidature);
         }
-    
-        public function removeCandidature(Candidature $candidature): self
-        {
-            if ($this->candidatures->removeElement($candidature)) {
-                // set the owning side to null (unless already changed)
-                if ($candidature->getIdoffre() === $this) {
-                    $candidature->setIdoffre(null);
-                }
-            }
-    
-            return $this;
-        }
+        return $this;
+    }
+
+    public function removeCandidature(Candidature $candidature): self
+    {
+        $this->getCandidatures()->removeElement($candidature);
+        return $this;
+    }
+
 }

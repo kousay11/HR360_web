@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Offre;
 use App\Form\OffreType;
+use App\Repository\OffreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,14 +15,10 @@ use Symfony\Component\Routing\Attribute\Route;
 final class OffreController extends AbstractController
 {
     #[Route(name: 'app_offre_index', methods: ['GET'])]
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(OffreRepository $offreRepository): Response
     {
-        $offres = $entityManager
-            ->getRepository(Offre::class)
-            ->findAll();
-
         return $this->render('offre/index.html.twig', [
-            'offres' => $offres,
+            'offres' => $offreRepository->findAll(),
         ]);
     }
 

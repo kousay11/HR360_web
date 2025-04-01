@@ -3,135 +3,169 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
-use App\Entity\Utilisateur;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Entretien;
 
-#[ORM\Entity]
+use App\Repository\CandidatureRepository;
+
+#[ORM\Entity(repositoryClass: CandidatureRepository::class)]
+#[ORM\Table(name: 'candidature')]
 class Candidature
 {
-
-        #[ORM\ManyToOne(targetEntity: Offre::class, inversedBy: "candidatures")]
-    #[ORM\JoinColumn(name: 'idoffre', referencedColumnName: 'idoffre', onDelete: 'CASCADE')]
-    private Offre $idoffre;
-
-        #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: "candidatures")]
-    #[ORM\JoinColumn(name: 'iduser', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private Utilisateur $iduser;
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $idCandidature;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $idCandidature = null;
 
-    #[ORM\Column(type: "datetime")]
-    private \DateTimeInterface $dateCandidature;
-
-    #[ORM\Column(type: "string", length: 50)]
-    private string $statut;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $cv;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $lettreMotivation;
-
-    #[ORM\Column(type: "text")]
-    private string $description;
-
-    #[ORM\Column(type: "datetime")]
-    private \DateTimeInterface $dateModification;
-
-    public function getIdoffre()
-    {
-        return $this->idoffre;
-    }
-
-    public function setIdoffre($value)
-    {
-        $this->idoffre = $value;
-    }
-
-    public function getIduser()
-    {
-        return $this->iduser;
-    }
-
-    public function setIduser($value)
-    {
-        $this->iduser = $value;
-    }
-
-    public function getIdCandidature()
+    public function getIdCandidature(): ?int
     {
         return $this->idCandidature;
     }
 
-    public function setIdCandidature($value)
+    public function setIdCandidature(int $idCandidature): self
     {
-        $this->idCandidature = $value;
+        $this->idCandidature = $idCandidature;
+        return $this;
     }
 
-    public function getDateCandidature()
+    #[ORM\Column(name:'dateCandidature',type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $dateCandidature = null;
+
+    public function getDateCandidature(): ?\DateTimeInterface
     {
         return $this->dateCandidature;
     }
 
-    public function setDateCandidature($value)
+    public function setDateCandidature(\DateTimeInterface $dateCandidature): self
     {
-        $this->dateCandidature = $value;
+        $this->dateCandidature = $dateCandidature;
+        return $this;
     }
 
-    public function getStatut()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $statut = null;
+
+    public function getStatut(): ?string
     {
         return $this->statut;
     }
 
-    public function setStatut($value)
+    public function setStatut(string $statut): self
     {
-        $this->statut = $value;
+        $this->statut = $statut;
+        return $this;
     }
 
-    public function getCv()
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $cv = null;
+
+    public function getCv(): ?string
     {
         return $this->cv;
     }
 
-    public function setCv($value)
+    public function setCv(string $cv): self
     {
-        $this->cv = $value;
+        $this->cv = $cv;
+        return $this;
     }
 
-    public function getLettreMotivation()
+    #[ORM\Column(name:'lettreMotivation',type: 'string', nullable: false)]
+    private ?string $lettreMotivation = null;
+
+    public function getLettreMotivation(): ?string
     {
         return $this->lettreMotivation;
     }
 
-    public function setLettreMotivation($value)
+    public function setLettreMotivation(string $lettreMotivation): self
     {
-        $this->lettreMotivation = $value;
+        $this->lettreMotivation = $lettreMotivation;
+        return $this;
+    }
+    #[ORM\ManyToOne(targetEntity: Offre::class, inversedBy: 'candidatures')]
+    #[ORM\JoinColumn(name: 'id_offre', referencedColumnName: 'id_offre')]
+    private ?Offre $offre = null;
+
+    public function getOffre(): ?Offre
+    {
+        return $this->offre;
     }
 
-    public function getDescription()
+    public function setOffre(?Offre $offre): self
+    {
+        $this->offre = $offre;
+        return $this;
+    }
+
+    #[ORM\Column(type: 'text', nullable: false)]
+    private ?string $description = null;
+
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription($value)
+    public function setDescription(string $description): self
     {
-        $this->description = $value;
+        $this->description = $description;
+        return $this;
     }
 
-    public function getDateModification()
+    #[ORM\Column(name:'dateModification',type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $dateModification = null;
+
+    public function getDateModification(): ?\DateTimeInterface
     {
         return $this->dateModification;
     }
 
-    public function setDateModification($value)
+    public function setDateModification(\DateTimeInterface $dateModification): self
     {
-        $this->dateModification = $value;
+        $this->dateModification = $dateModification;
+        return $this;
     }
 
-    #[ORM\OneToMany(mappedBy: "idCandidature", targetEntity: Entretien::class)]
+    #[ORM\Column(name:'id_user',type: 'integer', nullable: false)]
+    private ?int $iduser = null;
+
+    public function getIduser(): ?int
+    {
+        return $this->iduser;
+    }
+
+    public function setIduser(int $iduser): self
+    {
+        $this->iduser = $iduser;
+        return $this;
+    }
+
+    #[ORM\OneToMany(targetEntity: Entretien::class, mappedBy: 'candidature')]
     private Collection $entretiens;
+
+    /**
+     * @return Collection<int, Entretien>
+     */
+    public function getEntretiens(): Collection
+    {
+        if (!$this->entretiens instanceof Collection) {
+            $this->entretiens = new ArrayCollection();
+        }
+        return $this->entretiens;
+    }
+
+    public function addEntretien(Entretien $entretien): self
+    {
+        if (!$this->getEntretiens()->contains($entretien)) {
+            $this->getEntretiens()->add($entretien);
+        }
+        return $this;
+    }
+
+    public function removeEntretien(Entretien $entretien): self
+    {
+        $this->getEntretiens()->removeElement($entretien);
+        return $this;
+    }
+
 }

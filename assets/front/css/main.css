@@ -226,7 +226,7 @@ h6 {
   --default-color: #ffffff;
   --heading-color: #ffffff;
   color: var(--default-color);
-  background-color: var(--background-color);
+  background-color: rgba(33, 37, 41, 0.8);;
   padding: 20px 0;
   transition: all 0.5s;
   z-index: 997;

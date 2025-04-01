@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Entretien;
 use App\Form\EntretienType;
+use App\Repository\EntretienRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,14 +15,10 @@ use Symfony\Component\Routing\Attribute\Route;
 final class EntretienController extends AbstractController
 {
     #[Route(name: 'app_entretien_index', methods: ['GET'])]
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(EntretienRepository $entretienRepository): Response
     {
-        $entretiens = $entityManager
-            ->getRepository(Entretien::class)
-            ->findAll();
-
         return $this->render('entretien/index.html.twig', [
-            'entretiens' => $entretiens,
+            'entretiens' => $entretienRepository->findAll(),
         ]);
     }
 

@@ -14,7 +14,6 @@ class TacheType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('id')
             ->add('nom')
             ->add('description')
             ->add('dateDebut', null, [
@@ -25,7 +24,7 @@ class TacheType extends AbstractType
             ])
             ->add('statut')
             ->add('trelloboardid')
-            ->add('idProjet', EntityType::class, [
+            ->add('projet', EntityType::class, [
                 'class' => Projet::class,
                 'choice_label' => 'id',
             ])
