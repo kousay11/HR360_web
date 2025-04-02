@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\StatusTache;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -84,17 +85,18 @@ class Tache
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $statut = null;
+    #[ORM\Column(type: 'statustache', nullable: false)]
+    private ?StatusTache $statut = null;
 
-    public function getStatut(): ?string
+    public function getStatut(): ?StatusTache
     {
+
         return $this->statut;
     }
-
-    public function setStatut(string $statut): self
+    
+    public function setStatut(StatusTache $statusTache): self
     {
-        $this->statut = $statut;
+        $this->statut = $statusTache;
         return $this;
     }
 

@@ -26,7 +26,7 @@
                 <td>{{ tache.description }}</td>
                 <td>{{ tache.dateDebut ? tache.dateDebut|date('Y-m-d') : '' }}</td>
                 <td>{{ tache.dateFin ? tache.dateFin|date('Y-m-d') : '' }}</td>
-                <td>{{ tache.statut }}</td>
+                <td>{{ tache.statut.value }}</td>
                 <td>{{ tache.trelloboardid }}</td>
                 <td>
                     <a href="{{ path('app_tache_show', {'id': tache.id}) }}">show</a>
