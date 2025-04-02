@@ -17,6 +17,9 @@ final class OffreController extends AbstractController
     #[Route(name: 'app_offre_index', methods: ['GET'])]
     public function index(OffreRepository $offreRepository): Response
     {
+        // Met à jour les statuts avant d'afficher
+        $offreRepository->updateExpiredStatus();
+
         return $this->render('offre/index.html.twig', [
             'offres' => $offreRepository->findAll(),
         ]);
@@ -30,6 +33,7 @@ final class OffreController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $offre->setStatut('Publiée'); // Définit le statut par défaut
             $entityManager->persist($offre);
             $entityManager->flush();
 

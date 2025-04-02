@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nos Offres d'Emploi{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <h1 class="text-center mb-5 text-dark">
+        <i class="fas fa-briefcase me-2"></i>Nos Offres d'Emploi
+    </h1>
+
+    <div class="row mb-4 justify-content-end">
+        <div class="col-md-6 text-end">
+            <div class="d-inline-block bg-light p-2 rounded">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Statut : 
+                    <span class="badge bg-success">Publiée</span>
+                    <span class="badge bg-secondary ms-1">Expirée</span>
+                </small>
+            </div>
+        </div>
+    </div>
+
+    {% if offres is empty %}
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle me-2"></i>Aucune offre disponible pour le moment
+        </div>
+    {% else %}
+        <div class="row g-4">
+            {% for offre in offres %}
+                {% set isExpired = date() > date(offre.dateExpiration) %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0 {% if isExpired %}border-secondary{% else %}border-danger{% endif %}">
+                        <div class="card-header bg-dark text-white position-relative" style="min-height: 60px;">
+                            <h5 class="card-title mb-0 pe-5">
+                                <i class="fas fa-heading me-2"></i>{{ offre.titre }}
+                            </h5>
+                            <span class="position-absolute top-50 end-0 translate-middle-y badge rounded-pill {% if isExpired %}bg-secondary{% else %}bg-success{% endif %} me-3">
+                                {% if isExpired %}
+                                    <i class="fas fa-clock me-1"></i>Expirée
+                                {% else %}
+                                    <i class="fas fa-check-circle me-1"></i>Publiée
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                <i class="fas fa-align-left text-muted me-2"></i>
+                                {{ offre.description|length > 100 ? offre.description|slice(0, 100) ~ '...' : offre.description }}
+                            </p>
+                            <hr>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item bg-transparent">
+                                    <i class="fas fa-calendar-plus text-danger me-2"></i>
+                                    <strong>Publiée :</strong> 
+                                    <span class="float-end">{{ offre.datePublication|date('d/m/Y') }}</span>
+                                </li>
+                                <li class="list-group-item bg-transparent">
+                                    <i class="fas fa-calendar-times text-danger me-2"></i>
+                                    <strong>Expire :</strong> 
+                                    <span class="float-end">{{ offre.dateExpiration|date('d/m/Y') }}</span>
+                                </li>
+                                <li class="list-group-item bg-transparent">
+                                    <i class="fas fa-clock text-danger me-2"></i>
+                                    <strong>Temps restant :</strong> 
+                                    <span class="float-end">
+                                        {% if isExpired %}
+                                            <span class="text-danger">Offre expirée</span>
+                                        {% else %}
+                                            {{ date(offre.dateExpiration).diff(date())|date('%a jours') }}
+                                        {% endif %}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-footer bg-white border-0 d-flex justify-content-between pt-0">
+                            <a href="{{ path('app_offreFront_show', {'idoffre': offre.idoffre}) }}" 
+                               class="btn btn-outline-dark btn-sm">
+                                <i class="fas fa-eye me-1"></i> Détails
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .card {
+        transition: all 0.3s ease;
+        border-width: 2px;
+        border-radius: 10px;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+    .card-header {
+        border-bottom: 2px solid #dc3545;
+        padding: 1rem 1.25rem;
+    }
+    .card-header .badge {
+        font-size: 0.75rem;
+        padding: 0.5em 0.8em;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+    .list-group-item {
+        padding: 0.75rem 0;
+        border: none;
+    }
+    hr {
+        opacity: 0.1;
+        margin: 1rem 0;
+    }
+    .card-title {
+        max-width: calc(100% - 100px);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+{% endblock %}

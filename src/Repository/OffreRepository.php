@@ -14,4 +14,18 @@ class OffreRepository extends ServiceEntityRepository
     }
 
     // Add custom methods as needed
+    public function updateExpiredStatus(): void
+{
+    $now = new \DateTime();
+    $qb = $this->createQueryBuilder('o');
+    
+    $qb->update()
+       ->set('o.statut', ':expiredStatus')
+       ->where('o.dateExpiration < :now')
+       ->andWhere('o.statut != :expiredStatus')
+       ->setParameter('expiredStatus', 'Expirée')
+       ->setParameter('now', $now)
+       ->getQuery()
+       ->execute();
+}
 }

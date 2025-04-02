@@ -1,42 +1,163 @@
-<!DOCTYPE html>
+{% extends 'base.html.twig' %}
 
-<title>Offre</title>
+{% block title %}{{ offre.titre }}{% endblock %}
 
 {% block body %}
-    <h1>Offre</h1>
+{% set isExpired = date() > date(offre.dateExpiration) %}
+{% set offreIcon %}
+    {% if offre.titre matches '/développeur|programmeur|devops/i' %}laptop-code
+    {% elseif offre.titre matches '/commercial|vente|marketing/i' %}handshake
+    {% elseif offre.titre matches '/design|graphique|UI|UX/i' %}palette
+    {% elseif offre.titre matches '/comptabilité|finance/i' %}calculator
+    {% elseif offre.titre matches '/rh|ressources humaines/i' %}users
+    {% else %}briefcase
+    {% endif %}
+{% endset %}
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Idoffre</th>
-                <td>{{ offre.idoffre }}</td>
-            </tr>
-            <tr>
-                <th>Titre</th>
-                <td>{{ offre.titre }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ offre.description }}</td>
-            </tr>
-            <tr>
-                <th>DatePublication</th>
-                <td>{{ offre.datePublication ? offre.datePublication|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>DateExpiration</th>
-                <td>{{ offre.dateExpiration ? offre.dateExpiration|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Statut</th>
-                <td>{{ offre.statut }}</td>
-            </tr>
-        </tbody>
-    </table>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{{ path('app_offre_index') }}" class="btn btn-outline-dark btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Retour
+        </a>
+    </div>
 
-    <a href="{{ path('app_offre_index') }}">back to list</a>
+    <div class="list-view-card mb-4">
+        <div class="list-view-header">
+            <div class="d-flex align-items-center">
+                <div class="list-view-icon bg-danger text-white">
+                    <i class="fas fa-{{ offreIcon }}"></i>
+                </div>
+                <div class="ms-3">
+                    <h3 class="mb-0">{{ offre.titre }}</h3>
+                    <small class="text-muted">
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        Publiée le {{ offre.datePublication|date('d/m/Y') }}
+                    </small>
+                </div>
+            </div>
+            <span class="badge {% if isExpired %}bg-secondary{% else %}bg-success{% endif %}">
+                {% if isExpired %}
+                    <i class="fas fa-clock me-1"></i>Expirée
+                {% else %}
+                    <i class="fas fa-check-circle me-1"></i>Publiée
+                {% endif %}
+            </span>
+        </div>
 
-    <a href="{{ path('app_offre_edit', {'idoffre': offre.idoffre}) }}">edit</a>
+        <div class="list-view-body">
+            <div class="mb-3">
+                <h5 class="text-dark mb-2">
+                    <i class="fas fa-align-left text-muted me-2"></i>Description
+                </h5>
+                <p>{{ offre.description }}</p>
+            </div>
 
-    {{ include('offre/_delete_form.html.twig') }}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="detail-item">
+                        <i class="fas fa-calendar-plus text-danger"></i>
+                        <div>
+                            <span>Publiée le</span>
+                            <strong>{{ offre.datePublication|date('d/m/Y à H:i') }}</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-item">
+                        <i class="fas fa-calendar-times text-danger"></i>
+                        <div>
+                            <span>Expire le</span>
+                            <strong>{{ offre.dateExpiration|date('d/m/Y à H:i') }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="list-view-footer">
+            {% if isExpired %}
+            <div class="alert alert-warning mb-0">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Cette offre a expiré le {{ offre.dateExpiration|date('d/m/Y') }}
+            </div>
+            {% else %}
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Temps restant : {{ date(offre.dateExpiration).diff(date())|date('%a jours') }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .list-view-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .list-view-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem;
+        background: #f8f9fa;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .list-view-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+    
+    .list-view-body {
+        padding: 1.25rem;
+    }
+    
+    .list-view-footer {
+        padding: 1.25rem;
+        background: #f8f9fa;
+        border-top: 1px solid #eee;
+    }
+    
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 0;
+    }
+    
+    .detail-item i {
+        font-size: 1.25rem;
+    }
+    
+    .detail-item div {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .detail-item span {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .detail-item strong {
+        font-weight: 500;
+    }
+    
+    .badge {
+        font-size: 0.85rem;
+        padding: 0.5em 0.8em;
+        font-weight: 500;
+    }
+</style>
 {% endblock %}
