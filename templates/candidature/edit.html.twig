@@ -1,13 +1,127 @@
-<!DOCTYPE html>
-
-<title>Edit Candidature</title>
+{% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Edit Candidature</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="text-center mb-0 text-dark">
+                    <i class="fas fa-edit me-2"></i>Modifier la candidature
+                </h1>
+                <a href="{{ path('app_candidature_index') }}" class="btn btn-outline-dark">
+                    <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                </a>
+            </div>
 
-    {{ include('candidature/_form.html.twig', {'button_label': 'Update'}) }}
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.description, 'Description complémentaire', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.description, {
+                            'attr': {
+                                'class': 'form-control' ~ (form.description.vars.valid ? '' : ' is-invalid'),
+                                'rows': 5
+                            }
+                        }) }}
+                        {{ form_errors(form.description) }}
+                        <div class="form-text">Minimum 50 caractères</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.cv, 'CV (PDF)', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.cv, {'attr': {'class': 'form-control' ~ (form.cv.vars.valid ? '' : ' is-invalid')}}) }}
+                        {{ form_errors(form.cv) }}
+                        {% if candidature.cv %}
+                            <div class="mt-2">
+                                <span class="badge bg-info">
+                                    <i class="fas fa-file-pdf me-1"></i>Fichier actuel: {{ candidature.cv }}
+                                </span>
+                                <a href="{{ asset('uploads/cvs/' ~ candidature.cv) }}" target="_blank" class="ms-2">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3" >
+                        {{ form_label(form.lettreMotivation, 'Lettre de motivation (PDF)', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.lettreMotivation, {'attr': {'class': 'form-control' ~ (form.lettreMotivation.vars.valid ? '' : ' is-invalid')}}) }}
+                        {{ form_errors(form.lettreMotivation) }}
+                        {% if candidature.lettreMotivation %}
+                            <div class="mt-2">
+                                <span class="badge bg-info">
+                                    <i class="fas fa-file-pdf me-1"></i>Fichier actuel: {{ candidature.lettreMotivation }}
+                                </span>
+                                <a href="{{ asset('uploads/lettres/' ~ candidature.lettreMotivation) }}" target="_blank" class="ms-2">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-primary me-md-2">
+                            <i class="fas fa-save me-2"></i>Enregistrer les modifications
+                        </button>
+                        <a href="{{ path('app_candidature_index') }}" class="btn btn-outline-secondary">
+                            Annuler
+                        </a>
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
 
-    <a href="{{ path('app_candidature_index') }}">back to list</a>
+            <div class="mt-4 text-end">
+                {{ include('candidature/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
 
-    {{ include('candidature/_delete_form.html.twig') }}
+<style>
+    .card {
+        border-radius: 10px;
+        border: 2px solid rgba(53, 111, 220, 0.2);
+        transition: all 0.3s ease;
+    }
+    .card:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .form-control:focus {
+        border-color: #356fdc;
+        box-shadow: 0 0 0 0.25rem rgba(53, 111, 220, 0.25);
+    }
+    .form-label {
+        color: #495057;
+    }
+    .btn-primary {
+        background-color: #356fdc;
+        border-color: #356fdc;
+    }
+    .btn-primary:hover {
+        background-color: #2a5ab7;
+        border-color: #2a5ab7;
+    }
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875rem;
+    }
+    .is-invalid {
+        border-color: #dc3545;
+    }
+    .is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+    .text-muted {
+        font-size: 0.8rem;
+    }
+    .badge {
+        font-size: 0.85rem;
+        padding: 0.35em 0.65em;
+    }
+</style>
 {% endblock %}

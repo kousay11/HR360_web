@@ -82,11 +82,10 @@
                 </div>
                 
                 <div class="card-footer bg-white border-0 d-flex justify-content-between">
-                    
                     <div>
-                        <a href="#" class="btn btn-success">
-                            <i class="fas fa-file-alt me-2"></i>Postuler
-                        </a>
+                    <a href="{{ path('app_candidature_new', {'idOffre': offre.idoffre}) }}" class="btn btn-success">
+                        <i class="fas fa-file-alt me-2"></i>Postuler
+                    </a>
                     </div>
                 </div>
             </div>

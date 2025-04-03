@@ -1,11 +1,168 @@
-<!DOCTYPE html>
+{% extends 'base.html.twig' %}
 
-<title>New Candidature</title>
+{% block title %}Postuler à l'offre{% endblock %}
 
 {% block body %}
-    <h1>Create new Candidature</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="text-center mb-0 text-dark">
+                    <i class="fas fa-file-alt me-2"></i>Postuler à l'offre
+                </h1>
+                <a href="{{ path('app_offre_index') }}" class="btn btn-outline-dark">
+                    <i class="fas fa-arrow-left me-2"></i>Retour
+                </a>
+            </div>
 
-    {{ include('candidature/_form.html.twig') }}
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    {{ form_start(form) }}
+                        <div class="mb-4">
+                            <h4 class="text-dark mb-3">
+                                <i class="fas fa-file-pdf text-danger me-2"></i>CV
+                            </h4>
+                            <div class="mb-3">
+                                {{ form_label(form.cv, null, {'label_attr': {'class': 'form-label'}}) }}
+                                <div class="input-group">
+                                    {{ form_widget(form.cv, {
+                                        'attr': {
+                                            'class': 'form-control' ~ (form.cv.vars.errors|length ? ' is-invalid' : ''),
+                                            'accept': 'application/pdf',
+                                            'onchange': 'displayFileName(this, "cv-file-name")'
+                                        }
+                                    }) }}
+                                </div>
+                                <div id="cv-file-name" class="mt-2 d-none">
+                                    <span class="text-muted">Fichier sélectionné : </span>
+                                    <a href="#" class="text-primary" id="cv-file-link" target="_blank"></a>
+                                </div>
+                                {{ form_help(form.cv, {'help_attr': {'class': 'form-text text-muted'}}) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.cv) }}
+                                </div>
+                            </div>
+                        </div>
 
-    <a href="{{ path('app_candidature_index') }}">back to list</a>
+                        <div class="mb-4">
+                            <h4 class="text-dark mb-3">
+                                <i class="fas fa-file-pdf text-danger me-2"></i>Lettre de motivation
+                            </h4>
+                            <div class="mb-3">
+                                {{ form_label(form.lettreMotivation, null, {'label_attr': {'class': 'form-label'}}) }}
+                                <div class="input-group">
+                                    {{ form_widget(form.lettreMotivation, {
+                                        'attr': {
+                                            'class': 'form-control' ~ (form.lettreMotivation.vars.errors|length ? ' is-invalid' : ''),
+                                            'accept': 'application/pdf',
+                                            'onchange': 'displayFileName(this, "lettre-file-name")'
+                                        }
+                                    }) }}
+                                </div>
+                                <div id="lettre-file-name" class="mt-2 d-none">
+                                    <span class="text-muted">Fichier sélectionné : </span>
+                                    <a href="#" class="text-primary" id="lettre-file-link" target="_blank"></a>
+                                </div>
+                                {{ form_help(form.lettreMotivation, {'help_attr': {'class': 'form-text text-muted'}}) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.lettreMotivation) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="text-dark mb-3">
+                                <i class="fas fa-align-left text-danger me-2"></i>Description complémentaire
+                            </h4>
+                            <div class="mb-3">
+                                {{ form_label(form.description, null, {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.description, {
+                                    'attr': {
+                                        'class': 'form-control' ~ (form.description.vars.errors|length ? ' is-invalid' : ''),
+                                        'rows': 5,
+                                        'placeholder': 'Décrivez vos motivations et compétences...'
+                                    }
+                                }) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.description) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-paper-plane me-2"></i>Soumettre la candidature
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function displayFileName(input, containerId) {
+        const container = document.getElementById(containerId);
+        const fileLink = document.getElementById(containerId.replace('file-name', 'file-link'));
+        
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const fileUrl = URL.createObjectURL(file);
+            
+            fileLink.textContent = file.name;
+            fileLink.href = fileUrl;
+            
+            container.classList.remove('d-none');
+        } else {
+            container.classList.add('d-none');
+        }
+    }
+</script>
+
+<style>
+    .card {
+        border-radius: 10px;
+        border-width: 2px;
+        border-color: rgb(53, 111, 220);
+    }
+    .form-control:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        padding: 0.5rem 1.5rem;
+    }
+    .btn-danger:hover {
+        background-color: #bb2d3b;
+        border-color: #bb2d3b;
+    }
+    .invalid-feedback {
+        color: #dc3545;
+        display: block;
+    }
+    .is-invalid {
+        border-color: #dc3545;
+    }
+    .is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+    #cv-file-link, #lettre-file-link {
+        text-decoration: none;
+        cursor: pointer;
+    }
+    #cv-file-link:hover, #lettre-file-link:hover {
+        text-decoration: underline;
+    }
+</style>
 {% endblock %}

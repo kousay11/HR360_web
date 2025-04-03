@@ -14,4 +14,14 @@ class CandidatureRepository extends ServiceEntityRepository
     }
 
     // Add custom methods as needed
+    // src/Repository/CandidatureRepository.php
+public function findAllWithOffre()
+{
+    return $this->createQueryBuilder('c')
+        ->leftJoin('c.offre', 'o')
+        ->addSelect('o')
+        ->orderBy('c.dateCandidature', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
 }
