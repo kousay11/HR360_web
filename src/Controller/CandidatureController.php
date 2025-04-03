@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Candidature;
 use App\Entity\Offre;
 use App\Form\CandidatureType;
+use App\Form\CandidatureTypeNew;
 use App\Repository\CandidatureRepository;
 use App\Repository\OffreRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -90,19 +91,16 @@ final class CandidatureController extends AbstractController
     #[Route('/{idCandidature}/edit', name: 'app_candidature_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Candidature $candidature, EntityManagerInterface $entityManager): Response
     {
-        // Sauvegarder les noms des fichiers existants
         $existingCv = $candidature->getCv();
         $existingLettre = $candidature->getLettreMotivation();
         $existingDescription = $candidature->getDescription();
     
-        $form = $this->createForm(CandidatureType::class, $candidature);
+        $form = $this->createForm(CandidatureTypeNew::class, $candidature);
         $form->handleRequest($request);
     
         if ($form->isSubmitted() && $form->isValid()) {
-             // Mettre à jour la date de modification seulement si c'est une vraie modification
-            if ($form->getData() != $form->getNormData()) {
-                $candidature->setDateModification(new \DateTime());
-            }
+            $hasChanged = false;
+    
             // Gestion du fichier CV
             $cvFile = $form->get('cv')->getData();
             if ($cvFile) {
@@ -120,9 +118,7 @@ final class CandidatureController extends AbstractController
                     $newFilename
                 );
                 $candidature->setCv($newFilename);
-            } else {
-                // Conserver l'ancien fichier CV si aucun nouveau n'est téléchargé
-                $candidature->setCv($existingCv);
+                $hasChanged = true;
             }
     
             // Gestion de la lettre de motivation
@@ -142,30 +138,16 @@ final class CandidatureController extends AbstractController
                     $newFilename
                 );
                 $candidature->setLettreMotivation($newFilename);
-            } else {
-                // Conserver l'ancienne lettre de motivation si aucune nouvelle n'est téléchargée
-                $candidature->setLettreMotivation($existingLettre);
+                $hasChanged = true;
             }
-            $hasChanged = false;
-
-        // Vérifier chaque champ pour détecter les modifications
-        if ($form->get('cv')->getData() !== null) {
-            $hasChanged = true;
-            // Traitement du CV...
-        }
-
-        if ($form->get('lettreMotivation')->getData() !== null) {
-            $hasChanged = true;
-            // Traitement de la lettre...
-        }
-
-        if ($candidature->getDescription() !== $existingDescription) {
-            $hasChanged = true;
-        }
-
-        if ($hasChanged) {
-            $candidature->setDateModification(new \DateTime());
-        }
+    
+            if ($candidature->getDescription() !== $existingDescription) {
+                $hasChanged = true;
+            }
+    
+            if ($hasChanged) {
+                $candidature->setDateModification(new \DateTime());
+            }
     
             $entityManager->flush();
     

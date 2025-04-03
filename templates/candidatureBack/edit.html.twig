@@ -29,44 +29,37 @@
                         <div class="form-text">Minimum 50 caractères</div>
                     </div>
                     
-                  <div class="mb-3">
-    {{ form_label(form.cv, 'CV (PDF)', {'label_attr': {'class': 'form-label fw-bold'}}) }}
-    {{ form_widget(form.cv, {'attr': {
-        'class': 'form-control' ~ (form.cv.vars.valid ? '' : ' is-invalid'),
-        'onchange': 'updateFileDisplay(this, "cv-current", "cv-preview")'
-    }}) }}
-    {{ form_errors(form.cv) }}
-    <div class="mt-2" id="cv-current">
-        {% if candidature.cv %}
-            <span class="badge bg-info">
-                <i class="fas fa-file-pdf me-1"></i>Fichier actuel: <span id="cv-filename">{{ candidature.cv }}</span>
-            </span>
-            <a href="{{ asset('uploads/cvs/' ~ candidature.cv) }}" target="_blank" class="ms-2" id="cv-preview">
-                <i class="fas fa-eye"></i> Voir
-            </a>
-        {% endif %}
-    </div>
-</div>
-
-<div class="mb-3">
-    {{ form_label(form.lettreMotivation, 'Lettre de motivation (PDF)', {'label_attr': {'class': 'form-label fw-bold'}}) }}
-    {{ form_widget(form.lettreMotivation, {'attr': {
-        'class': 'form-control' ~ (form.lettreMotivation.vars.valid ? '' : ' is-invalid'),
-        'onchange': 'updateFileDisplay(this, "lettre-current", "lettre-preview")'
-    }}) }}
-    {{ form_errors(form.lettreMotivation) }}
-    <div class="mt-2" id="lettre-current">
-        {% if candidature.lettreMotivation %}
-            <span class="badge bg-info">
-                <i class="fas fa-file-pdf me-1"></i>Fichier actuel: <span id="lettre-filename">{{ candidature.lettreMotivation }}</span>
-            </span>
-            <a href="{{ asset('uploads/lettres/' ~ candidature.lettreMotivation) }}" target="_blank" class="ms-2" id="lettre-preview">
-                <i class="fas fa-eye"></i> Voir
-            </a>
-        {% endif %}
-    </div>
-</div>
-
+                    <div class="mb-3">
+                        {{ form_label(form.cv, 'CV (PDF)', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.cv, {'attr': {'class': 'form-control' ~ (form.cv.vars.valid ? '' : ' is-invalid')}}) }}
+                        {{ form_errors(form.cv) }}
+                        {% if candidature.cv %}
+                            <div class="mt-2">
+                                <span class="badge bg-info">
+                                    <i class="fas fa-file-pdf me-1"></i>Fichier actuel: {{ candidature.cv }}
+                                </span>
+                                <a href="{{ asset('uploads/cvs/' ~ candidature.cv) }}" target="_blank" class="ms-2">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3" >
+                        {{ form_label(form.lettreMotivation, 'Lettre de motivation (PDF)', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.lettreMotivation, {'attr': {'class': 'form-control' ~ (form.lettreMotivation.vars.valid ? '' : ' is-invalid')}}) }}
+                        {{ form_errors(form.lettreMotivation) }}
+                        {% if candidature.lettreMotivation %}
+                            <div class="mt-2">
+                                <span class="badge bg-info">
+                                    <i class="fas fa-file-pdf me-1"></i>Fichier actuel: {{ candidature.lettreMotivation }}
+                                </span>
+                                <a href="{{ asset('uploads/lettres/' ~ candidature.lettreMotivation) }}" target="_blank" class="ms-2">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
                     
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                         <button type="submit" class="btn btn-primary me-md-2">
@@ -131,36 +124,4 @@
         padding: 0.35em 0.65em;
     }
 </style>
-<script>
-function updateFileDisplay(input, currentElementId, previewElementId) {
-    if (input.files && input.files[0]) {
-        const fileName = input.files[0].name;
-        const currentElement = document.getElementById(currentElementId);
-        const filenameSpan = document.getElementById(currentElementId.replace('current', 'filename'));
-        const previewLink = document.getElementById(previewElementId);
-        
-        // Crée l'élément s'il n'existe pas
-        if (!filenameSpan) {
-            currentElement.innerHTML = `
-                <span class="badge bg-info">
-                    <i class="fas fa-file-pdf me-1"></i>Fichier actuel: <span id="${currentElementId.replace('current', 'filename')}">${fileName}</span>
-                </span>
-                <a href="#" target="_blank" class="ms-2" id="${previewElementId}">
-                    <i class="fas fa-eye"></i> Voir
-                </a>
-            `;
-        } else {
-            filenameSpan.textContent = fileName;
-        }
-        
-        // Met à jour le lien de prévisualisation
-        const newPreviewLink = document.getElementById(previewElementId);
-        newPreviewLink.onclick = function(e) {
-            e.preventDefault();
-            const fileUrl = URL.createObjectURL(input.files[0]);
-            window.open(fileUrl, '_blank');
-        };
-    }
-}
-</script>
 {% endblock %}
