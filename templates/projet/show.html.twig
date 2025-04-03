@@ -54,7 +54,7 @@
                     <div class="progress-percent">65%</div>
                 </div>
                 <div class="progress-text">Project completion</div>
-                <button class="btn btn-tasks">
+                <button class="btn btn-tasks" onclick="window.location='{{ path('app_tache_by_project', {'id': projet.id}) }}'">
                     <i class="fas fa-tasks"></i> Voir Tâches
                 </button>
             </div>
