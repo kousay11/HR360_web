@@ -1,38 +1,78 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ projet.nom }} - Project Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('front/css/styleProjet.css') }}">
+</head>
+<body>
+    <div class="project-detail-container">
+        <div class="project-header">
+            <h1>{{ projet.nom }}</h1>
+        </div>
 
-<title>Projet</title>
+        <div class="project-description">
+            <h3>Project Description</h3>
+            <p>{{ projet.description }}</p>
+        </div>
 
-{% block body %}
-    <h1>Projet</h1>
+        <div class="project-dates">
+            <div class="date-card">
+                <h4>Start Date</h4>
+                <div class="date-value">
+                    <i class="fas fa-calendar-day"></i>
+                    {{ projet.dateDebut ? projet.dateDebut|date('M d, Y') : 'Not set' }}
+                </div>
+            </div>
+            <div class="date-card">
+                <h4>End Date</h4>
+                <div class="date-value">
+                    <i class="fas fa-calendar-check"></i>
+                    {{ projet.dateFin ? projet.dateFin|date('M d, Y') : 'Not set' }}
+                </div>
+            </div>
+        </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ projet.id }}</td>
-            </tr>
-            <tr>
-                <th>Nom</th>
-                <td>{{ projet.nom }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ projet.description }}</td>
-            </tr>
-            <tr>
-                <th>DateDebut</th>
-                <td>{{ projet.dateDebut ? projet.dateDebut|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>DateFin</th>
-                <td>{{ projet.dateFin ? projet.dateFin|date('Y-m-d') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+        <div class="project-meta-section">
+            <div class="project-actions">
+                <button class="btn btn-associate">
+                    <i class="fas fa-link"></i> Associer
+                </button>
+                <p class="mt-3">Associate this project with other resources</p>
+            </div>
+            <div class="progress-container">
+                <div class="progress-header">
+                    <h4>Project Progress</h4>
+                </div>
+                <div class="progress-circle">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="progress-circle-bg" cx="50" cy="50" r="40"></circle>
+                        <circle class="progress-circle-fill" cx="50" cy="50" r="40" style="--progress: 65"></circle>
+                    </svg>
+                    <div class="progress-percent">65%</div>
+                </div>
+                <div class="progress-text">Project completion</div>
+                <button class="btn btn-tasks">
+                    <i class="fas fa-tasks"></i> Voir Tâches
+                </button>
+            </div>
+        </div>
 
-    <a href="{{ path('app_projet_index') }}">back to list</a>
+        <div class="chart-placeholder">
+            Bar Chart Visualization - To be implemented
+        </div>
 
-    <a href="{{ path('app_projet_edit', {'id': projet.id}) }}">edit</a>
-
-    {{ include('projet/_delete_form.html.twig') }}
-{% endblock %}
+        <div class="action-buttons">
+            <a href="{{ path('app_projet_index') }}" class="btn btn-back">
+                <i class="fas fa-arrow-left"></i> Back to list
+            </a>
+            <a href="{{ path('app_projet_edit', {'id': projet.id}) }}" class="btn btn-edit">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            {{ include('projet/_delete_form.html.twig') }}
+        </div>
+    </div>
+</body>
+</html>
