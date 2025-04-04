@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Projet;
+use App\Enum\StatusTache;
+use App\Repository\ProjetRepository;
 
 #[Route('/tache')]
 final class TacheController extends AbstractController
@@ -30,10 +32,11 @@ final class TacheController extends AbstractController
     }
 
     #[Route('/new/{projetId}', name: 'app_tache_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, ?int $projetId = null): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, ProjetRepository $projetRepository, ?int $projetId = null): Response
     {
         $tache = new Tache();
-        
+        $tache->setStatut(StatusTache::AFAIRE);
+        $projet = $projetId ? $projetRepository->find($projetId) : null;
         // If projetId is provided, set it on the new task
         if ($projetId) {
             $projet = $entityManager->getRepository(Projet::class)->find($projetId);
@@ -42,7 +45,10 @@ final class TacheController extends AbstractController
             }
         }
 
-        $form = $this->createForm(TacheType::class, $tache);
+        $form = $this->createForm(TacheType::class, $tache, [
+            'projet' => $projet,
+            'is_edit' => false
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -71,7 +77,10 @@ final class TacheController extends AbstractController
     {
         $projetId = $tache->getProjet() ? $tache->getProjet()->getId() : null;
         
-        $form = $this->createForm(TacheType::class, $tache);
+        $form = $this->createForm(TacheType::class, $tache, [
+            'is_edit' => true,  // Explicitly set to true for edit
+            'projet' => $tache->getProjet()  // Pass the associated project
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

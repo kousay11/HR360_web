@@ -14,34 +14,49 @@ use Symfony\Component\Form\Extension\Core\Type\EnumType;
 class TacheType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
-    {
-        $builder
-            ->add('nom')
-            ->add('description')
-            ->add('dateDebut', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('dateFin', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('statut', EnumType::class, [
-                'class' => StatusTache::class,
-                'choice_label' => fn(StatusTache $type) => $type->getLabel(),
-                'label' => 'statut',
-                'placeholder' => 'Sélectionnez un statut',
-            ])
-            ->add('trelloboardid')
-            ->add('projet', EntityType::class, [
-                'class' => Projet::class,
-                'choice_label' => 'id',
-            ])
-        ;
-    }
+{
+    $builder
+        ->add('nom', null, [
+            'attr' => ['class' => 'form-control'],
+            'label' => 'Task Name'
+        ])
+        ->add('description', null, [
+            'attr' => [
+                'class' => 'form-control task-description-field',
+                'rows' => 6,
+                'placeholder' => 'Enter detailed task description...'
+            ],
+            'label' => 'Description'
+        ])
+        ->add('dateDebut', null, [
+            'widget' => 'single_text',
+            'attr' => ['class' => 'form-control datepicker'],
+            'label' => 'Start Date'
+        ])
+        ->add('dateFin', null, [
+            'widget' => 'single_text',
+            'attr' => ['class' => 'form-control datepicker'],
+            'label' => 'End Date'
+        ]);
 
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'data_class' => Tache::class,
+    // Only add status field when editing
+    if ($options['is_edit']) {
+        $builder->add('statut', EnumType::class, [
+            'class' => StatusTache::class,
+            'choice_label' => fn(StatusTache $type) => $type->getLabel(),
+            'label' => 'Status',
+            'attr' => ['class' => 'form-control']
         ]);
     }
+
+    
 }
+
+public function configureOptions(OptionsResolver $resolver): void
+{
+    $resolver->setDefaults([
+        'data_class' => Tache::class,
+        'is_edit' => false,
+        'projet' => null  // Changed from projet_id to projet
+    ]);
+}}

@@ -10,14 +10,15 @@
 <div class="task-container">
     <div class="task-header">
         <h1>Create New Task</h1>
+        <p class="text-muted">Fill in the task details below</p>
     </div>
 
-    {{ include('tache/_form.html.twig') }}
+    {{ include('tache/_form.html.twig', {'button_label': 'Create'}) }}
 
-    <div class="mt-4">
+    <div class="form-actions mt-4">
         <a href="{{ path(projetId ? 'app_tache_by_project' : 'app_tache_index', {'id': projetId}) }}" 
            class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to list
+            <i class="fas fa-arrow-left me-1"></i> Back to list
         </a>
     </div>
 </div>
