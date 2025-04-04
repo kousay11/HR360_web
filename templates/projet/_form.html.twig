@@ -1,29 +1,29 @@
 {# templates/projet/_form.html.twig #}
 <link rel="stylesheet" href="{{ asset('front/css/styleProjet.css') }}">
-{{ form_start(form, {'attr': {'class': 'project-form'}}) }}
+{{ form_start(form, {'attr': {'class': 'project-form','novalidate': 'novalidate'}}) }}
     <div class="form-group">
         {{ form_label(form.nom, 'Project Name') }}
-        {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
-        {{ form_errors(form.nom) }}
+        {{ form_widget(form.nom, {'attr': {'class': 'form-control'~ (form.nom.vars.errors|length ? ' is-invalid' : '')}}) }}
+        <div class="error-message">{{ form_errors(form.nom) }}</div>
     </div>
 
     <div class="form-group">
         {{ form_label(form.description, 'Description') }}
-        {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 4}}) }}
-        {{ form_errors(form.description) }}
+        {{ form_widget(form.description, {'attr': {'class': 'form-control'~ (form.nom.vars.errors|length ? ' is-invalid' : ''), 'rows': 4}}) }}
+        <div class="error-message">{{ form_errors(form.description) }}</div>
     </div>
 
     <div class="form-dates">
         <div class="form-group">
             {{ form_label(form.dateDebut, 'Start Date') }}
-            {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control datepicker'}}) }}
-            {{ form_errors(form.dateDebut) }}
+            {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control datepicker'~ (form.nom.vars.errors|length ? ' is-invalid' : '')}}) }}
+            <div class="error-message">{{ form_errors(form.dateDebut) }}</div>
         </div>
 
         <div class="form-group">
             {{ form_label(form.dateFin, 'End Date') }}
-            {{ form_widget(form.dateFin, {'attr': {'class': 'form-control datepicker'}}) }}
-            {{ form_errors(form.dateFin) }}
+            {{ form_widget(form.dateFin, {'attr': {'class': 'form-control datepicker'~ (form.nom.vars.errors|length ? ' is-invalid' : '')}}) }}
+            <div class="error-message">{{ form_errors(form.dateFin) }}</div>
         </div>
     </div>
 

@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 use App\Repository\ProjetRepository;
 
@@ -29,6 +30,13 @@ class Projet
     }
 
     #[ORM\Column(type: 'string', nullable: false)]
+    #[Assert\NotBlank(message: "Le nom du projet est obligatoire")]
+    #[Assert\Length(
+        min: 3,
+        max: 50,
+        minMessage: "Le nom doit contenir au moins {{ limit }} caractères",
+        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères"
+    )]
     private ?string $nom = null;
 
     public function getNom(): ?string
@@ -43,6 +51,13 @@ class Projet
     }
 
     #[ORM\Column(type: 'string', nullable: false)]
+    #[Assert\NotBlank(message: "La description est obligatoire")]
+    #[Assert\Length(
+        min: 10,
+        max: 1000,
+        minMessage: "La description doit contenir au moins {{ limit }} caractères",
+        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères"
+    )]
     private ?string $description = null;
 
     public function getDescription(): ?string
@@ -57,6 +72,11 @@ class Projet
     }
 
     #[ORM\Column(name:'dateDebut',type: 'date', nullable: false)]
+    #[Assert\NotBlank(message: "La date de début est obligatoire")]
+    #[Assert\GreaterThanOrEqual(
+        "today",
+        message: "La date de début doit être aujourd'hui ou dans le futur"
+    )]
     private ?\DateTimeInterface $dateDebut = null;
 
     public function getDateDebut(): ?\DateTimeInterface
@@ -71,6 +91,11 @@ class Projet
     }
 
     #[ORM\Column(name:'dateFin',type: 'date', nullable: false)]
+    #[Assert\NotBlank(message: "La date de fin est obligatoire")]
+    #[Assert\GreaterThan(
+        propertyPath: "dateDebut",
+        message: "La date de fin doit être après la date de début"
+    )]
     private ?\DateTimeInterface $dateFin = null;
 
     public function getDateFin(): ?\DateTimeInterface

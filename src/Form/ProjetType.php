@@ -27,21 +27,29 @@ public function buildForm(FormBuilderInterface $builder, array $options): void
                 'rows' => 4
             ]
         ])
-        ->add('dateDebut', DateType::class, [
-            'label' => 'Start Date',
+        ->add('dateDebut',  DateType::class, [
             'widget' => 'single_text',
+            'required' => false,
             'html5' => true,
+            'format' => 'yyyy-MM-dd',
+            'empty_data' => null,
             'attr' => [
-                'class' => 'datepicker'
-            ]
+                'class' => 'form-control datepicker',
+                'placeholder' => 'YYYY-MM-DD'
+            ],
+            'invalid_message' => 'Please enter a valid date (YYYY-MM-DD)'
         ])
         ->add('dateFin', DateType::class, [
-            'label' => 'End Date',
             'widget' => 'single_text',
+            'required' => false,
             'html5' => true,
+            'format' => 'yyyy-MM-dd',
+            'empty_data' => null,
             'attr' => [
-                'class' => 'datepicker'
-            ]
+                'class' => 'form-control datepicker',
+                'placeholder' => 'YYYY-MM-DD'
+            ],
+            'invalid_message' => 'Please enter a valid date (YYYY-MM-DD)'
         ])
     ;
 }
