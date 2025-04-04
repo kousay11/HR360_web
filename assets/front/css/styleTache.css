@@ -1,0 +1,492 @@
+/* styleTache.css */
+:root {
+    --todo: #f72585;
+    --in-progress: #f8961e;
+    --done: #4cc9f0;
+    --primary: #4361ee;
+    --light: #f8f9fa;
+    --dark: #212529;
+    --gray: #6c757d;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+a {
+    text-decoration: none;
+}
+
+/* But keep underlines on hover for better UX */
+a:hover {
+    text-decoration: none;
+}
+
+.task-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.task-header {
+    margin-bottom: 30px;
+}
+
+.task-header h1 {
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.task-header h1:after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: var(--primary);
+    border-radius: 2px;
+}
+
+.task-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.search-box {
+    flex: 1;
+    min-width: 250px;
+    max-width: 400px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-success {
+    background-color: var(--done);
+    color: white;
+}
+
+.btn-warning {
+    background-color: var(--in-progress);
+    color: white;
+}
+
+.btn-danger {
+    background-color: var(--todo);
+    color: white;
+}
+
+.btn-secondary {
+    background-color: var(--gray);
+    color: white;
+}
+
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.task-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.task-item.selected {
+    border-left: 4px solid var(--primary);
+    background-color: #f5f7ff;
+}
+
+.task-name {
+    flex: 2;
+    font-weight: 500;
+}
+
+.task-status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.status-a-faire {
+    background-color: rgba(247, 37, 133, 0.1);
+    color: var(--todo);
+}
+
+.status-en-cours {
+    background-color: rgba(248, 150, 30, 0.1);
+    color: var(--in-progress);
+}
+
+.status-terminée {
+    background-color: rgba(76, 201, 240, 0.1);
+    color: var(--done);
+}
+
+.task-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.task-details {
+    margin-top: 30px;
+    background: white;
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.task-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.task-dates {
+    display: flex;
+    gap: 20px;
+    margin: 15px 0;
+}
+
+.task-date {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.task-date-label {
+    font-size: 0.85rem;
+    color: var(--gray);
+}
+
+.task-date-value {
+    font-weight: 500;
+}
+
+.trello-btn {
+    background-color: #026aa7;
+    color: white;
+    padding: 8px 16px;
+}
+
+.trello-btn:hover {
+    background-color: #055a8c;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .task-controls {
+        flex-direction: column;
+    }
+    
+    .search-box {
+        width: 100%;
+    }
+    
+    .task-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .task-actions {
+        margin-left: 0;
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+/* Two-column layout */
+.task-layout {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.task-list-column {
+    flex: 1;
+    min-width: 350px;
+}
+
+.task-details-column {
+    flex: 2;
+    min-width: 400px;
+}
+
+/* Task List Improvements */
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: calc(100vh - 250px);
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+}
+
+.task-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.task-item.selected {
+    border-left: 3px solid var(--primary);
+    background-color: #f0f4ff;
+}
+
+.task-name {
+    flex: 1;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 10px;
+}
+
+/* Task Details Card */
+.task-details-card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 25px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.task-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.task-details-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--dark);
+}
+
+.task-content {
+    flex: 1;
+}
+
+.task-description {
+    color: var(--dark);
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.task-meta {
+    background: #f9fafc;
+    padding: 20px;
+    border-radius: var(--border-radius);
+}
+
+.task-dates {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 15px;
+}
+
+.task-date {
+    display: flex;
+    flex-direction: column;
+}
+
+.task-date-label {
+    font-size: 0.85rem;
+    color: var(--gray);
+    margin-bottom: 5px;
+}
+
+.task-date-value {
+    font-weight: 500;
+}
+
+.task-status-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.task-status-label {
+    color: var(--gray);
+}
+
+.task-status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.task-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--gray);
+    padding: 40px 0;
+}
+
+.task-empty-state i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .task-layout {
+        flex-direction: column;
+    }
+    
+    .task-list-column,
+    .task-details-column {
+        min-width: 100%;
+    }
+    
+    .task-list {
+        max-height: none;
+        margin-bottom: 30px;
+    }
+}
+/* Task List Column - Wider */
+.task-list-column {
+    flex: 1;
+    min-width: 450px;
+    max-width: 600px;
+    padding-right: 20px;
+}
+
+/* Task Item - Wider */
+.task-item {
+    width: 90%;
+    min-width: 400px;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+/* Task Content - Wider */
+.task-content-wrapper {
+    display: flex;
+    flex-grow: 1;
+    gap: 15px;
+    align-items: center;
+}
+
+.task-name {
+    min-width: 200px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.task-secondary-info {
+    min-width: 250px;
+    display: flex;
+    gap: 15px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+    .task-list-column {
+        min-width: 400px;
+    }
+    
+    .task-item {
+        min-width: 350px;
+    }
+}
+
+@media (max-width: 992px) {
+    .task-list-column {
+        min-width: 100%;
+    }
+    
+    .task-item {
+        min-width: unset;
+    }
+}
+.task-status {
+    min-width: 120px; /* Instead of auto */
+    padding: 6px 15px ; /* More horizontal padding */
+    margin-right: 15px;
+}
+.task-list-column,.task-list{
+    min-width: 600px; /* Instead of 450px */
+}
+
+.task-layout {
+    gap: 40px; /* More space between columns */
+}

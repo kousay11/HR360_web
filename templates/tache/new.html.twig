@@ -1,11 +1,24 @@
-<!DOCTYPE html>
+{# extends 'base.html.twig' }
 
-<title>New Tache</title>
+{% block title %}New Task{% endblock #}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('front/css/styleTache.css') }}">
+{% endblock %}
 
 {% block body %}
-    <h1>Create new Tache</h1>
+<div class="task-container">
+    <div class="task-header">
+        <h1>Create New Task</h1>
+    </div>
 
     {{ include('tache/_form.html.twig') }}
 
-    <a href="{{ path(projetId ? 'app_tache_by_project' : 'app_tache_index', {'id': projetId}) }}">back to list</a>
+    <div class="mt-4">
+        <a href="{{ path(projetId ? 'app_tache_by_project' : 'app_tache_index', {'id': projetId}) }}" 
+           class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to list
+        </a>
+    </div>
+</div>
 {% endblock %}

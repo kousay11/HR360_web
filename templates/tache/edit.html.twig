@@ -1,13 +1,24 @@
-<!DOCTYPE html>
+{# extends 'base.html.twig' %}
 
-<title>Edit Tache</title>
+{% block title %}Edit Task{% endblock #}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('front/css/styleTache.css') }}">
+{% endblock %}
 
 {% block body %}
-    <h1>Edit Tache</h1>
+<div class="task-container">
+    <div class="task-header">
+        <h1>Edit Task</h1>
+    </div>
 
     {{ include('tache/_form.html.twig', {'button_label': 'Update'}) }}
 
-    <a href="{{ path(projetId ? 'app_tache_by_project' : 'app_tache_index', {'id': projetId}) }}">back to list</a>
-
-    {{ include('tache/_delete_form.html.twig') }}
+    <div class="mt-4">
+        <a href="{{ path(projetId ? 'app_tache_by_project' : 'app_tache_index', {'id': projetId}) }}" 
+           class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to list
+        </a>
+    </div>
+</div>
 {% endblock %}

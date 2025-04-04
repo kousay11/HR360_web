@@ -1,49 +1,164 @@
-<!DOCTYPE html>
+{# extends 'base.html.twig' %}
 
-<title>Tache index</title>
-<h1>Tasks for project: {{ projet.nom }}</h1>
-        
-        <a href="{{ path('app_projet_show', {'id': projet.id}) }}" class="btn btn-back">
+{% block title %}Tasks for {{ projet.nom }}{% endblock #}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('front/css/styleTache.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="task-container">
+    <div class="task-header">
+        <a href="{{ path('app_projet_show', {'id': projet.id}) }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to Project
         </a>
-{% block body %}
-    <h1>Tache index</h1>
+        <h1>Tasks for project: {{ projet.nom }}</h1>
+    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>Description</th>
-                <th>DateDebut</th>
-                <th>DateFin</th>
-                <th>Statut</th>
-                <th>Trelloboardid</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for tache in taches %}
-            <tr>
-                <td>{{ tache.id }}</td>
-                <td>{{ tache.nom }}</td>
-                <td>{{ tache.description }}</td>
-                <td>{{ tache.dateDebut ? tache.dateDebut|date('Y-m-d') : '' }}</td>
-                <td>{{ tache.dateFin ? tache.dateFin|date('Y-m-d') : '' }}</td>
-                <td>{{ tache.statut.value }}</td>
-                <td>{{ tache.trelloboardid }}</td>
-                <td>
-                    <a href="{{ path('app_tache_show', {'id': tache.id,'projetId': projet ? projet.id : null}) }}">show</a>
-                    <a href="{{ path('app_tache_edit', {'id': tache.id,'projetId': projet ? projet.id : null}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="8">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="task-controls">
+        <input type="text" class="search-box" placeholder="Search tasks...">
+        <div class="action-buttons">
+            <button class="btn btn-primary">
+                <i class="fas fa-sort-amount-up"></i> Prioritize
+            </button>
+            <button class="btn btn-primary">
+                <i class="fas fa-file-export"></i> Export
+            </button>
+            <button class="btn btn-primary">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <a href="{{ path('app_tache_new', {'projetId': projet.id}) }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Task
+            </a>
+        </div>
+    </div>
 
-    <a href="{{ path('app_tache_new', {'projetId': projet ? projet.id : null}) }}">Create new</a>
+    <div class="task-layout">
+        <!-- Left Column - Task List -->
+        <div class="task-list-column">
+            <div class="task-list">
+                {% for tache in taches %}
+                   <div class="task-item {% if loop.first %}selected{% endif %}" 
+     onclick="selectTask({{ tache.id }}, '{{ tache.nom|escape('js') }}', '{{ tache.description|escape('js') }}', '{{ tache.dateDebut ? tache.dateDebut|date('Y-m-d') : 'null' }}', '{{ tache.dateFin ? tache.dateFin|date('Y-m-d') : 'null' }}', '{{ tache.statut.value|escape('js') }}', '{{ tache.trelloboardid ? tache.trelloboardid : 'null' }}')"
+     data-tache-id="{{ tache.id }}">
+                        <div class="task-name">{{ tache.nom }}</div>
+                        <div class="task-status status-{{ tache.statut.value|lower|replace({' ': '-'}) }}">
+                            <i class="fas fa-{{ tache.statut.value == 'A faire' ? 'clock' : (tache.statut.value == 'En cours' ? 'spinner' : 'check-circle') }}"></i>
+                            {{ tache.statut.value }}
+                        </div>
+                        <div class="task-actions">
+                            <a href="{{ path('app_tache_edit', {'id': tache.id, 'projetId': projet.id}) }}" 
+                               class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            {{ include('tache/_delete_form.html.twig') }}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">No tasks found</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Right Column - Task Details -->
+        <div class="task-details-column">
+            <div class="task-details-card" id="taskDetails">
+                <div class="task-details-header">
+                    <h2>{% if taches|length > 0 %}{{ taches|first.nom }}{% else %}No Task Selected{% endif %}</h2>
+                    {% if taches|length > 0 and taches|first.trelloboardid %}
+                        <a href="#" class="btn trello-btn">
+                            <i class="fab fa-trello"></i> View Trello
+                        </a>
+                    {% elseif taches|length > 0 %}
+                        <a href="#" class="btn trello-btn">
+                            <i class="fab fa-trello"></i> Enable Trello
+                        </a>
+                    {% endif %}
+                </div>
+                
+                {% if taches|length > 0 %}
+                    <div class="task-content">
+                        <p class="task-description">{{ taches|first.description }}</p>
+                        
+                        <div class="task-meta">
+                            <div class="task-dates">
+                                <div class="task-date">
+                                    <span class="task-date-label">Start Date</span>
+                                    <span class="task-date-value">
+                                        {{ taches|first.dateDebut ? taches|first.dateDebut|date('M d, Y') : 'Not set' }}
+                                    </span>
+                                </div>
+                                <div class="task-date">
+                                    <span class="task-date-label">End Date</span>
+                                    <span class="task-date-value">
+                                        {{ taches|first.dateFin ? taches|first.dateFin|date('M d, Y') : 'Not set' }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-status-display">
+                                <span class="task-status-label">Status:</span>
+                                <span class="task-status-badge status-{{ taches|first.statut.value|lower|replace({' ': '-'}) }}">
+                                    <i class="fas fa-{{ taches|first.statut.value == 'A faire' ? 'clock' : (taches|first.statut.value == 'En cours' ? 'spinner' : 'check-circle') }}"></i>
+                                    {{ taches|first.statut.value }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="task-empty-state">
+                        <i class="fas fa-tasks"></i>
+                        <p>Select a task to view details</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function selectTask(taskId, taskName, taskDescription, taskDateDebut, taskDateFin, taskStatut, taskTrelloId) {
+    // Remove selected class from all items
+    document.querySelectorAll('.task-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked item
+    document.querySelector(`.task-item[data-tache-id="${taskId}"]`).classList.add('selected');
+    
+    // Update task details
+    const detailsContainer = document.getElementById('taskDetails');
+    if (taskName) {
+        detailsContainer.querySelector('h2').textContent = taskName;
+        detailsContainer.querySelector('.task-description').textContent = taskDescription;
+        
+        // Update dates
+        const formatDate = (dateString) => {
+            if (!dateString) return 'Not set';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        };
+        
+        detailsContainer.querySelectorAll('.task-date-value')[0].textContent = formatDate(taskDateDebut);
+        detailsContainer.querySelectorAll('.task-date-value')[1].textContent = formatDate(taskDateFin);
+        
+        // Update status
+        const statusBadge = detailsContainer.querySelector('.task-status-badge');
+        statusBadge.className = `task-status-badge status-${taskStatut.toLowerCase().replace(' ', '-')}`;
+        statusBadge.innerHTML = `
+            <i class="fas fa-${taskStatut == 'A faire' ? 'clock' : (taskStatut == 'En cours' ? 'spinner' : 'check-circle')}"></i>
+            ${taskStatut}
+        `;
+        
+        // Update Trello button
+        const trelloBtn = detailsContainer.querySelector('.trello-btn');
+        if (taskTrelloId == null) {
+            trelloBtn.innerHTML = '<i class="fab fa-trello"></i> View Trello';
+        } else {
+            trelloBtn.innerHTML = '<i class="fab fa-trello"></i> Enable Trello';
+        }
+    }
+}
+</script>
 {% endblock %}
