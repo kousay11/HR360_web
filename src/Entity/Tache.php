@@ -7,11 +7,15 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator\Constraints\DateDansIntervalleProjet;
 
 use App\Repository\TacheRepository;
 
 #[ORM\Entity(repositoryClass: TacheRepository::class)]
 #[ORM\Table(name: 'tache')]
+
+
+#[DateDansIntervalleProjet]
 class Tache
 {
     #[ORM\Id]
