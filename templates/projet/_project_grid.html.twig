@@ -1,0 +1,41 @@
+{% for projet in projets %}
+    <div class="col-md-4 mb-4">
+        <div class="project-card" onclick="if(!event.target.closest('.action-buttons')) window.location='{{ path('app_projet_show', {'id': projet.id}) }}'">
+            <div class="project-card-header d-flex align-items-center gap-3">
+                <div class="project-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h5 class="project-title">{{ projet.nom }}</h5>
+            </div>
+            <div class="project-card-body">
+                <div class="project-meta">
+                    <i class="fas fa-align-left"></i>
+                    <span>{{ projet.description|default('No description')|slice(0, 60) }}{% if projet.description|length > 60 %}...{% endif %}</span>
+                </div>
+                <div class="project-meta">
+                    <i class="fas fa-calendar-day"></i>
+                    <span>Start: {{ projet.dateDebut ? projet.dateDebut|date('M d, Y') : 'Not set' }}</span>
+                </div>
+                <div class="project-meta">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>End: {{ projet.dateFin ? projet.dateFin|date('M d, Y') : 'Not set' }}</span>
+                </div>
+            </div>
+            <div class="project-card-footer">
+                <div class="action-buttons">
+                    <a href="{{ path('app_projet_edit', {'id': projet.id}) }}" class="btn btn-modify"><i class="fas fa-edit me-1"></i> Edit</a>
+                    {{ include('projet/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="col-12">
+        <div class="empty-state">
+            <i class="fas fa-folder-open"></i>
+            <h4>No projects found</h4>
+            <p>No projects match your search criteria</p>
+            <a href="{{ path('app_projet_new') }}" class="btn btn-add"><i class="fas fa-plus me-2"></i> Add Project</a>
+        </div>
+    </div>
+{% endfor %}

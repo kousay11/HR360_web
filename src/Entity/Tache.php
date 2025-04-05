@@ -14,7 +14,6 @@ use App\Repository\TacheRepository;
 #[ORM\Entity(repositoryClass: TacheRepository::class)]
 #[ORM\Table(name: 'tache')]
 
-
 #[DateDansIntervalleProjet]
 class Tache
 {

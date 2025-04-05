@@ -14,11 +14,26 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/projet')]
 final class ProjetController extends AbstractController
 {
-    #[Route(name: 'app_projet_index', methods: ['GET'])]
-    public function index(ProjetRepository $projetRepository): Response
+    #[Route('/', name: 'app_projet_index', methods: ['GET'])]
+    public function index(Request $request, ProjetRepository $projetRepository): Response
     {
+        return $this->search($request, $projetRepository);
+    }
+
+    #[Route('/search', name: 'app_projet_search', methods: ['GET'])]
+    public function search(Request $request, ProjetRepository $projetRepository): Response
+    {
+        $query = $request->query->get('q', '');
+        $projets = $projetRepository->search($query);
+
+        if ($request->isXmlHttpRequest()) {
+            return $this->render('projet/_project_grid.html.twig', [
+                'projets' => $projets,
+            ]);
+        }
+
         return $this->render('projet/index.html.twig', [
-            'projets' => $projetRepository->findAll(),
+            'projets' => $projets,
         ]);
     }
 
