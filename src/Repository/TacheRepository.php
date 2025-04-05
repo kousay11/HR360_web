@@ -22,5 +22,23 @@ public function findByProject(Projet $projet)
         ->getQuery()
         ->getResult();
 }
-    // Add custom methods as needed
+public function search(string $query): array
+{
+    return $this->createQueryBuilder('t')
+        ->where('t.nom LIKE :query')
+        ->setParameter('query', '%'.$query.'%')
+        ->getQuery()
+        ->getResult();
+}
+
+public function searchByProject(Projet $projet, string $query): array
+{
+    return $this->createQueryBuilder('t')
+        ->where('t.projet = :projet')
+        ->andWhere('(t.nom LIKE :query)')
+        ->setParameter('projet', $projet)
+        ->setParameter('query', '%'.$query.'%')
+        ->getQuery()
+        ->getResult();
+}
 }

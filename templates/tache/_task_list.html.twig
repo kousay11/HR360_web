@@ -1,0 +1,24 @@
+{% for tache in taches %}
+    <div class="task-item {% if loop.first %}selected{% endif %}" 
+         data-tache-id="{{ tache.id }}"
+         data-description="{{ tache.description|escape }}"
+         data-date-debut="{{ tache.dateDebut ? tache.dateDebut|date('Y-m-d') : '' }}"
+         data-date-fin="{{ tache.dateFin ? tache.dateFin|date('Y-m-d') : '' }}"
+         data-statut="{{ tache.statut.value }}"
+         data-trello-id="{{ tache.trelloboardid ? tache.trelloboardid : '' }}">
+        <div class="task-name">{{ tache.nom }}</div>
+        <div class="task-status status-{{ tache.statut.value|lower|replace({' ': '-'}) }}">
+            <i class="fas fa-{{ tache.statut.value == 'A faire' ? 'clock' : (tache.statut.value == 'En cours' ? 'spinner' : 'check-circle') }}"></i>
+            {{ tache.statut.value }}
+        </div>
+        <div class="task-actions">
+            <a href="{{ path('app_tache_edit', {'id': tache.id, 'projetId': projet.id}) }}" 
+               class="btn btn-primary btn-sm">
+                <i class="fas fa-edit"></i>
+            </a>
+            {{ include('tache/_delete_form.html.twig') }}
+        </div>
+    </div>
+{% else %}
+    <div class="alert alert-info">No tasks found</div>
+{% endfor %}
