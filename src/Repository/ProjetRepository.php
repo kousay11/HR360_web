@@ -20,5 +20,13 @@ class ProjetRepository extends ServiceEntityRepository
         ->getQuery()
         ->getResult();
 }
+public function prioritize(): array
+{
+    return $this->createQueryBuilder('t')
+        ->orderBy('t.dateFin', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
+
     // Add custom methods as needed
 }

@@ -36,6 +36,21 @@ final class ProjetController extends AbstractController
             'projets' => $projets,
         ]);
     }
+    #[Route('/prioritize', name: 'app_projet_prioritize', methods: ['GET'])]
+    public function prioritize(Request $request, ProjetRepository $projetRepository): Response
+    {
+        $projets = $projetRepository->prioritize();
+
+        if ($request->isXmlHttpRequest()) {
+            return $this->render('projet/_project_grid.html.twig', [
+                'projets' => $projets,
+            ]);
+        }
+
+        return $this->render('projet/index.html.twig', [
+            'projets' => $projets,
+        ]);
+    }
 
     #[Route('/new', name: 'app_projet_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
