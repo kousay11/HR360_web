@@ -41,4 +41,21 @@ public function searchByProject(Projet $projet, string $query): array
         ->getQuery()
         ->getResult();
 }
+public function prioritize(): array
+{
+    return $this->createQueryBuilder('t')
+        ->orderBy('t.dateFin', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
+
+public function prioritizeByProject(Projet $projet): array
+{
+    return $this->createQueryBuilder('t')
+        ->where('t.projet = :projet')
+        ->setParameter('projet', $projet)
+        ->orderBy('t.dateFin', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
 }

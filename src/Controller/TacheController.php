@@ -62,6 +62,27 @@ final class TacheController extends AbstractController
         ]);
     }
 
+    #[Route('/prioritize/project/{id}', name: 'app_tache_prioritize_project')]
+#[Route('/prioritize', name: 'app_tache_prioritize')]
+public function prioritize(Request $request, ?Projet $projet, TacheRepository $tacheRepository): Response
+{
+    $taches = $projet 
+        ? $tacheRepository->prioritizeByProject($projet)
+        : $tacheRepository->prioritize();
+
+    if ($request->isXmlHttpRequest()) {
+        return $this->render('tache/_task_list.html.twig', [
+            'taches' => $taches,
+            'projet' => $projet
+        ]);
+    }
+
+    return $this->render('tache/index.html.twig', [
+        'taches' => $taches,
+        'projet' => $projet
+    ]);
+}
+
     #[Route('/new/{projetId}', name: 'app_tache_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, ProjetRepository $projetRepository, ?int $projetId = null): Response
     {

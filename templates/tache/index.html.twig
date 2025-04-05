@@ -19,15 +19,15 @@
     <div class="task-controls">
         <input type="text" class="search-box" placeholder="Search tasks..." id="searchInput">
         <div class="action-buttons">
-            <button class="btn btn-primary">
+            <a href="{{ path('app_tache_prioritize_project',{'id': projet.id}) }}" class="btn btn-primary">
                 <i class="fas fa-sort-amount-up"></i> Prioritize
-            </button>
+            </a>
             <button class="btn btn-primary">
                 <i class="fas fa-file-export"></i> Export
             </button>
-            <button class="btn btn-primary">
+            <a href="{{ path('app_tache_by_project',{'id': projet.id}) }}" class="btn btn-primary">
                 <i class="fas fa-sync-alt"></i> Refresh
-            </button>
+            </a>
             <a href="{{ path('app_tache_new', {'projetId': projet.id}) }}" class="btn btn-primary">
                 <i class="fas fa-plus"></i> New Task
             </a>
