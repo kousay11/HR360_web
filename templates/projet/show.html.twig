@@ -7,6 +7,18 @@
     <link rel="stylesheet" href="{{ asset('front/css/styleProjet.css') }}">
 {% endblock %}
 {% block body %}
+{% set n=0 %}{% set na=0 %}{% set ne=0 %}{% set nt=0 %}
+{% for tache in taches %}
+    {% set n = n + 1 %}
+    {% if tache.statut.value == 'A faire' %}
+        {% set na = na + 1 %}
+    {% elseif tache.statut.value == 'En cours' %}
+        {% set ne = ne + 1 %}
+    {% elseif tache.statut.value == 'Terminée' %}
+        {% set nt = nt + 1 %}
+    {% endif %}
+{% endfor %}
+{% set per = ((na*0 + ne*0.5 + nt*1)/n)*100 %}
 
     <div class="project-detail-container">
         <div class="project-header">
@@ -49,9 +61,9 @@
                 <div class="progress-circle">
                     <svg viewBox="0 0 100 100">
                         <circle class="progress-circle-bg" cx="50" cy="50" r="40"></circle>
-                        <circle class="progress-circle-fill" cx="50" cy="50" r="40" style="--progress: 65"></circle>
+                        <circle class="progress-circle-fill" cx="50" cy="50" r="40" style="{{ '--progress: ' ~ per }}"></circle>
                     </svg>
-                    <div class="progress-percent">65%</div>
+                    <div class="progress-percent">{{ per }}%</div>
                 </div>
                 <div class="progress-text">Project completion</div>
                 <button class="btn btn-tasks" onclick="window.location='{{ path('app_tache_by_project', {'id': projet.id}) }}'">

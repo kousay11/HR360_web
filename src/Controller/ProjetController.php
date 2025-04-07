@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Projet;
 use App\Form\ProjetType;
 use App\Repository\ProjetRepository;
+use App\Repository\TacheRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -73,10 +74,12 @@ final class ProjetController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_projet_show', methods: ['GET'])]
-    public function show(Projet $projet): Response
+    public function show(Projet $projet,TacheRepository $tacheRepository): Response
     {
+        $taches = $tacheRepository->findByProject($projet);
         return $this->render('projet/show.html.twig', [
             'projet' => $projet,
+            'taches' => $taches,
         ]);
     }
 
