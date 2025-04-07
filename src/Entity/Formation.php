@@ -70,19 +70,20 @@ class Formation
         return $this;
     }
 
-    #[ORM\Column(name:'dateFormation',type: 'string', nullable: false)]
+    #[ORM\Column(name:'dateFormation', type: 'string', nullable: false)]
     private ?string $dateFormation = null;
-
+    
     public function getDateFormation(): ?string
     {
         return $this->dateFormation;
     }
-
-    public function setDateFormation(string $dateFormation): self
+    
+    public function setDateFormation(?string $dateFormation): void
     {
         $this->dateFormation = $dateFormation;
-        return $this;
     }
+    
+    
 
     #[ORM\Column(name:'isFavorite',type: 'boolean', nullable: false)]
     private ?bool $isFavorite = null;

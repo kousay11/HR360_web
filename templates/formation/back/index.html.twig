@@ -1,0 +1,62 @@
+{% extends 'baseRH.html.twig' %}
+
+{% block title %}Liste des Formations{% endblock %}
+
+{% block body %}
+<h2>Liste des Formations</h2>
+<form method="get" action="{{ path('app_formation_index') }}">
+    <input type="text" name="search" value="{{ search }}" placeholder="Rechercher par titre..." />
+    <button type="submit">🔍 Rechercher</button>
+    <a href="{{ path('app_formation_index') }}">Réinitialiser</a>
+</form>
+
+<a href="{{ path('app_formation_new') }}">➕ Ajouter une formation</a>
+
+<table border="1" cellpadding="10">
+    <thead>
+        <tr>
+            <th>Titre</th>
+            <th>Description</th>
+            <th>Durée</th>
+            <th>Date</th>
+            <th>Favori</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for formation in formations %}
+        <tr>
+            <td>{{ formation.titre }}</td>
+            <td>{{ formation.description }}</td>
+            <td>{{ formation.duree }} jours</td>
+            <td>{{ formation.dateFormation }}</td>
+            <td>{{ formation.isIsFavorite ? 'Oui' : 'Non' }}</td>
+            <td>
+                <a href="{{ path('app_formation_show', {'id': formation.id}) }}">Voir</a> |
+                <a href="{{ path('app_formation_edit', {'id': formation.id}) }}">Modifier</a> |
+                <form method="post" action="{{ path('app_formation_delete', {'id': formation.id}) }}" style="display:inline" onsubmit="return confirm('Confirmer la suppression ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ formation.id) }}">
+                    <button type="submit">Supprimer</button>
+                </form>
+            </td>
+        </tr>
+    {% else %}
+        <tr><td colspan="6">Aucune formation disponible.</td></tr>
+    {% endfor %}
+    </tbody>
+    {% set totalPages = (total / limit)|round(0, 'ceil') %}
+
+{% if totalPages > 1 %}
+    <div style="margin-top: 20px;">
+        Pages :
+        {% for i in 1..totalPages %}
+            {% if i == page %}
+                <strong>[{{ i }}]</strong>
+            {% else %}
+                <a href="{{ path('app_formation_index', {'page': i, 'search': search}) }}">{{ i }}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+</table>
+{% endblock %}

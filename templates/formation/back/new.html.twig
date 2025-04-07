@@ -1,0 +1,14 @@
+{% extends 'baseRH.html.twig' %}
+
+{% block title %}Nouvelle Formation{% endblock %}
+
+{% block body %}
+<h2>Ajouter une formation</h2>
+
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button type="submit">Créer</button>
+{{ form_end(form) }}
+
+<a href="{{ path('app_formation_index') }}">⬅ Retour</a>
+{% endblock %}
