@@ -8,9 +8,55 @@
         <i class="fas fa-briefcase me-2"></i>Nos Offres d'Emploi
     </h1>
 
+    {# Barre de recherche et de tri #}
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form method="get" class="input-group">
+                <input type="text" 
+                       name="search" 
+                       class="form-control" 
+                       placeholder="Rechercher par titre..." 
+                       value="{{ searchTerm }}">
+                <button class="btn btn-danger" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+                {% if searchTerm %}
+                    <a href="{{ path('app_offre_index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i>
+                    </a>
+                {% endif %}
+            </form>
+        </div>
+        <div class="col-md-6">
+            <div class="dropdown float-end">
+                <button class="btn btn-outline-dark dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
+                    <i class="fas fa-sort me-2"></i>
+                    {% if currentSort == 'titre_asc' %}Titre (A-Z)
+                    {% elseif currentSort == 'titre_desc' %}Titre (Z-A)
+                    {% elseif currentSort == 'date_expiration_asc' %}Date expiration (↑)
+                    {% elseif currentSort == 'date_expiration_desc' %}Date expiration (↓)
+                    {% else %}Trier par...
+                    {% endif %}
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{{ path('app_offre_index', {sort: 'titre_asc', search: searchTerm}) }}">Titre (A-Z)</a></li>
+                    <li><a class="dropdown-item" href="{{ path('app_offre_index', {sort: 'titre_desc', search: searchTerm}) }}">Titre (Z-A)</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{{ path('app_offre_index', {sort: 'date_expiration_asc', search: searchTerm}) }}">Date expiration (plus ancienne)</a></li>
+                    <li><a class="dropdown-item" href="{{ path('app_offre_index', {sort: 'date_expiration_desc', search: searchTerm}) }}">Date expiration (plus récente)</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     {% if offres is empty %}
         <div class="alert alert-info text-center">
-            <i class="fas fa-info-circle me-2"></i>Aucune offre disponible
+            <i class="fas fa-info-circle me-2"></i>
+            {% if searchTerm %}
+                Aucune offre trouvée pour "{{ searchTerm }}"
+            {% else %}
+                Aucune offre disponible
+            {% endif %}
         </div>
     {% else %}
         <div class="list-group mb-4">
@@ -113,6 +159,12 @@
     .btn-group-sm form {
         display: inline-block;
         margin: 0;
+    }
+    .input-group {
+        max-width: 400px;
+    }
+    .dropdown-menu {
+        min-width: 200px;
     }
 </style>
 {% endblock %}

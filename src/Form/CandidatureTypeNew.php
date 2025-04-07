@@ -41,6 +41,7 @@ class CandidatureTypeNew extends AbstractType
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description complémentaire',
+                'empty_data' => '', // Assurez-vous que le champ est vide par défaut
                 'constraints' => [
                     new NotBlank([ // Ajout de la contrainte NotBlank
                         'message' => 'La description ne peut pas être vide'
