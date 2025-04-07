@@ -74,14 +74,40 @@ final class ProjetController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_projet_show', methods: ['GET'])]
-    public function show(Projet $projet,TacheRepository $tacheRepository): Response
-    {
-        $taches = $tacheRepository->findByProject($projet);
-        return $this->render('projet/show.html.twig', [
-            'projet' => $projet,
-            'taches' => $taches,
-        ]);
+public function show(Projet $projet, TacheRepository $tacheRepository): Response
+{
+    $taches = $tacheRepository->findBy(['projet' => $projet]);
+    
+    // Initialize counters
+    $counts = [
+        'total' => count($taches),
+        'a_faire' => 0,
+        'en_cours' => 0,
+        'terminee' => 0
+    ];
+    
+    // Count tasks by status
+    foreach ($taches as $tache) {
+        switch ($tache->getStatut()->value) {
+            case 'A faire': $counts['a_faire']++; break;
+            case 'En cours': $counts['en_cours']++; break;
+            case 'Terminée': $counts['terminee']++; break;
+        }
     }
+    
+    // Calculate completion percentage
+    $completionPercentage = $counts['total'] > 0 
+        ? (($counts['a_faire'] * 0 + $counts['en_cours'] * 0.5 + $counts['terminee'] * 1) / $counts['total'] * 100)
+        : 0;
+    $completionPercentage = round($completionPercentage, 2);
+
+    return $this->render('projet/show.html.twig', [
+        'projet' => $projet,
+        'taches' => $taches,
+        'counts' => $counts,
+        'completionPercentage' => $completionPercentage
+    ]);
+}
 
     #[Route('/{id}/edit', name: 'app_projet_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Projet $projet, EntityManagerInterface $entityManager): Response
