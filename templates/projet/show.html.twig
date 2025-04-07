@@ -1,13 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ projet.nom }} - Project Details</title>
+{% extends 'baseRH.html.twig' %}
+{% block title %}{{ projet.nom }} - Project Details{% endblock %}
+{% block heading %}{{ projet.nom }} - Project Details{% endblock %}
+{% block css %}
+    {{ parent() }}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('front/css/styleProjet.css') }}">
-</head>
-<body>
+{% endblock %}
+{% block body %}
+
     <div class="project-detail-container">
         <div class="project-header">
             <h1>{{ projet.nom }}</h1>
@@ -74,5 +74,4 @@
             {{ include('projet/_delete_form.html.twig') }}
         </div>
     </div>
-</body>
-</html>
+{% endblock %}

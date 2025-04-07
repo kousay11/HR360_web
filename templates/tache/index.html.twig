@@ -1,8 +1,11 @@
-{# extends 'base.html.twig' %}
+{% extends 'baseRH.html.twig' %}
 
-{% block title %}Tasks for {{ projet.nom }}{% endblock #}
+{% block title %}Tasks for {{ projet.nom }}{% endblock %}
+{% block heading %}Tasks for {{ projet.nom }}{% endblock %}
 
-{% block stylesheets %}
+
+{% block css %}
+    {{ parent() }}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('front/css/styleTache.css') }}">
 {% endblock %}
@@ -13,7 +16,6 @@
         <a href="{{ path('app_projet_show', {'id': projet.id}) }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to Project
         </a>
-        <h1>Tasks for project: {{ projet.nom }}</h1>
     </div>
 
     <div class="task-controls">
@@ -97,7 +99,9 @@
         </div>
     </div>
 </div>
-
+{% endblock %}
+{% block js %}
+{{ parent() }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');

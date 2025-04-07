@@ -1,3 +1,7 @@
+{% extends 'baseRH.html.twig' %}
+
+{% block stylesheets %}
+{{ parent() }}
 <link rel="stylesheet" href="{{ asset('front/css/styleProjet.css') }}">
 <style>
         .error-message {
@@ -9,8 +13,9 @@
             border-color: #dc3545 !important;
         }
     </style>
-<title>New Project</title>
-
+{% endblock %}
+{% block title %}New Project{% endblock %}
+{% block heading %}New Project{% endblock %}
 
 {% block body %}
 <div class="container project-form-container">
