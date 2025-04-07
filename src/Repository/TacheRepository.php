@@ -58,4 +58,17 @@ public function prioritizeByProject(Projet $projet): array
         ->getQuery()
         ->getResult();
 }
+public function findAllForExport(?Projet $projet = null): array
+{
+    $qb = $this->createQueryBuilder('t')
+        ->orderBy('t.statut', 'ASC')
+        ->addOrderBy('t.dateFin', 'ASC');
+
+    if ($projet) {
+        $qb->andWhere('t.projet = :projet')
+           ->setParameter('projet', $projet);
+    }
+
+    return $qb->getQuery()->getResult();
+}
 }

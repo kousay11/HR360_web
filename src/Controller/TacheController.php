@@ -181,4 +181,105 @@ public function prioritize(Request $request, ?Projet $projet, TacheRepository $t
             'projetId' => $projetId
         ]);
     }
+
+    #[Route('/export/project/{id}', name: 'app_tache_export_project')]
+#[Route('/export', name: 'app_tache_export')]
+public function export(?Projet $projet, TacheRepository $tacheRepository): Response
+{
+    $taches = $tacheRepository->findAllForExport($projet);
+
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Set project name with blue background
+    if ($projet) {
+        $sheet->setCellValue('A1', 'Project: ' . $projet->getNom());
+        $sheet->mergeCells('A1:E1');
+        $sheet->getStyle('A1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => 'FFFFFF']
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'color' => ['rgb' => '0070C0']
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER
+            ]
+        ]);
+    }
+
+    // Set headers
+    $headers = ['Task Name', 'Description', 'Start Date', 'End Date', 'Status'];
+    $sheet->fromArray($headers, null, 'A2');
+    $sheet->getStyle('A2:E2')->applyFromArray([
+        'font' => ['bold' => true],
+        'fill' => [
+            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+            'color' => ['rgb' => 'D9D9D9']
+        ]
+    ]);
+    $sheet->freezePane('A3');
+    $sheet->setAutoFilter('A2:E2');
+    // Set column widths
+    $sheet->getColumnDimension('A')->setWidth(25); // Task Name
+    $sheet->getColumnDimension('B')->setWidth(40); // Description (wider for wrapped text)
+    $sheet->getColumnDimension('C')->setWidth(15); // Start Date
+    $sheet->getColumnDimension('D')->setWidth(15); // End Date
+    $sheet->getColumnDimension('E')->setWidth(15); // Status
+
+    // Add tasks data
+    $row = 3;
+    foreach ($taches as $tache) {
+        $sheet->setCellValue('A' . $row, $tache->getNom());
+        
+        // Shorten description and add ellipsis if too long
+        $description = $tache->getDescription();
+        $maxLength = 200; // Adjust as needed
+        if (strlen($description) > $maxLength) {
+            $description = substr($description, 0, $maxLength) . '...';
+        }
+        
+        $sheet->setCellValue('B' . $row, $description);
+        $sheet->getStyle('B' . $row)->getAlignment()->setWrapText(true);
+        
+        $sheet->setCellValue('C' . $row, $tache->getDateDebut() ? $tache->getDateDebut()->format('Y-m-d') : '');
+        $sheet->setCellValue('D' . $row, $tache->getDateFin() ? $tache->getDateFin()->format('Y-m-d') : '');
+        $sheet->setCellValue('E' . $row, $tache->getStatut()->value);
+
+        // Color status cells based on value
+        $statusColor = match($tache->getStatut()->value) {
+            'A faire' => 'FF0000', // Red
+            'En cours' => 'FFA500', // Orange
+            'Terminée' => '00B050', // Green
+            default => '000000'
+        };
+
+        $sheet->getStyle('E' . $row)->applyFromArray([
+            'font' => [
+                'color' => ['rgb' => $statusColor]
+            ]
+        ]);
+
+        // Set row height for description (auto-size will adjust this)
+        $sheet->getRowDimension($row)->setRowHeight(-1); // Auto-size
+
+        $row++;
+    }
+
+    // Create Excel file
+    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    
+    $response = new Response();
+    $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    $response->headers->set('Content-Disposition', 'attachment;filename="tasks_export_' . ($projet ? $projet->getNom() : 'all') . '.xlsx"');
+    $response->headers->set('Cache-Control', 'max-age=0');
+    
+    ob_start();
+    $writer->save('php://output');
+    $response->setContent(ob_get_clean());
+    
+    return $response;
+}
 }
