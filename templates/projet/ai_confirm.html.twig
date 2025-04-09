@@ -1,0 +1,247 @@
+{% extends 'baseRH.html.twig' %}
+
+{% block title %}Confirm AI Generated Project{% endblock %}
+{% block heading %}Confirm AI Generated Project{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('front/css/styleProjet.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/styleTache.css') }}">
+    <style>
+        .confirmation-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .task-list-container {
+            flex: 1;
+            max-width: 300px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+        }
+        
+        .details-container {
+            flex: 2;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+        }
+        
+        .task-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .task-item:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .task-item.selected {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .task-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .task-dates {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .task-item.selected .task-dates {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .section-title {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="project-form-container">
+        <div class="project-form-header">
+            <h1>Review AI Generated Project</h1>
+            <p class="text-muted">Review and modify the generated project details before saving</p>
+        </div>
+
+        <form method="post" id="confirmationForm">
+            <div class="confirmation-container">
+                <!-- Left Column - Task List -->
+                <div class="task-list-container">
+                    <h3 class="section-title">Tasks</h3>
+                    <div class="task-list">
+                        {% for task in tasks %}
+                            <div class="task-item {% if loop.first %}selected{% endif %}" 
+                                 data-task-index="{{ loop.index0 }}">
+                                <div class="task-name">{{ task.name }}</div>
+                                <div class="task-dates">
+                                    {{ task.startDate|date('M d') }} - {{ task.endDate|date('M d') }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Right Column - Details -->
+                <div class="details-container">
+                    <div class="project-details">
+                        <h3 class="section-title">Project Details</h3>
+                        <div class="form-group">
+                            <label for="project_name">Project Name</label>
+                            <input type="text" id="project_name" name="project[name]" 
+                                   class="form-control" value="{{ project.name }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="project_description">Project Description</label>
+                            <textarea id="project_description" name="project[description]" 
+                                      class="form-control" rows="4" required>{{ project.description }}</textarea>
+                        </div>
+
+                        <div class="form-dates">
+                            <div class="form-group">
+                                <label for="project_start_date">Start Date</label>
+                                <input type="date" id="project_start_date" name="project[start_date]" 
+                                       class="form-control datepicker" value="{{ project.start_date }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="project_end_date">End Date</label>
+                                <input type="date" id="project_end_date" name="project[end_date]" 
+                                       class="form-control datepicker" value="{{ project.end_date }}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="task-details">
+                        <h3 class="section-title">Selected Task Details</h3>
+                        <input type="hidden" id="selected_task_index" name="selected_task_index" value="0">
+                        
+                        {% for task in tasks %}
+                            <div class="task-fields" id="taskFields{{ loop.index0 }}" 
+                                 style="display: {{ loop.first ? 'block' : 'none' }}">
+                                <div class="form-group">
+                                    <label for="task_name_{{ loop.index0 }}">Task Name</label>
+                                    <input type="text" id="task_name_{{ loop.index0 }}" name="tasks[{{ loop.index0 }}][name]" 
+                                           class="form-control" value="{{ task.name }}" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="task_description_{{ loop.index0 }}">Task Description</label>
+                                    <textarea id="task_description_{{ loop.index0 }}" name="tasks[{{ loop.index0 }}][description]" 
+                                              class="form-control" rows="4" required>{{ task.description }}</textarea>
+                                </div>
+
+                                <div class="form-dates">
+                                    <div class="form-group">
+                                        <label for="task_start_date_{{ loop.index0 }}">Start Date</label>
+                                        <input type="date" id="task_start_date_{{ loop.index0 }}" name="tasks[{{ loop.index0 }}][start_date]" 
+                                               class="form-control datepicker" value="{{ task.startDate }}" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="task_end_date_{{ loop.index0 }}">End Date</label>
+                                        <input type="date" id="task_end_date_{{ loop.index0 }}" name="tasks[{{ loop.index0 }}][end_date]" 
+                                               class="form-control datepicker" value="{{ task.endDate }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions" style="margin-top: 20px;">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i> Confirm and Save
+                </button>
+                <a href="{{ path('app_projet_ai_generate') }}" class="btn btn-back">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Generator
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Task selection functionality
+    const taskItems = document.querySelectorAll('.task-item');
+    
+    taskItems.forEach(item => {
+        item.addEventListener('click', function() {
+            // Remove selected class from all items
+            taskItems.forEach(i => i.classList.remove('selected'));
+            
+            // Add selected class to clicked item
+            this.classList.add('selected');
+            
+            // Update hidden field with selected task index
+            const taskIndex = this.dataset.taskIndex;
+            document.getElementById('selected_task_index').value = taskIndex;
+            
+            // Hide all task fields
+            document.querySelectorAll('.task-fields').forEach(field => {
+                field.style.display = 'none';
+            });
+            
+            // Show only the selected task's fields
+            document.getElementById(`taskFields${taskIndex}`).style.display = 'block';
+        });
+    });
+
+    // Form validation
+    document.getElementById('confirmationForm').addEventListener('submit', function(e) {
+        const projectStart = new Date(document.getElementById('project_start_date').value);
+        const projectEnd = new Date(document.getElementById('project_end_date').value);
+        
+        if (projectEnd < projectStart) {
+            e.preventDefault();
+            alert('Project end date must be after start date');
+            return;
+        }
+        
+        // Validate all task dates are within project dates
+        const taskStartInputs = document.querySelectorAll('input[name^="tasks["][name$="[start_date]"]');
+        const taskEndInputs = document.querySelectorAll('input[name^="tasks["][name$="[end_date]"]');
+        
+        for (let i = 0; i < taskStartInputs.length; i++) {
+            const taskStart = new Date(taskStartInputs[i].value);
+            const taskEnd = new Date(taskEndInputs[i].value);
+            
+            if (taskStart < projectStart || taskEnd > projectEnd) {
+                e.preventDefault();
+                alert(`Task ${i+1} dates must be within project dates`);
+                return;
+            }
+            
+            if (taskEnd < taskStart) {
+                e.preventDefault();
+                alert(`Task ${i+1} end date must be after start date`);
+                return;
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
