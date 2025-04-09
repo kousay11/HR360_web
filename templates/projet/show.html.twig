@@ -18,8 +18,11 @@
         {% set nt = nt + 1 %}
     {% endif %}
 {% endfor %}
-{% set per = ((na*0 + ne*0.5 + nt*1)/n)*100 %}
-
+{% if (n!=0) %}
+    {% set per = ((na*0 + ne*0.5 + nt*1)/n)*100 %}
+{% else %}
+    {% set per = 0 %}
+{% endif %}
     <div class="project-detail-container">
         <div class="project-header">
             <h1>{{ projet.nom }}</h1>
