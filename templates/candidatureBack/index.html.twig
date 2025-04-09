@@ -255,7 +255,7 @@
                                     </td>
                                     <td>
                                         <div>
-                                            <small class="d-block">{{ candidature.dateCandidature|date('d/m/Y H:i') }}</small>
+                                            <small class="d-block">{{ candidature.dateModification|date('d/m/Y H:i') }}</small>
                                             {% if candidature.dateModification and candidature.dateModification != candidature.dateCandidature %}
                                                 <small class="text-modified">
                                                     <i class="fas fa-clock me-1"></i>Modifié

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Candidature;
+use App\Service\EmailService;
 use App\Entity\Offre;
 use App\Form\CandidatureOtherType;
 use App\Repository\CandidatureRepository;
@@ -13,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Dompdf\Dompdf;
+use Psr\Log\LoggerInterface;
 use Dompdf\Options;
 
 #[Route('/candidatureBack')]
@@ -68,19 +70,50 @@ final class CandidatureBackController extends AbstractController
     }
 
     #[Route('/{idCandidature}/edit', name: 'app_candidatureBack_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Candidature $candidature, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(CandidatureOtherType::class, $candidature);
+public function edit(
+    Request $request, 
+    Candidature $candidature, 
+    EntityManagerInterface $entityManager,
+    EmailService $emailService
+): Response {
+    // Avant de traiter le formulaire, on garde le statut initial
+    $ancienStatut = $candidature->getStatut();
+
+    // Création et traitement du formulaire
+    $form = $this->createForm(CandidatureOtherType::class, $candidature);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
+        // Nouveau statut après soumission
+        $nouveauStatut = $candidature->getStatut();
+
+        // Mettre à jour la date de modification
         $candidature->setDateModification(new \DateTime());
+
+        // Sauvegarder dans la base de données
         $entityManager->flush();
 
-        $this->addFlash('success', 'Le statut de la candidature a été mis à jour.');
-        return $this->redirectToRoute('app_candidatureBack_index', ['idCandidature' => $candidature->getIdCandidature()]);
+        // Si le statut a changé, on envoie l'email
+        if ($ancienStatut !== $nouveauStatut) {
+            $emailSent = $emailService->sendStatusUpdateEmail(
+                'kousay.najar@esprit.tn',  // À remplacer plus tard par $candidature->getEmail()
+                $nouveauStatut
+            );
+
+            // Afficher une notification dans l'interface
+            $this->addFlash(
+                $emailSent ? 'success' : 'warning',
+                $emailSent 
+                    ? 'Statut mis à jour et email envoyé'
+                    : 'Statut mis à jour mais échec d\'envoi d\'email'
+            );
+        }
+
+        // Redirection après traitement
+        return $this->redirectToRoute('app_candidatureBack_index');
     }
 
+    // Affichage du formulaire si non soumis ou invalide
     return $this->render('candidatureBack/edit.html.twig', [
         'candidature' => $candidature,
         'form' => $form->createView(),

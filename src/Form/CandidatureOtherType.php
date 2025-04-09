@@ -25,10 +25,8 @@ class CandidatureOtherType extends AbstractType
         'choices' => [
             'Accepté' => 'Accepté',
             'Refusé' => 'Refusé',
-            'En attente' => 'En attente'
         ],
         'attr' => ['class' => 'form-select'],
-        'placeholder' => 'Choisir un statut',
         'required' => true
     ]);
 }
