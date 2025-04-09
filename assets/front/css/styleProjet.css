@@ -23,7 +23,7 @@ body {
 
 .container {
     margin-top: 40px;
-    max-width: 1800px;
+    min-width: 1000px;
 }
 
 h1 {
@@ -241,7 +241,7 @@ h1:after {
 }
 
 .project-detail-container {
-    max-width: 900px;
+    min-width: 1000px;
     margin: 40px auto;
     padding: 0 20px;
 }
