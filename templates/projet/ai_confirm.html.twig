@@ -23,7 +23,7 @@
             padding: 20px;
         }
         
-        .details-container {
+        .task-details-container {
             flex: 2;
             background: white;
             border-radius: var(--border-radius);
@@ -31,7 +31,18 @@
             padding: 20px;
         }
         
+        .project-description-container {
+            flex: 1;
+            max-width: 300px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+        }
+        
         .task-item {
+            max-width: 250px;
+            min-width: 250px;
             padding: 10px;
             margin-bottom: 10px;
             border-radius: var(--border-radius);
@@ -70,15 +81,26 @@
             padding-bottom: 10px;
             border-bottom: 2px solid var(--primary-light);
         }
+        
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .project-dates {
+            font-size: 1rem;
+            color: var(--gray);
+        }
     </style>
 {% endblock %}
 
 {% block body %}
 <div class="container">
     <div class="project-form-container">
-        <div class="project-form-header">
-            <h1>Review AI Generated Project</h1>
-            <p class="text-muted">Review and modify the generated project details before saving</p>
+        <div class="project-header">
+            <h3>{{ project.name }} ({{ project.start_date|date('M d, Y') }} - {{ project.end_date|date('M d, Y') }})</h3>
         </div>
 
         <form method="post" id="confirmationForm">
@@ -91,79 +113,54 @@
                             <div class="task-item {% if loop.first %}selected{% endif %}" 
                                  data-task-index="{{ loop.index0 }}">
                                 <div class="task-name">{{ task.name }}</div>
-                                <div class="task-dates">
-                                    {{ task.startDate|date('M d') }} - {{ task.endDate|date('M d') }}
-                                </div>
                             </div>
                         {% endfor %}
                     </div>
                 </div>
 
-                <!-- Right Column - Details -->
-                <div class="details-container">
-                    <div class="project-details">
-                        <h3 class="section-title">Project Details</h3>
-                        <div class="form-group">
-                            <label for="project_name">Project Name</label>
-                            <input type="text" id="project_name" name="project[name]" 
-                                   class="form-control" value="{{ project.name }}" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="project_description">Project Description</label>
-                            <textarea id="project_description" name="project[description]" 
-                                      class="form-control" rows="4" required>{{ project.description }}</textarea>
-                        </div>
-
-                        <div class="form-dates">
+                <!-- Middle Column - Task Details -->
+                <div class="task-details-container">
+                    <h3 class="section-title">Task Details</h3>
+                    <input type="hidden" id="selected_task_index" name="selected_task_index" value="0">
+                    
+                    {% for task in tasks %}
+                        <div class="task-fields" id="taskFields{{ loop.index0 }}" 
+                             style="display: {{ loop.first ? 'block' : 'none' }}">
                             <div class="form-group">
-                                <label for="project_start_date">Start Date</label>
-                                <input type="date" id="project_start_date" name="project[start_date]" 
-                                       class="form-control datepicker" value="{{ project.start_date }}" required>
+                                <label for="task_name_{{ loop.index0 }}">Task Name</label>
+                                <input type="text" id="task_name_{{ loop.index0 }}" name="tasks[{{ loop.index0 }}][name]" 
+                                       class="form-control" value="{{ task.name }}" required>
                             </div>
 
                             <div class="form-group">
-                                <label for="project_end_date">End Date</label>
-                                <input type="date" id="project_end_date" name="project[end_date]" 
-                                       class="form-control datepicker" value="{{ project.end_date }}" required>
+                                <label for="task_description_{{ loop.index0 }}">Task Description</label>
+                                <textarea id="task_description_{{ loop.index0 }}" name="tasks[{{ loop.index0 }}][description]" 
+                                          class="form-control" rows="4" required>{{ task.description }}</textarea>
+                            </div>
+
+                            <div class="form-dates">
+                                <div class="form-group">
+                                    <label for="task_start_date_{{ loop.index0 }}">Start Date</label>
+                                    <input type="date" id="task_start_date_{{ loop.index0 }}" name="tasks[{{ loop.index0 }}][start_date]" 
+                                           class="form-control datepicker" value="{{ task.startDate }}" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="task_end_date_{{ loop.index0 }}">End Date</label>
+                                    <input type="date" id="task_end_date_{{ loop.index0 }}" name="tasks[{{ loop.index0 }}][end_date]" 
+                                           class="form-control datepicker" value="{{ task.endDate }}" required>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% endfor %}
+                </div>
 
-                    <div class="task-details">
-                        <h3 class="section-title">Selected Task Details</h3>
-                        <input type="hidden" id="selected_task_index" name="selected_task_index" value="0">
-                        
-                        {% for task in tasks %}
-                            <div class="task-fields" id="taskFields{{ loop.index0 }}" 
-                                 style="display: {{ loop.first ? 'block' : 'none' }}">
-                                <div class="form-group">
-                                    <label for="task_name_{{ loop.index0 }}">Task Name</label>
-                                    <input type="text" id="task_name_{{ loop.index0 }}" name="tasks[{{ loop.index0 }}][name]" 
-                                           class="form-control" value="{{ task.name }}" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="task_description_{{ loop.index0 }}">Task Description</label>
-                                    <textarea id="task_description_{{ loop.index0 }}" name="tasks[{{ loop.index0 }}][description]" 
-                                              class="form-control" rows="4" required>{{ task.description }}</textarea>
-                                </div>
-
-                                <div class="form-dates">
-                                    <div class="form-group">
-                                        <label for="task_start_date_{{ loop.index0 }}">Start Date</label>
-                                        <input type="date" id="task_start_date_{{ loop.index0 }}" name="tasks[{{ loop.index0 }}][start_date]" 
-                                               class="form-control datepicker" value="{{ task.startDate }}" required>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="task_end_date_{{ loop.index0 }}">End Date</label>
-                                        <input type="date" id="task_end_date_{{ loop.index0 }}" name="tasks[{{ loop.index0 }}][end_date]" 
-                                               class="form-control datepicker" value="{{ task.endDate }}" required>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
+                <!-- Right Column - Project Description -->
+                <div class="project-description-container">
+                    <h3 class="section-title">Project Description</h3>
+                    <div class="form-group">
+                        <textarea id="project_description" name="project[description]" 
+                                  class="form-control" rows="12" required>{{ project.description }}</textarea>
                     </div>
                 </div>
             </div>

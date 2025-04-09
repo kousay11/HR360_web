@@ -70,10 +70,10 @@ public function confirm(Request $request, EntityManagerInterface $entityManager)
         
         // Create and save the project
         $project = new Projet();
-        $project->setNom($postData['project']['name']);
+        $project->setNom($generatedData['project']['name']);
         $project->setDescription($postData['project']['description']);
-        $project->setDateDebut(new \DateTime($postData['project']['start_date']));
-        $project->setDateFin(new \DateTime($postData['project']['end_date']));
+        $project->setDateDebut(new \DateTime($generatedData['project']['start_date']));
+        $project->setDateFin(new \DateTime($generatedData['project']['end_date']));
         
         $entityManager->persist($project);
         $entityManager->flush();

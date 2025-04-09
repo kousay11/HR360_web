@@ -23,7 +23,7 @@ body {
 
 .container {
     margin-top: 40px;
-    max-width: 1200px;
+    max-width: 1800px;
 }
 
 h1 {
@@ -595,7 +595,7 @@ textarea.form-control {
 }
 /* Form Container */
 .project-form-container {
-    max-width: 900px;
+    max-width: 1800px;
     margin: 40px auto;
     padding: 0 20px;
 }
