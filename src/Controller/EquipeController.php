@@ -21,6 +21,22 @@ final class EquipeController extends AbstractController
             'equipes' => $equipeRepository->findAll(),
         ]);
     }
+    #[Route('/search', name: 'app_equipe_search', methods: ['GET'])]
+    public function search(Request $request, EquipeRepository $equipeRepository): Response
+    {
+        $query = $request->query->get('q', '');
+        $equipes = $equipeRepository->search($query);
+
+        if ($request->isXmlHttpRequest()) {
+            return $this->render('equipe/_grid.html.twig', [
+                'equipes' => $equipes,
+            ]);
+        }
+
+        return $this->render('equipe/index.html.twig', [
+            'equipes' => $equipes,
+        ]);
+    }
 
     #[Route('/new', name: 'app_equipe_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response

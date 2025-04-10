@@ -1,0 +1,45 @@
+<div class="row" id="teamsContainer">
+    {% for equipe in equipes %}
+        <div class="col-md-4 mb-4">
+            <div class="equipe-card">
+                <!-- Combined header with name and icon -->
+                <div class="equipe-card-header d-flex align-items-center">
+                    <div class="equipe-icon me-3">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="equipe-title mb-0">{{ equipe.nom }}</h3>
+                </div>
+                <!--
+                
+                <div class="equipe-card-body">
+                  
+                    <div class="team-meta">
+                        
+                    </div>
+                </div>
+                -->
+                
+
+                <div class="equipe-card-footer">
+                    <div class="action-buttons d-flex justify-content-end">
+                        <a href="{{ path('app_equipe_edit', {'id': equipe.id}) }}" class="btn btn-sm btn-modify me-2">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        {{ include('equipe/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="col-12">
+            <div class="empty-state">
+                <i class="fas fa-users-slash"></i>
+                <h4>No teams found</h4>
+                <p>Create your first team to get started</p>
+                <a href="{{ path('app_equipe_new') }}" class="btn btn-add">
+                    <i class="fas fa-plus me-2"></i> Add Team
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
