@@ -1,4 +1,13 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_start(form, {'attr': {'class': 'team-form'}}) }}
+    <div class="form-group">
+        {{ form_label(form.nom, 'Team Name') }}
+        {{ form_widget(form.nom, {'attr': {
+            'class': 'form-control',
+            'placeholder': 'Enter team name'
+        }}) }}
+        {{ form_errors(form.nom) }}
+    </div>
+    <button type="submit" class="btn btn-submit">
+        <i class="fas fa-save me-2"></i> {{ button_label|default('Save') }}
+    </button>
 {{ form_end(form) }}
