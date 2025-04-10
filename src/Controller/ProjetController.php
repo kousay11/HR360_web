@@ -11,6 +11,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Entity\Projetequipe;
+use App\Entity\Equipe;
+use App\Repository\ProjetequipeRepository;
+use App\Repository\EquipeRepository;
 
 #[Route('/projet')]
 final class ProjetController extends AbstractController
@@ -52,6 +56,48 @@ final class ProjetController extends AbstractController
             'projets' => $projets,
         ]);
     }
+    // In ProjetController.php
+
+#[Route('/projet/{id}/associate-team', name: 'app_projet_associate_team', methods: ['GET', 'POST'])]
+public function associateTeam(Request $request, Projet $projet, EntityManagerInterface $entityManager): Response
+{
+    $equipes = $entityManager->getRepository(Equipe::class)->findAll();
+    
+    if ($request->isMethod('POST')) {
+        $equipeId = $request->request->get('equipe');
+        $equipe = $entityManager->getRepository(Equipe::class)->find($equipeId);
+        
+        $projetEquipe = new Projetequipe();
+        $projetEquipe->setProjet($projet);
+        $projetEquipe->setEquipe($equipe);
+        
+        $entityManager->persist($projetEquipe);
+        $entityManager->flush();
+        
+        return $this->redirectToRoute('app_projet_show', ['id' => $projet->getId()]);
+    }
+    
+    return $this->render('projet/associate_team.html.twig', [
+        'projet' => $projet,
+        'equipes' => $equipes,
+    ]);
+}
+
+#[Route('/projet/{id}/disassociate-team/{equipeId}', name: 'app_projet_disassociate_team', methods: ['POST'])]
+public function disassociateTeam(Request $request, Projet $projet, int $equipeId, EntityManagerInterface $entityManager): Response
+{
+    $projetEquipe = $entityManager->getRepository(Projetequipe::class)->findOneBy([
+        'projet' => $projet,
+        'equipe' => $equipeId
+    ]);
+    
+    if ($projetEquipe) {
+        $entityManager->remove($projetEquipe);
+        $entityManager->flush();
+    }
+    
+    return $this->redirectToRoute('app_projet_show', ['id' => $projet->getId()]);
+}
 
     #[Route('/new', name: 'app_projet_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
