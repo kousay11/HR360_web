@@ -16,13 +16,28 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/reservation')]
 final class ReservationController extends AbstractController
 {
+    private $entityManager;
+
+    // Injection de l'EntityManagerInterface
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     #[Route(name: 'app_reservation_index', methods: ['GET'])]
     public function index(ReservationRepository $reservationRepository): Response
     {
+        // Récupérer l'utilisateur ayant ID = 1 pour les tests
+        $utilisateur = $this->entityManager->getRepository(Utilisateur::class)->find(1);
+        
+        // Filtrer les réservations par utilisateur
+        $reservations = $reservationRepository->findBy(['utilisateur' => $utilisateur]);
+
         return $this->render('reservation/index.html.twig', [
-            'reservations' => $reservationRepository->findAll(),
+            'reservations' => $reservations,
         ]);
     }
+
 
     #[Route('/new/{ressourceId}', name: 'app_reservation_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager , ?int $ressourceId = null): Response

@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 use App\Repository\RessourceRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RessourceRepository::class)]
 #[ORM\Table(name: 'ressource')]
@@ -29,6 +30,7 @@ class Ressource
     }
 
     #[ORM\Column(type: 'string', nullable: false)]
+    #[Assert\NotBlank(message: "Le nom de la ressource est obligatoire.")]
     private ?string $nom = null;
 
     public function getNom(): ?string
@@ -43,6 +45,7 @@ class Ressource
     }
 
     #[ORM\Column(type: 'string', nullable: false)]
+    #[Assert\NotBlank(message: "Le type de la ressource est obligatoire.")]
     private ?string $type = null;
 
     public function getType(): ?string
@@ -57,6 +60,7 @@ class Ressource
     }
 
     #[ORM\Column(type: 'string', nullable: false)]
+    #[Assert\NotBlank(message: "L'état de la ressource est obligatoire.")]
     private ?string $etat = null;
 
     public function getEtat(): ?string
@@ -70,8 +74,11 @@ class Ressource
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', nullable: false)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: false)]
+    #[Assert\NotBlank(message: "Le prix de la ressource est obligatoire.")]
+    #[Assert\GreaterThan(value: 0, message: "Le prix doit être supérieur à zéro.")]
     private ?string $prix = null;
+    
 
     public function getPrix(): ?string
     {
@@ -111,5 +118,4 @@ class Ressource
         $this->getReservations()->removeElement($reservation);
         return $this;
     }
-
 }

@@ -11,7 +11,6 @@
         </div>
         <div class="card-body">
             <table class="table table-bordered">
-                <tr><th>ID</th><td>{{ ressource.id }}</td></tr>
                 <tr><th>Nom</th><td>{{ ressource.nom }}</td></tr>
                 <tr><th>Type</th><td>{{ ressource.type }}</td></tr>
                 <tr><th>État</th><td>{{ ressource.etat }}</td></tr>
@@ -32,7 +31,6 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Date début</th>
                             <th>Date fin</th>
                             <th>Actions</th>
@@ -41,7 +39,6 @@
                     <tbody>
                         {% for reservation in reservations %}
                             <tr>
-                                <td>{{ reservation.id }}</td>
                                 <td>{{ reservation.datedebut|date('Y-m-d') }}</td>
                                 <td>{{ reservation.datefin|date('Y-m-d') }}</td>
                                 <td>

@@ -10,21 +10,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/ressource')]
 final class RessourceController extends AbstractController
 {
     #[Route(name: 'app_ressource_index', methods: ['GET'])]
     public function index(RessourceRepository $ressourceRepository): Response
-{
-    $ressources = $ressourceRepository->findAll();
-    return $this->render('resource/index.html.twig', [
-        'ressources' => $ressources,
-    ]);
-}
+    {
+        $ressources = $ressourceRepository->findAll();
+        return $this->render('ressource/index.html.twig', [
+            'ressources' => $ressources,
+        ]);
+    }
 
-
-
+    
 
     #[Route('/ressource/employee', name: 'app_ressource_index_employee', methods: ['GET'])]
 public function indexForEmployees(RessourceRepository $ressourceRepository): Response
@@ -34,26 +34,25 @@ public function indexForEmployees(RessourceRepository $ressourceRepository): Res
     ]);
 }
 
-
     #[Route('/new', name: 'app_ressource_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $ressource = new Ressource();
-        $form = $this->createForm(RessourceType::class, $ressource);
-        $form->handleRequest($request);
+{
+    $ressource = new Ressource();
+    $form = $this->createForm(RessourceType::class, $ressource);
+    $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($ressource);
-            $entityManager->flush();
+    if ($form->isSubmitted() && $form->isValid()) {
+        $entityManager->persist($ressource);
+        $entityManager->flush();
 
-            return $this->redirectToRoute('app_ressource_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('ressource/new.html.twig', [
-            'ressource' => $ressource,
-            'form' => $form,
-        ]);
+        return $this->redirectToRoute('app_ressource_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    return $this->render('ressource/new.html.twig', [
+        'ressource' => $ressource,
+        'form' => $form->createView(),
+    ]);
+}
 
     #[Route('/{id}', name: 'app_ressource_show', methods: ['GET'])]
 public function show(Ressource $ressource): Response

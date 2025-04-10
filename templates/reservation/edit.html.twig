@@ -1,13 +1,108 @@
-{% extends 'baseEMP.html.twig' %}
-
-{% block title %}Modifier la Réservation{% endblock %}
-
-{% block heading %}Modifier la Réservation{% endblock %}
-
 {% block content %}
+    <style>
+        /* Styles globaux */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+        /* Style de la card */
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 20px auto;
+            max-width: 800px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        /* En-tête de la card */
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 15px 20px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        /* Corps de la card */
+        .card-body {
+            padding: 20px;
+        }
+
+        /* Style du bouton 'Retour à la liste' */
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            font-size: 14px;
+            padding: 8px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+
+        /* Style des marges */
+        .mt-3 {
+            margin-top: 20px;
+        }
+
+        .mt-2 {
+            margin-top: 15px;
+        }
+
+        /* Ajout d'un effet de survol pour le bouton supprimer */
+        .btn-danger {
+            font-size: 14px;
+            padding: 8px 20px;
+            border-radius: 5px;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
+        /* Améliorations de la mise en forme pour les éléments inclus (_form.html.twig, _delete_form.html.twig) */
+        .card-body .form-group {
+            margin-bottom: 20px;
+        }
+
+        .card-body label {
+            font-weight: bold;
+        }
+
+        .card-body input, .card-body select, .card-body textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .card-body input:focus, .card-body select:focus, .card-body textarea:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* Style spécifique pour les formulaires inclus */
+        .card-body .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+    </style>
+
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Formulaire de modification</h6>
+            <!-- Vous pouvez ajouter un titre ou autre contenu ici si nécessaire -->
         </div>
         <div class="card-body">
             {{ include('reservation/_form.html.twig', {'button_label': 'Mettre à jour'}) }}

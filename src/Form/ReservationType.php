@@ -17,9 +17,13 @@ class ReservationType extends AbstractType
         $builder
             ->add('datedebut', null, [
                 'widget' => 'single_text',
+                'required' => false,
+                'empty_data' => null,
             ])
             ->add('datefin', null, [
                 'widget' => 'single_text',
+                'required' => false,
+                'empty_data' => null,
             ])
         ;
     }
