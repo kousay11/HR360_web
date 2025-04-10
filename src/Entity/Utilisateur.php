@@ -5,12 +5,12 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use App\Repository\UtilisateurRepository;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[ORM\Table(name: 'utilisateur')]
-class Utilisateur
+class Utilisateur implements PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -232,7 +232,7 @@ class Utilisateur
         return $this;
     }
 
-    public function removeReservation(Reservation $reservation): self
+     public function removeReservation(Reservation $reservation): self
     {
         $this->getReservations()->removeElement($reservation);
         return $this;
@@ -267,5 +267,7 @@ class Utilisateur
     
             return $this;
         }
+
+
 
 }

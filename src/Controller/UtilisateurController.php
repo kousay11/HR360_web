@@ -10,6 +10,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Form\RegistrationFormType;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 #[Route('/utilisateur')]
 final class UtilisateurController extends AbstractController
@@ -21,6 +24,57 @@ final class UtilisateurController extends AbstractController
             'utilisateurs' => $utilisateurRepository->findAll(),
         ]);
     }
+
+
+  
+
+    #[Route('/register', name: 'app_register')]
+    public function register(
+        Request $request, 
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $entityManager,
+        ParameterBagInterface $params // ✅ au lieu de string $imagesDirectory
+    ): Response {
+        $user = new Utilisateur();
+        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form->handleRequest($request);
+    
+        if ($form->isSubmitted() && $form->isValid()) {
+            $imageFile = $form->get('image')->getData();
+    
+            if ($imageFile) {
+                $newFilename = uniqid().'.'.$imageFile->guessExtension();
+    
+                $imageFile->move(
+                    $params->get('images_directory'),
+                    $newFilename
+                );
+    
+                $user->setImage($newFilename);
+            } else {
+                $user->setImage('default.jpg');
+            }
+    
+            $user->setRole('Candidat');
+    
+            $user->setPassword(
+                $passwordHasher->hashPassword(
+                    $user,
+                    $form->get('plainPassword')->getData()
+                )
+            );
+    
+            $entityManager->persist($user);
+            $entityManager->flush();
+    
+            return $this->redirectToRoute('app_utilisateur_new'); // tu peux adapter cette route
+        }
+    
+        return $this->render('login.html.twig', [
+            'registrationForm' => $form->createView(),
+        ]);
+    }
+    
 
     #[Route('/new', name: 'app_utilisateur_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -71,7 +125,7 @@ final class UtilisateurController extends AbstractController
     #[Route('/{id}', name: 'app_utilisateur_delete', methods: ['POST'])]
     public function delete(Request $request, Utilisateur $utilisateur, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$utilisateur->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $utilisateur->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($utilisateur);
             $entityManager->flush();
         }

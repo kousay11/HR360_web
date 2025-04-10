@@ -20,40 +20,32 @@ class RegistrationFormType extends AbstractType
     {
         $builder
             ->add('email', EmailType::class, [
-                'label' => 'Email',
-                'constraints' => [
-                    new NotBlank(['message' => 'Veuillez entrer un email']),
-                ]
+                'attr' => ['class' => 'form-styling', 'placeholder' => 'Email']
+            ])
+            ->add('nom', TextType::class, [
+                'attr' => ['class' => 'form-styling', 'placeholder' => 'Nom']
+            ])
+            ->add('prenom', TextType::class, [
+                'attr' => ['class' => 'form-styling', 'placeholder' => 'Prénom']
+            ])
+            ->add('competence', TextType::class, [
+                'attr' => ['class' => 'form-styling', 'placeholder' => 'Compétences']
             ])
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'invalid_message' => 'Les mots de passe doivent correspondre.',
-                'options' => ['attr' => ['class' => 'password-field']],
-                'required' => true,
-                'first_options'  => ['label' => 'Mot de passe'],
-                'second_options' => ['label' => 'Confirmer le mot de passe'],
-                'constraints' => [
-                    new NotBlank(['message' => 'Veuillez entrer un mot de passe']),
-                    new Length([
-                        'min' => 6,
-                        'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
-                        'max' => 4096,
-                    ]),
+                'options' => ['attr' => ['class' => 'input']],
+                'first_options'  => [
+                    'label' => 'Mot de passe',
+                    'attr' => ['class' => 'input', 'placeholder' => 'Créez votre mot de passe']
                 ],
-                'mapped' => false
+                'second_options' => [
+                    'label' => 'Confirmation du mot de passe',
+                    'attr' => ['class' => 'input', 'placeholder' => 'Confirmez votre mot de passe']
+                ],
+                'mapped' => false,
             ])
-            ->add('nom', TextType::class, [
-                'label' => 'Nom',
-                'constraints' => [
-                    new NotBlank(['message' => 'Veuillez entrer votre nom']),
-                ]
-            ])
-            ->add('prenom', TextType::class, [
-                'label' => 'Prénom',
-                'constraints' => [
-                    new NotBlank(['message' => 'Veuillez entrer votre prénom']),
-                ]
-            ])
+            
             ->add('image', FileType::class, [
                 'label' => 'Photo de profil (optionnel)',
                 'mapped' => false,
@@ -61,10 +53,10 @@ class RegistrationFormType extends AbstractType
                 'constraints' => [
                     new Image([
                         'maxSize' => '2M',
-                        'mimeTypes' => ['image/jpeg', 'image/png', 'image/gif'],
+                        'mimeTypes' => ['image/jpg', 'image/png', 'image/gif','image/jpeg'],
                         'mimeTypesMessage' => 'Veuillez uploader une image valide (JPEG, PNG ou GIF)'
                     ])
-                ]
+                ],
             ]);
     }
 

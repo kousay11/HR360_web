@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Connexion/Inscription</title>
+		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="{{ asset('front/css/auth.css') }}">
+	</head>
+	<body>
+		<div class="row">
+			<div class="col-md-6 mx-auto p-0">
+				<div class="card">
+					<div class="login-box">
+						<div class="login-snip">
+							<input id="tab-1" type="radio" name="tab" class="sign-in" checked><label for="tab-1" class="tab">Login</label>
+							<input id="tab-2" type="radio" name="tab" class="sign-up"><label for="tab-2" class="tab">Sign Up</label>
+							<div class="login-space">
+
+								<div class="login">
+									<div class="group">
+										<label for="user" class="label">Username</label>
+										<input id="user" type="text" class="input" placeholder="Enter your username">
+									</div>
+									<div class="group">
+										<label for="pass" class="label">Password</label>
+										<input id="pass" type="password" class="input" data-type="password" placeholder="Enter your password">
+									</div>
+									<div class="group">
+										<input id="check" type="checkbox" class="check" checked>
+										<label for="check">
+											<span class="icon"></span>
+											Keep me Signed in</label>
+									</div>
+									<div class="group">
+										<input type="submit" class="button" value="Sign In">
+									</div>
+									<div class="hr"></div>
+									<div class="foot">
+										<a href="#">Forgot Password?</a>
+									</div>
+								</div>
+
+
+								<div class="sign-up-form">
+									{{ form_start(registrationForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
+									<!-- Informations de base -->
+									<div class="group">
+										{{ form_label(registrationForm.nom) }}
+										{{ form_widget(registrationForm.nom, {'attr': {'class': 'input', 'placeholder': 'Votre nom'}}) }}
+									</div>
+
+									<div class="group">
+										{{ form_label(registrationForm.prenom) }}
+										{{ form_widget(registrationForm.prenom, {'attr': {'class': 'input', 'placeholder': 'Votre prénom'}}) }}
+									</div>
+
+									<div class="group">
+										{{ form_label(registrationForm.email) }}
+										{{ form_widget(registrationForm.email, {'attr': {'class': 'input', 'placeholder': 'Votre email'}}) }}
+									</div>
+
+									<!-- Mot de passe -->
+									<div class="group">
+										{{ form_label(registrationForm.plainPassword.first) }}
+										{{ form_widget(registrationForm.plainPassword.first) }}
+									</div>
+
+									<div class="group">
+										{{ form_label(registrationForm.plainPassword.second) }}
+										{{ form_widget(registrationForm.plainPassword.second) }}
+									</div>
+
+									<!-- Photo de profil -->
+									<div class="group">
+										{{ form_label(registrationForm.image) }}
+										{{ form_widget(registrationForm.image, {'attr': {'class': 'input'}}) }}
+									</div>
+
+									<!-- Compétences -->
+									<div class="group">
+										{{ form_label(registrationForm.competence) }}
+
+									</div>
+									<div class="group">
+										{{ form_widget(registrationForm.competence, {'attr': {'class': 'input', 'placeholder': 'Décrivez vos compétences'}}) }}
+									</div>
+
+									<div class="group">
+										<button type="submit" class="button">S'inscrire</button>
+									</div>
+
+									<div class="hr"></div>
+									<div class="foot">
+										<a href="">Déjà inscrit ? Connectez-vous</a>
+									</div>
+									{{ form_end(registrationForm) }}
+								</div>
+
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</body>
+</html>
