@@ -1,17 +1,92 @@
 <!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index des Réservations</title>
+    <style>
+        /* Styles globaux */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #495057;
+            margin: 0;
+            padding: 0;
+        }
 
-<title>Reservation index</title>
+        h1 {
+            text-align: center;
+            color: #007bff;
+            margin-top: 20px;
+        }
 
-{% block body %}
-    <h1>Reservation index</h1>
+        /* Styles du tableau */
+        .table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+        }
+
+        .table th, .table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .table th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* Styles des liens d'action */
+        .table a {
+            margin-right: 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .table a:hover {
+            color: #0056b3;
+        }
+
+        .table a:focus {
+            outline: none;
+        }
+
+        /* Style du bouton "Créer une nouvelle réservation" */
+        .create-new-btn {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 16px;
+            text-decoration: none;
+        }
+
+        .create-new-btn:hover {
+            background-color: #218838;
+        }
+
+        .create-new-btn:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Index des Réservations</h1>
 
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Datedebut</th>
-                <th>Datefin</th>
-                <th>actions</th>
+                <th>ID</th>
+                <th>Date de début</th>
+                <th>Date de fin</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -21,17 +96,18 @@
                 <td>{{ reservation.datedebut ? reservation.datedebut|date('Y-m-d') : '' }}</td>
                 <td>{{ reservation.datefin ? reservation.datefin|date('Y-m-d') : '' }}</td>
                 <td>
-                    <a href="{{ path('app_reservation_show', {'id': reservation.id}) }}">show</a>
-                    <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}">edit</a>
+                    <a href="{{ path('app_reservation_show', {'id': reservation.id}) }}">Afficher</a>
+                    <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}">Modifier</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="4">no records found</td>
+                <td colspan="4">Aucune réservation trouvée.</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_reservation_new') }}">Create new</a>
-{% endblock %}
+    <a href="{{ path('app_reservation_new') }}" class="create-new-btn">Créer une nouvelle réservation</a>
+</body>
+</html>

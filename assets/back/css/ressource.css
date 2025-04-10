@@ -1,0 +1,69 @@
+/* Style global du formulaire */
+form {
+    max-width: 600px; /* Largeur maximale du formulaire */
+    margin: 0 auto; /* Centrer le formulaire */
+    padding: 20px;
+    background-color: #f9f9f9; /* Fond clair */
+    border-radius: 8px; /* Bords arrondis */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre douce */
+}
+
+/* Style des labels du formulaire */
+form label {
+    font-weight: bold;
+    color: #333; /* Couleur du texte des labels */
+    margin-bottom: 5px;
+    display: block;
+}
+
+/* Style des champs de saisie (inputs et selects) */
+form input,
+form select,
+form textarea {
+    width: 100%; /* Remplir la largeur du formulaire */
+    padding: 10px; /* Espacement interne */
+    border: 1px solid #ccc; /* Bordure grise */
+    border-radius: 5px; /* Bords arrondis */
+    margin-bottom: 20px; /* Espacement entre les champs */
+    font-size: 16px;
+    background-color: #fff; /* Fond blanc */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Effet de transition */
+}
+
+/* Effet au survol des champs de saisie */
+form input:focus,
+form select:focus,
+form textarea:focus {
+    border-color: #007bff; /* Bordure bleue au focus */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3); /* Ombre bleue */
+    outline: none; /* Enlever la bordure par défaut */
+}
+
+/* Style du bouton de soumission */
+form button {
+    background-color: #007bff; /* Fond bleu */
+    color: white; /* Texte blanc */
+    padding: 12px 30px; /* Espacement interne */
+    font-size: 16px;
+    border: none; /* Enlever la bordure */
+    border-radius: 5px; /* Bords arrondis */
+    cursor: pointer; /* Changer le curseur en main */
+    transition: background-color 0.3s ease; /* Effet de transition */
+}
+
+/* Effet au survol du bouton */
+form button:hover {
+    background-color: #0056b3; /* Couleur plus foncée au survol */
+}
+
+/* Ajout d'un espacement entre le formulaire et les autres éléments */
+form .form-group {
+    margin-bottom: 15px;
+}
+
+/* Style pour les messages d'erreur */
+.form-error {
+    color: #ff0000; /* Rouge pour les erreurs */
+    font-size: 14px;
+    margin-top: -10px;
+}

@@ -16,11 +16,24 @@ final class RessourceController extends AbstractController
 {
     #[Route(name: 'app_ressource_index', methods: ['GET'])]
     public function index(RessourceRepository $ressourceRepository): Response
-    {
-        return $this->render('ressource/index.html.twig', [
-            'ressources' => $ressourceRepository->findAll(),
-        ]);
-    }
+{
+    $ressources = $ressourceRepository->findAll();
+    return $this->render('resource/index.html.twig', [
+        'ressources' => $ressources,
+    ]);
+}
+
+
+
+
+    #[Route('/ressource/employee', name: 'app_ressource_index_employee', methods: ['GET'])]
+public function indexForEmployees(RessourceRepository $ressourceRepository): Response
+{
+    return $this->render('ressource/index_employee.html.twig', [
+        'ressources' => $ressourceRepository->findAll(),
+    ]);
+}
+
 
     #[Route('/new', name: 'app_ressource_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -43,12 +56,14 @@ final class RessourceController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_ressource_show', methods: ['GET'])]
-    public function show(Ressource $ressource): Response
-    {
-        return $this->render('ressource/show.html.twig', [
-            'ressource' => $ressource,
-        ]);
-    }
+public function show(Ressource $ressource): Response
+{
+    return $this->render('ressource/show.html.twig', [
+        'ressource' => $ressource,
+        'reservations' => $ressource->getReservations(),
+    ]);
+}
+
 
     #[Route('/{id}/edit', name: 'app_ressource_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Ressource $ressource, EntityManagerInterface $entityManager): Response
