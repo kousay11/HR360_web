@@ -1,4 +1,173 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
+
+{% if not form.vars.valid %}
+    <div class="alert alert-danger">
+        <strong>Erreurs :</strong> Veuillez corriger les erreurs ci-dessous
+    </div>
+{% endif %}
+
+<div class="form-group row">
+    <div class="col-md-12 mb-3">
+        {{ form_label(form.titreEva, 'Titre de l\'évaluation', {'label_attr': {'class': 'font-weight-bold'}}) }}
+        {{ form_widget(form.titreEva, {'attr': {'class': 'form-control' ~ (form.titreEva.vars.errors|length ? ' is-invalid' : '')}}) }}
+        <div class="invalid-feedback">
+            {% for error in form.titreEva.vars.errors %}
+                <div style="color: red;">{{ error.message }}</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="form-group row">
+    <div class="col-md-6 mb-3">
+        {{ form_label(form.dateEvaluation, 'Date et heure d\'évaluation', {'label_attr': {'class': 'font-weight-bold'}}) }}
+        <div class="input-group">
+            {{ form_widget(form.dateEvaluation, {
+                'attr': {
+                    'class': 'form-control datetimepicker' ~ (form.dateEvaluation.vars.errors|length ? ' is-invalid' : ''),
+                    'data-timezone': 'Africa/Tunis'
+                }
+            }) }}
+            <div class="input-group-append">
+                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+            </div>
+        </div>
+        <div class="invalid-feedback">
+            {% for error in form.dateEvaluation.vars.errors %}
+                <div style="color: red;">{{ error.message }}</div>
+            {% endfor %}
+        </div>
+        <small class="form-text text-muted">Fuseau horaire: Tunis (UTC+1)</small>
+    </div>
+    
+    <div class="col-md-6 mb-3">
+        {{ form_label(form.scorequiz, 'Score Quiz (/10)', {'label_attr': {'class': 'font-weight-bold'}}) }}
+        {{ form_widget(form.scorequiz, {
+            'attr': {
+                'class': 'form-control' ~ (form.scorequiz.vars.errors|length ? ' is-invalid' : ''),
+                'min': 0,
+                'max': 10,
+                'onchange': 'updateCommentaire(this.value)'
+            }
+        }) }}
+        <div class="invalid-feedback">
+            {% for error in form.scorequiz.vars.errors %}
+                <div style="color: red;">{{ error.message }}</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="form-group row">
+    <div class="col-md-6 mb-3">
+        {{ form_label(form.noteTechnique, 'Note Technique (/20)', {'label_attr': {'class': 'font-weight-bold'}}) }}
+        {{ form_widget(form.noteTechnique, {
+            'attr': {
+                'class': 'form-control' ~ (form.noteTechnique.vars.errors|length ? ' is-invalid' : ''),
+                'min': 0,
+                'max': 20,
+                'step': 0.5
+            }
+        }) }}
+        <div class="invalid-feedback">
+            {% for error in form.noteTechnique.vars.errors %}
+                <div style="color: red;">{{ error.message }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-3">
+        {{ form_label(form.noteSoftSkills, 'Note Soft Skills (/20)', {'label_attr': {'class': 'font-weight-bold'}}) }}
+        {{ form_widget(form.noteSoftSkills, {
+            'attr': {
+                'class': 'form-control' ~ (form.noteSoftSkills.vars.errors|length ? ' is-invalid' : ''),
+                'min': 0,
+                'max': 20,
+                'step': 0.5
+            }
+        }) }}
+        <div class="invalid-feedback">
+            {% for error in form.noteSoftSkills.vars.errors %}
+                <div style="color: red;">{{ error.message }}</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    {{ form_label(form.commentaire, 'Décision', {'label_attr': {'class': 'font-weight-bold'}}) }}
+    {{ form_widget(form.commentaire, {
+        'attr': {
+            'class': 'form-control' ~ (form.commentaire.vars.errors|length ? ' is-invalid' : ''),
+            'rows': 1,
+            'readonly': 'readonly'
+        }
+    }) }}
+    <div class="invalid-feedback">
+        {% for error in form.commentaire.vars.errors %}
+            <div style="color: red;">{{ error.message }}</div>
+        {% endfor %}
+    </div>
+</div>
+
+{# Champ caché pour la redirection #}
+{% if evaluation.entretien is defined and evaluation.entretien is not null %}
+    <input type="hidden" name="redirect_to_entretien" value="1">
+{% endif %}
+
+<div class="form-group text-right mt-4">
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save mr-2"></i>{{ button_label|default('Enregistrer') }}
+    </button>
+    {% if evaluation.entretien is defined and evaluation.entretien is not null %}
+        <a href="{{ path('app_evaluation_index_for_entretien', {'idEntretien': evaluation.entretien.idEntretien}) }}" class="btn btn-secondary ml-2">
+            <i class="fas fa-times mr-2"></i>Annuler
+        </a>
+    {% else %}
+        <a href="{{ path('app_evaluation_index') }}" class="btn btn-secondary ml-2">
+            <i class="fas fa-times mr-2"></i>Annuler
+        </a>
+    {% endif %}
+</div>
+
 {{ form_end(form) }}
+
+<script>
+function updateCommentaire(score) {
+    const commentaireField = document.getElementById('{{ form.commentaire.vars.id }}');
+    if (score > 7) {
+        commentaireField.value = 'ACCEPTÉ';
+    } else {
+        commentaireField.value = 'REFUSÉ';
+    }
+}
+
+// Initialiser le commentaire au chargement
+document.addEventListener('DOMContentLoaded', function() {
+    const initialScore = document.getElementById('{{ form.scorequiz.vars.id }}').value;
+    if (initialScore) {
+        updateCommentaire(initialScore);
+    }
+});
+
+// Initialisation du datetimepicker
+$(function () {
+    $('.datetimepicker').datetimepicker({
+        format: 'DD/MM/YYYY HH:mm',
+        sideBySide: true,
+        locale: 'fr',
+        timeZone: 'Africa/Tunis',
+        icons: {
+            time: 'fas fa-clock',
+            date: 'fas fa-calendar',
+            up: 'fas fa-arrow-up',
+            down: 'fas fa-arrow-down',
+            previous: 'fas fa-chevron-left',
+            next: 'fas fa-chevron-right',
+            today: 'fas fa-calendar-check',
+            clear: 'fas fa-trash',
+            close: 'fas fa-times'
+        }
+    });
+});
+</script>

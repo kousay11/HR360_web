@@ -1,45 +1,120 @@
-<!DOCTYPE html>
+{% extends 'baseRH.html.twig' %}
 
-<title>Entretien index</title>
+{% block title %}Liste des Entretiens{% endblock %}
 
 {% block body %}
-    <h1>Entretien index</h1>
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>IdEntretien</th>
-                <th>Date</th>
-                <th>Heure</th>
-                <th>Type</th>
-                <th>Statut</th>
-                <th>Lienmeet</th>
-                <th>Localisation</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for entretien in entretiens %}
-            <tr>
-                <td>{{ entretien.idEntretien }}</td>
-                <td>{{ entretien.date ? entretien.date|date('Y-m-d') : '' }}</td>
-                <td>{{ entretien.heure }}</td>
-                <td>{{ entretien.type }}</td>
-                <td>{{ entretien.statut }}</td>
-                <td>{{ entretien.lienmeet }}</td>
-                <td>{{ entretien.localisation }}</td>
-                <td>
-                    <a href="{{ path('app_entretien_show', {'idEntretien': entretien.idEntretien}) }}">show</a>
-                    <a href="{{ path('app_entretien_edit', {'idEntretien': entretien.idEntretien}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="8">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Gestion des Entretiens</h1>
+            <a href="{{ path('app_entretien_new') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                <i class="fas fa-plus fa-sm text-white-50 mr-2"></i>Créer un nouvel entretien
+            </a>
+        </div>
 
-    <a href="{{ path('app_entretien_new') }}">Create new</a>
+        <!-- DataTales Example -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Liste des entretiens</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Date</th>
+                                <th>Heure</th>
+                                <th>Type</th>
+                                <th>Statut</th>
+                                <th>Lien Meet</th>
+                                <th>Localisation</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entretien in entretiens %}
+                                <tr>
+                                    <td>{{ entretien.idEntretien }}</td>
+                                    <td>{{ entretien.date ? entretien.date|date('d/m/Y') : '' }}</td>
+                                    <td>{{ entretien.heure|date('H:i') }}</td>
+                                    <td>{{ entretien.type.value }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if entretien.statut.value == 'Planifié' %}badge-primary
+                                            {% elseif entretien.statut.value == 'Terminé' %}badge-success
+                                            {% elseif entretien.statut.value == 'Annulé' %}badge-danger
+                                            {% else %}badge-secondary
+                                            {% endif %}">
+                                            {{ entretien.statut.value }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if entretien.lienmeet %}
+                                            <a href="{{ entretien.lienmeet }}" target="_blank" class="btn btn-sm btn-info">
+                                                <i class="fas fa-video"></i> Rejoindre
+                                            </a>
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ entretien.localisation }}</td>
+                                    <td>
+    <div class="btn-group" role="group">
+        <a href="{{ path('app_entretien_show', {'idEntretien': entretien.idEntretien}) }}" 
+           class="btn btn-sm btn-primary" title="Voir">
+            <i class="fas fa-eye"></i>
+        </a>
+        <a href="{{ path('app_entretien_edit', {'idEntretien': entretien.idEntretien}) }}" 
+           class="btn btn-sm btn-warning" title="Modifier">
+            <i class="fas fa-edit"></i>
+        </a>
+        <a href="{{ path('app_evaluation_index_for_entretien', {'idEntretien': entretien.idEntretien}) }}" 
+           class="btn btn-sm btn-info" title="Évaluations">
+            <i class="fas fa-clipboard-check"></i>
+        </a>
+        <form method="post" action="{{ path('app_entretien_delete', {'idEntretien': entretien.idEntretien}) }}" 
+              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet entretien ?');"
+              class="d-inline">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ entretien.idEntretien) }}">
+            <button class="btn btn-sm btn-danger" title="Supprimer">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </form>
+    </div>
+</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="8" class="text-center">Aucun entretien trouvé</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- /.container-fluid -->
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <!-- Page level plugins -->
+    <script src="{{ asset('back/vendor/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('back/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+
+    <!-- Page level custom scripts -->
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/French.json"
+                }
+            });
+        });
+    </script>
 {% endblock %}

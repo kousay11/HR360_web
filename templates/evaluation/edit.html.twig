@@ -1,13 +1,68 @@
-<!DOCTYPE html>
+{% extends 'baseRH.html.twig' %}
 
-<title>Edit Evaluation</title>
+{% block title %}Modifier Évaluation #{{ evaluation.idEvaluation }}{% endblock %}
 
 {% block body %}
-    <h1>Edit Evaluation</h1>
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
 
-    {{ include('evaluation/_form.html.twig', {'button_label': 'Update'}) }}
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Modifier l'évaluation</h1>
+            {% if evaluation.entretien %}
+                <a href="{{ path('app_evaluation_index_for_entretien', {'idEntretien': evaluation.entretien.idEntretien}) }}" 
+                   class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+                    <i class="fas fa-arrow-left fa-sm text-white-50 mr-2"></i>Retour aux évaluations
+                </a>
+            {% endif %}
+        </div>
 
-    <a href="{{ path('app_evaluation_index') }}">back to list</a>
+        <!-- Content Row -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Formulaire de modification</h6>
+                    </div>
+                    <div class="card-body">
+                        {{ include('evaluation/_form.html.twig', {
+                            'button_label': 'Mettre à jour',
+                            'include_back_to_entretien': evaluation.entretien is not null
+                        }) }}
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    {{ include('evaluation/_delete_form.html.twig') }}
+    </div>
+    <!-- /.container-fluid -->
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.33/moment-timezone-with-data.min.js"></script>
+    
+    <script>
+    $(function () {
+        $('.datetimepicker').datetimepicker({
+            format: 'DD/MM/YYYY HH:mm',
+            sideBySide: true,
+            locale: 'fr',
+            timeZone: 'Africa/Tunis', 
+            extraFormats: ['X'],
+            icons: {
+                time: 'fas fa-clock',
+                date: 'fas fa-calendar',
+                up: 'fas fa-arrow-up',
+                down: 'fas fa-arrow-down',
+                previous: 'fas fa-chevron-left',
+                next: 'fas fa-chevron-right',
+                today: 'fas fa-calendar-check',
+                clear: 'fas fa-trash',
+                close: 'fas fa-times'
+            }
+        });
+    });
+</script>
 {% endblock %}

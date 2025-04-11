@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/entretien')]
 final class EntretienController extends AbstractController
@@ -22,25 +23,69 @@ final class EntretienController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_entretien_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $entretien = new Entretien();
-        $form = $this->createForm(EntretienType::class, $entretien);
-        $form->handleRequest($request);
+    /*#[Route('/entfront', name: 'app_entretien_front', methods: ['GET'])]
+public function indexfront(EntretienRepository $entretienRepository): Response
+{
+    return $this->render('entretien/entfront.html.twig', [
+        'entretiens' => $entretienRepository->findAll(),
+    ]);
+}*/
 
-        if ($form->isSubmitted() && $form->isValid()) {
+#[Route('/entfront/{page}', name: 'app_entretien_front', defaults: ['page' => 1], methods: ['GET'])]
+public function indexfront(EntretienRepository $entretienRepository, int $page = 1): Response
+{
+    $limit = 4; // 4 entretiens par page
+    $query = $entretienRepository->createQueryBuilder('e')
+        ->orderBy('e.date', 'ASC')
+        ->getQuery();
+
+    $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($query);
+    $totalItems = count($paginator);
+    $totalPages = ceil($totalItems / $limit);
+
+    $entretiens = $paginator
+        ->getQuery()
+        ->setFirstResult(($page - 1) * $limit)
+        ->setMaxResults($limit)
+        ->getResult();
+
+    return $this->render('entretien/entfront.html.twig', [
+        'entretiens' => $entretiens,
+        'page' => $page,
+        'totalPages' => $totalPages
+    ]);
+}
+
+#[Route('/new', name: 'app_entretien_new', methods: ['GET', 'POST'])]
+public function new(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): Response
+{
+    $entretien = new Entretien();
+    $form = $this->createForm(EntretienType::class, $entretien);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted()) {
+        // Validation manuelle avant $form->isValid()
+        $errors = $validator->validate($entretien);
+        
+        if (count($errors) === 0 && $form->isValid()) {
             $entityManager->persist($entretien);
             $entityManager->flush();
 
+            $this->addFlash('success', 'L\'entretien a été créé avec succès.');
             return $this->redirectToRoute('app_entretien_index', [], Response::HTTP_SEE_OTHER);
+        } else {
+            // Afficher les erreurs de validation
+            foreach ($errors as $error) {
+                $this->addFlash('error', $error->getMessage());
+            }
         }
-
-        return $this->render('entretien/new.html.twig', [
-            'entretien' => $entretien,
-            'form' => $form,
-        ]);
     }
+
+    return $this->render('entretien/new.html.twig', [
+        'entretien' => $entretien,
+        'form' => $form,
+    ]);
+}
 
     #[Route('/{idEntretien}', name: 'app_entretien_show', methods: ['GET'])]
     public function show(Entretien $entretien): Response
@@ -50,23 +95,42 @@ final class EntretienController extends AbstractController
         ]);
     }
 
-    #[Route('/{idEntretien}/edit', name: 'app_entretien_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Entretien $entretien, EntityManagerInterface $entityManager): Response
+    
+    #[Route('/detailfront/{idEntretien}', name: 'app_entretien_show_front', methods: ['GET'])]
+    public function showfront(Entretien $entretien): Response
     {
-        $form = $this->createForm(EntretienType::class, $entretien);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_entretien_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('entretien/edit.html.twig', [
+        return $this->render('entretien/detailsfr.html.twig', [
             'entretien' => $entretien,
-            'form' => $form,
         ]);
     }
+    #[Route('/{idEntretien}/edit', name: 'app_entretien_edit', methods: ['GET', 'POST'])]
+public function edit(Request $request, Entretien $entretien, EntityManagerInterface $entityManager, ValidatorInterface $validator): Response
+{
+    $form = $this->createForm(EntretienType::class, $entretien);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted()) {
+        // Validation manuelle avant $form->isValid()
+        $errors = $validator->validate($entretien);
+        
+        if (count($errors) === 0 && $form->isValid()) {
+            $entityManager->flush();
+
+            $this->addFlash('success', 'L\'entretien a été modifié avec succès.');
+            return $this->redirectToRoute('app_entretien_index', [], Response::HTTP_SEE_OTHER);
+        } else {
+            // Afficher les erreurs de validation
+            foreach ($errors as $error) {
+                $this->addFlash('error', $error->getMessage());
+            }
+        }
+    }
+
+    return $this->render('entretien/edit.html.twig', [
+        'entretien' => $entretien,
+        'form' => $form,
+    ]);
+}
 
     #[Route('/{idEntretien}', name: 'app_entretien_delete', methods: ['POST'])]
     public function delete(Request $request, Entretien $entretien, EntityManagerInterface $entityManager): Response
@@ -78,4 +142,7 @@ final class EntretienController extends AbstractController
 
         return $this->redirectToRoute('app_entretien_index', [], Response::HTTP_SEE_OTHER);
     }
+
+
+
 }

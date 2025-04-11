@@ -1,47 +1,133 @@
-<!DOCTYPE html>
+{% extends 'baseRH.html.twig' %}
 
-<title>Evaluation index</title>
+{% block title %}Gestion des Évaluations{% endblock %}
 
 {% block body %}
-    <h1>Evaluation index</h1>
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>IdEvaluation</th>
-                <th>TitreEva</th>
-                <th>NoteTechnique</th>
-                <th>NoteSoftSkills</th>
-                <th>Commentaire</th>
-                <th>DateEvaluation</th>
-                <th>Scorequiz</th>
-                <th>Questions</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for evaluation in evaluations %}
-            <tr>
-                <td>{{ evaluation.idEvaluation }}</td>
-                <td>{{ evaluation.titreEva }}</td>
-                <td>{{ evaluation.noteTechnique }}</td>
-                <td>{{ evaluation.noteSoftSkills }}</td>
-                <td>{{ evaluation.commentaire }}</td>
-                <td>{{ evaluation.dateEvaluation ? evaluation.dateEvaluation|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ evaluation.scorequiz }}</td>
-                <td>{{ evaluation.questions }}</td>
-                <td>
-                    <a href="{{ path('app_evaluation_show', {'idEvaluation': evaluation.idEvaluation}) }}">show</a>
-                    <a href="{{ path('app_evaluation_edit', {'idEvaluation': evaluation.idEvaluation}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="9">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="h3 mb-0 text-gray-800">Évaluations</h1>
+                {% if entretien is defined %}
+                    <p class="mb-0 text-muted small">Pour l'entretien #{{ entretien.idEntretien }}</p>
+                {% endif %}
+            </div>
+            <div>
+                {% if entretien is defined %}
+                    <a href="{{ path('app_entretien_index') }}" class="btn btn-secondary mr-2">
+                        <i class="fas fa-arrow-left"></i> Retour aux entretiens
+                    </a>
+                {% endif %}
+                {% if entretien is defined and evaluations|length == 0 %}
+                    <a href="{{ path('app_evaluation_new_for_entretien', {'idEntretien': entretien.idEntretien}) }}" 
+                       class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nouvelle Évaluation
+                    </a>
+                {% elseif entretien is not defined %}
+                    <a href="{{ path('app_evaluation_new') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nouvelle Évaluation
+                    </a>
+                {% endif %}
+            </div>
+        </div>
 
-    <a href="{{ path('app_evaluation_new') }}">Create new</a>
+        <!-- Centered Card View -->
+        <div class="row justify-content-center">
+            {% for evaluation in evaluations %}
+            <div class="col-xl-6 col-lg-8">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    {{ evaluation.titreEva }}
+                                </div>
+                                <div class="mb-2">
+                                    <span class="badge badge-{{ evaluation.commentaire == 'ACCEPTÉ' ? 'success' : 'danger' }}">
+                                        {{ evaluation.commentaire }}
+                                    </span>
+                                    <small class="text-muted ml-2">{{ evaluation.dateEvaluation|date('d/m/Y H:i') }}</small>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <div class="text-xs font-weight-bold text-info mb-1">Note Technique</div>
+                                    <div class="progress progress-sm">
+                                        <div class="progress-bar bg-{{ evaluation.noteTechnique >= 10 ? 'success' : 'warning' }}" 
+                                             style="width: {{ (evaluation.noteTechnique/20)*100 }}%">
+                                            {{ evaluation.noteTechnique }}/20
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <div class="text-xs font-weight-bold text-info mb-1">Note Soft Skills</div>
+                                    <div class="progress progress-sm">
+                                        <div class="progress-bar bg-{{ evaluation.noteSoftSkills >= 10 ? 'success' : 'info' }}" 
+                                             style="width: {{ (evaluation.noteSoftSkills/20)*100 }}%">
+                                            {{ evaluation.noteSoftSkills }}/20
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="text-xs font-weight-bold text-info mb-1">Score Quiz</div>
+                                    <span class="badge badge-{{ evaluation.scorequiz > 7 ? 'success' : 'danger' }}">
+                                        {{ evaluation.scorequiz }}/10
+                                    </span>
+                                </div>
+                                
+                                <div class="d-flex justify-content-end">
+                                    <a href="{{ path('app_evaluation_show', {'idEvaluation': evaluation.idEvaluation}) }}" 
+                                       class="btn btn-sm btn-info mr-1" title="Voir">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_evaluation_edit', {'idEvaluation': evaluation.idEvaluation}) }}" 
+                                       class="btn btn-sm btn-warning mr-1" title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="post" action="{{ path('app_evaluation_delete', {'idEvaluation': evaluation.idEvaluation}) }}" 
+                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette évaluation ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evaluation.idEvaluation) }}">
+                                        <button class="btn btn-sm btn-danger" title="Supprimer">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center">
+                <div class="alert alert-info">
+                    Aucune évaluation trouvée
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+    <!-- /.container-fluid -->
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <!-- Page level plugins -->
+    <script src="{{ asset('back/vendor/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('back/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+
+    <!-- Page level custom scripts -->
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/French.json"
+                },
+                "order": [[6, "desc"]]  // Tri par date (colonne 6 maintenant)
+            });
+        });
+    </script>
 {% endblock %}
