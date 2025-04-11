@@ -7,10 +7,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use App\Repository\UtilisateurRepository;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[ORM\Table(name: 'utilisateur')]
-class Utilisateur implements PasswordAuthenticatedUserInterface
+class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -27,6 +28,23 @@ class Utilisateur implements PasswordAuthenticatedUserInterface
         $this->id = $id;
         return $this;
     }
+
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    public function getRoles(): array
+    {
+        return [$this->role ?? 'Candidat']; // ou ROLE_USER par défaut
+    }
+
+    public function eraseCredentials()
+    {
+        // Laisse vide si pas de données sensibles temporaires
+    }
+
 
     #[ORM\Column(type: 'string', nullable: false)]
     private ?string $nom = null;
@@ -232,7 +250,7 @@ class Utilisateur implements PasswordAuthenticatedUserInterface
         return $this;
     }
 
-     public function removeReservation(Reservation $reservation): self
+    public function removeReservation(Reservation $reservation): self
     {
         $this->getReservations()->removeElement($reservation);
         return $this;
@@ -241,33 +259,30 @@ class Utilisateur implements PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: "idUser", targetEntity: Participation::class)]
     private Collection $participations;
 
-        public function getParticipations(): Collection
-        {
-            return $this->participations;
+    public function getParticipations(): Collection
+    {
+        return $this->participations;
+    }
+
+    public function addParticipation(Participation $participation): self
+    {
+        if (!$this->participations->contains($participation)) {
+            $this->participations[] = $participation;
+            $participation->setIdUser($this);
         }
-    
-        public function addParticipation(Participation $participation): self
-        {
-            if (!$this->participations->contains($participation)) {
-                $this->participations[] = $participation;
-                $participation->setIdUser($this);
+
+        return $this;
+    }
+
+    public function removeParticipation(Participation $participation): self
+    {
+        if ($this->participations->removeElement($participation)) {
+            // set the owning side to null (unless already changed)
+            if ($participation->getIdUser() === $this) {
+                $participation->setIdUser(null);
             }
-    
-            return $this;
-        }
-    
-        public function removeParticipation(Participation $participation): self
-        {
-            if ($this->participations->removeElement($participation)) {
-                // set the owning side to null (unless already changed)
-                if ($participation->getIdUser() === $this) {
-                    $participation->setIdUser(null);
-                }
-            }
-    
-            return $this;
         }
 
-
-
+        return $this;
+    }
 }

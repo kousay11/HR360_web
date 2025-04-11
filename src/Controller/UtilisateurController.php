@@ -13,6 +13,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Form\RegistrationFormType;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Form\FormFactoryInterface;
 
 #[Route('/utilisateur')]
 final class UtilisateurController extends AbstractController
@@ -26,11 +28,84 @@ final class UtilisateurController extends AbstractController
     }
 
 
-  
 
-    #[Route('/register', name: 'app_register')]
+    #[Route('/auth', name: 'app_auth')]
+    public function showAuthPage(AuthenticationUtils $authenticationUtils, Request $request): Response
+    {
+        $error = $authenticationUtils->getLastAuthenticationError();
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        $user = new Utilisateur();
+        $registrationForm = $this->createForm(RegistrationFormType::class, $user);
+
+        return $this->render('login.html.twig', [
+            'last_username' => $lastUsername,
+            'error' => $error,
+            'registrationForm' => $registrationForm->createView(),
+        ]);
+    }
+
+    #[Route('/register', name: 'app_register', methods: ['POST'])]
+    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager, ParameterBagInterface $params): Response
+    {
+        $user = new Utilisateur();
+        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            dump('Le formulaire a été soumis');
+            dump($form->isValid());
+            dump($form->getErrors(true));
+            $imageFile = $form->get('image')->getData();
+            
+            if ($imageFile) {
+                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+                $imageFile->move($params->get('images_directory'), $newFilename);
+                $user->setImage($newFilename);
+            } else {
+                $user->setImage('default.jpg');
+            }
+
+            $user->setPassword(
+                $passwordHasher->hashPassword(
+                    $user,
+                    $form->get('plainPassword')->getData()
+                )
+            );
+            $user->setRole('Candidat');
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_auth');
+        }
+
+        // Re-render with errors
+        return $this->render('login.html.twig', [
+            'registrationForm' => $form->createView(),
+            'last_username' => '',
+            'error' => null
+        ]);
+    }
+
+    #[Route('/login', name: 'app_login', methods: ['POST'])]
+    public function loginCheck(): void
+    {
+        // Symfony va intercepter cette requête automatiquement
+        throw new \LogicException('This method should never be reached!');
+    }
+
+    #[Route(path: '/logout', name: 'app_logout')]
+    public function logout(): void
+    {
+        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+    }
+
+
+
+    /*#[Route('/register', name: 'app_register')]
     public function register(
-        Request $request, 
+        Request $request,
         UserPasswordHasherInterface $passwordHasher,
         EntityManagerInterface $entityManager,
         ParameterBagInterface $params // ✅ au lieu de string $imagesDirectory
@@ -38,43 +113,59 @@ final class UtilisateurController extends AbstractController
         $user = new Utilisateur();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
-    
+
         if ($form->isSubmitted() && $form->isValid()) {
             $imageFile = $form->get('image')->getData();
-    
+
             if ($imageFile) {
-                $newFilename = uniqid().'.'.$imageFile->guessExtension();
-    
+                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+
                 $imageFile->move(
                     $params->get('images_directory'),
                     $newFilename
                 );
-    
+
                 $user->setImage($newFilename);
             } else {
                 $user->setImage('default.jpg');
             }
-    
+
             $user->setRole('Candidat');
-    
+
             $user->setPassword(
                 $passwordHasher->hashPassword(
                     $user,
                     $form->get('plainPassword')->getData()
                 )
             );
-    
+
             $entityManager->persist($user);
             $entityManager->flush();
-    
+
             return $this->redirectToRoute('app_utilisateur_new'); // tu peux adapter cette route
         }
-    
+
         return $this->render('login.html.twig', [
             'registrationForm' => $form->createView(),
         ]);
+    }*/
+
+    #[Route(path: '/login', name: 'app_login')]
+    public function login(AuthenticationUtils $authenticationUtils, FormFactoryInterface $formFactory): Response
+    {
+        $error = $authenticationUtils->getLastAuthenticationError();
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        $user = new Utilisateur();
+        $form = $formFactory->create(RegistrationFormType::class, $user);
+
+        return $this->render('login.html.twig', [
+            'last_username' => $lastUsername,
+            'error' => $error,
+            'registrationForm' => $form->createView(),
+        ]);
     }
-    
+
 
     #[Route('/new', name: 'app_utilisateur_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
