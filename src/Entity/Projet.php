@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Form\FormInterface;
 
 use App\Repository\ProjetRepository;
 
@@ -33,9 +34,10 @@ class Projet
     #[Assert\NotBlank(message: "Le nom du projet est obligatoire")]
     #[Assert\Length(
         min: 3,
-        max: 50,
+        max: 35,
         minMessage: "Le nom doit contenir au moins {{ limit }} caractères",
-        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères"
+        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères",
+        groups: ['not_blank_nom']
     )]
     private ?string $nom = null;
 
@@ -56,7 +58,8 @@ class Projet
         min: 10,
         max: 1000,
         minMessage: "La description doit contenir au moins {{ limit }} caractères",
-        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères"
+        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères",
+        groups :['not_blank_description']
     )]
     private ?string $description = null;
 

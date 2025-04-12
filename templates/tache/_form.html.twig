@@ -28,7 +28,7 @@
                 {{ form_label(form.dateDebut, 'Date de début') }}
                 {{ form_widget(form.dateDebut, {
     'attr': {
-        'class': 'form-control datepicker',
+        'class': 'form-control datepicker' ~ (form.dateDebut.vars.errors|length ? ' is-invalid' : ''),
         'placeholder': 'YYYY-MM-DD',
         'data-allow-null': 'true' 
     }
@@ -39,7 +39,7 @@
                 {{ form_label(form.dateFin, 'Date de fin') }}
                 {{ form_widget(form.dateFin, {
     'attr': {
-        'class': 'form-control datepicker',
+        'class': 'form-control datepicker'~ (form.dateFin.vars.errors|length ? ' is-invalid' : ''),
         'placeholder': 'YYYY-MM-DD',
         'data-allow-null': 'true'
     }

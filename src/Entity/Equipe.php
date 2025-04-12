@@ -35,7 +35,8 @@ class Equipe
         min: 3,
         max: 20,
         minMessage: "Le nom doit contenir au moins {{ limit }} caractères",
-        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères"
+        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères",
+        groups: ['not_blank_nom']
     )]
     private ?string $nom = null;
 

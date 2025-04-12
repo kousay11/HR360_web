@@ -7,6 +7,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class ProjetType extends AbstractType
 {
@@ -16,12 +18,14 @@ public function buildForm(FormBuilderInterface $builder, array $options): void
     $builder
         ->add('nom', null, [
             'label' => 'Project Name',
+            'empty_data' => '',
             'attr' => [
-                'placeholder' => 'Enter project name'
-            ]
+                'placeholder' => 'Enter project name',       
+            ],
         ])
-        ->add('description', null, [
+        ->add('description', TextareaType::class, [
             'label' => 'Description',
+            'empty_data' => '',
             'attr' => [
                 'placeholder' => 'Describe the project details',
                 'rows' => 4
@@ -57,6 +61,20 @@ public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $resolver->setDefaults([
             'data_class' => Projet::class,
+            'validation_groups' => function (FormInterface $form) {
+                $data = $form->getData();
+                $groups = ['Default'];
+                
+                // Field-specific group activation
+                if ($data && !empty($data->getNom())) {
+                    $groups[] = 'not_blank_nom';
+                }
+                if ($data && !empty($data->getDescription())) {
+                    $groups[] = 'not_blank_description';
+                }
+                
+                return $groups;
+            },
         ]);
     }
 }

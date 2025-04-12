@@ -9,20 +9,20 @@
 
     <div class="form-group">
         {{ form_label(form.description, 'Description') }}
-        {{ form_widget(form.description, {'attr': {'class': 'form-control'~ (form.nom.vars.errors|length ? ' is-invalid' : ''), 'rows': 4}}) }}
+        {{ form_widget(form.description, {'attr': {'class': 'form-control'~ (form.description.vars.errors|length ? ' is-invalid' : ''), 'rows': 4}}) }}
         <div class="error-message">{{ form_errors(form.description) }}</div>
     </div>
 
     <div class="form-dates">
         <div class="form-group">
             {{ form_label(form.dateDebut, 'Start Date') }}
-            {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control datepicker'~ (form.nom.vars.errors|length ? ' is-invalid' : '')}}) }}
+            {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control datepicker'~ (form.dateDebut.vars.errors|length ? ' is-invalid' : '')}}) }}
             <div class="error-message">{{ form_errors(form.dateDebut) }}</div>
         </div>
 
         <div class="form-group">
             {{ form_label(form.dateFin, 'End Date') }}
-            {{ form_widget(form.dateFin, {'attr': {'class': 'form-control datepicker'~ (form.nom.vars.errors|length ? ' is-invalid' : '')}}) }}
+            {{ form_widget(form.dateFin, {'attr': {'class': 'form-control datepicker'~ (form.dateFin.vars.errors|length ? ' is-invalid' : '')}}) }}
             <div class="error-message">{{ form_errors(form.dateFin) }}</div>
         </div>
     </div>

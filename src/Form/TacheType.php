@@ -13,6 +13,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use App\Form\DataTransformer\NullableDateTransformer;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class TacheType extends AbstractType
 {
@@ -20,21 +22,17 @@ class TacheType extends AbstractType
     {
         $builder
             ->add('nom', null, [
+                'empty_data' => '',
                 'attr' => [
                     'class' => 'form-control',
-                    'minlength' => 3,
-                    'maxlength' => 50,
-                    'required' => true
                 ],
                 'label' => 'Nom de la tâche'
             ])
-            ->add('description', null, [
+            ->add('description', TextareaType::class, [
+                'empty_data' => '',
                 'attr' => [
                     'class' => 'form-control task-description-field',
-                    'rows' => 6,
-                    'minlength' => 10,
-                    'maxlength' => 1000,
-                    'required' => true
+                    'rows' => 4,
                 ],
                 'label' => 'Description'
             ])
@@ -83,6 +81,20 @@ public function configureOptions(OptionsResolver $resolver): void
     $resolver->setDefaults([
         'data_class' => Tache::class,
         'is_edit' => false,
-        'projet' => null  // Changed from projet_id to projet
+        'projet' => null,
+        'validation_groups' => function (FormInterface $form) {
+                $data = $form->getData();
+                $groups = ['Default'];
+                
+                // Field-specific group activation
+                if ($data && !empty($data->getNom())) {
+                    $groups[] = 'not_blank_nom';
+                }
+                if ($data && !empty($data->getDescription())) {
+                    $groups[] = 'not_blank_description';
+                }
+                
+                return $groups;
+            },
     ]);
 }}

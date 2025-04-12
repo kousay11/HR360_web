@@ -39,7 +39,8 @@ class Tache
         min: 3,
         max: 35,
         minMessage: "Le nom doit contenir au moins {{ limit }} caractères",
-        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères"
+        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères",
+        groups: ['not_blank_nom']
     )]
     private ?string $nom = null;
 
@@ -60,7 +61,8 @@ class Tache
         min: 10,
         max: 1000,
         minMessage: "La description doit contenir au moins {{ limit }} caractères",
-        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères"
+        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères",
+        groups: ['not_blank_description']
     )]
     private ?string $description = null;
 
