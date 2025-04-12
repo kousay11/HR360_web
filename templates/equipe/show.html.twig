@@ -1,26 +1,89 @@
 <!DOCTYPE html>
-
-<title>Equipe</title>
+<html>
+<head>
+    <title>{{ equipe.nom }} - Details</title>
+    <link rel="stylesheet" href="{{ asset('front/css/styleEquipe.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
 
 {% block body %}
-    <h1>Equipe</h1>
+<div class="equipe-container">
+    <div class="top-controls">
+        <a href="{{ path('app_equipe_index') }}" class="btn btn-back">
+            <i class="fas fa-arrow-left"></i> Back to list
+        </a>
+        <h1>{{ equipe.nom }}</h1>
+    </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ equipe.id }}</td>
-            </tr>
-            <tr>
-                <th>Nom</th>
-                <td>{{ equipe.nom }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="equipe-details-card">
+        <div class="equipe-card-header">
+            <div class="equipe-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <h2 class="equipe-title">Team Details</h2>
+        </div>
+        <div class="equipe-card-body">
+            <div class="detail-row">
+                <span class="detail-label">Team ID:</span>
+                <span class="detail-value">{{ equipe.id }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Team Name:</span>
+                <span class="detail-value">{{ equipe.nom }}</span>
+            </div>
+        </div>
+    </div>
 
-    <a href="{{ path('app_equipe_index') }}">back to list</a>
+    <div class="members-section">
+        <div class="section-header">
+            <h2>Team Members</h2>
+            <a href="{{ path('app_equipeemploye_new', {'id': equipe.id}) }}" class="btn btn-add">
+                <i class="fas fa-plus"></i> Add Member
+            </a>
+        </div>
 
-    <a href="{{ path('app_equipe_edit', {'id': equipe.id}) }}">edit</a>
+        {% if equipe.equipeemployes|length > 0 %}
+            <div class="members-list">
+                {% for equipeEmploye in equipe.equipeemployes %}
+                {% set member = equipeEmploye.utilisateur %}
+                <div class="member-card">
+                    <div class="member-info">
+                        <div class="member-name-role">
+                            <span class="member-name">{{ member.nom }} {{ member.prenom }}</span>
+                            <span class="member-role">{{ member.poste }}</span>
+                        </div>
+                        <div class="member-contact">
+                            <span class="member-email">{{ member.email }}</span>
+                            {% if member.competence %}
+                            <span class="member-skills">{{ member.competence }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="member-actions">
+                        <form method="post" action="{{ path('app_equipeemploye_delete', {'id_equipe': equipe.id, 'id_employe': member.id}) }}" onsubmit="return confirm('Are you sure you want to remove this member from the team?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ equipe.id ~ member.id) }}">
+                            <button class="btn btn-delete">
+                                <i class="fas fa-user-minus"></i> Remove
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-user-friends"></i>
+                <h4>No Members Found</h4>
+                <p>This team doesn't have any members yet. Add some to get started!</p>
+            </div>
+        {% endif %}
+    </div>
 
-    {{ include('equipe/_delete_form.html.twig') }}
+    <div class="form-footer">
+        <a href="{{ path('app_equipe_edit', {'id': equipe.id}) }}" class="btn btn-modify">
+            <i class="fas fa-edit"></i> Edit Team
+        </a>
+        {{ include('equipe/_delete_form.html.twig') }}
+    </div>
+</div>
 {% endblock %}

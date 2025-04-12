@@ -1,7 +1,7 @@
 <div class="row" id="teamsContainer">
     {% for equipe in equipes %}
         <div class="col-md-4 mb-4">
-            <div class="equipe-card">
+            <div class="equipe-card" onclick="if(!event.target.closest('.action-buttons')) window.location='{{ path('app_equipe_show', {'id': equipe.id}) }}'">
                 <!-- Combined header with name and icon -->
                 <div class="equipe-card-header d-flex align-items-center">
                     <div class="equipe-icon me-3">

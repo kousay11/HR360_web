@@ -1,0 +1,36 @@
+{% extends 'baseRH.html.twig' %}
+
+{% block title %}Add Member to Team{% endblock %}
+{% block css %}
+{{ parent() }}
+    <link rel="stylesheet" href="{{ asset('front/css/styleEquipe.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
+{% block js %}
+{{ parent() }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+{% endblock %}
+{% block body %}
+<div class="form-container">
+    <div class="form-card">
+        <h1 class="form-title">Add Member to {{ equipe.nom }}</h1>
+        
+        {{ form_start(form) }}
+            <div class="form-group">
+                {{ form_label(form.utilisateur) }}
+                {{ form_widget(form.utilisateur, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.utilisateur) }}
+            </div>
+            
+            <button type="submit" class="btn btn-submit">Add to Team</button>
+        {{ form_end(form) }}
+        
+        <div class="form-footer mt-3">
+            <a href="{{ path('app_equipe_show', {'id': equipe.id}) }}" class="btn btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Team
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

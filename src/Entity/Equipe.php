@@ -50,5 +50,41 @@ class Equipe
         $this->nom = $nom;
         return $this;
     }
+    #[ORM\OneToMany(targetEntity: Equipeemploye::class, mappedBy: 'equipe')]
+    private Collection $equipeemployes;
+
+    public function __construct()
+    {
+        $this->equipeemployes = new ArrayCollection();
+    }
+
+    /**
+     * @return Collection<int, Equipeemploye>
+     */
+    public function getEquipeemployes(): Collection
+    {
+        return $this->equipeemployes;
+    }
+
+    public function addEquipeemploye(Equipeemploye $equipeemploye): self
+    {
+        if (!$this->equipeemployes->contains($equipeemploye)) {
+            $this->equipeemployes->add($equipeemploye);
+            $equipeemploye->setEquipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEquipeemploye(Equipeemploye $equipeemploye): self
+    {
+        if ($this->equipeemployes->removeElement($equipeemploye)) {
+            // set the owning side to null (unless already changed)
+            if ($equipeemploye->getEquipe() === $this) {
+                $equipeemploye->setEquipe(null);
+            }
+        }
+        return $this;
+    }
 
 }
