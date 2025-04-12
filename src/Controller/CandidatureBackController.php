@@ -20,47 +20,78 @@ use Dompdf\Options;
 #[Route('/candidatureBack')]
 final class CandidatureBackController extends AbstractController
 {
-    #[Route(name: 'app_candidatureBack_index', methods: ['GET'])]
-    public function index(CandidatureRepository $candidatureRepository): Response
-    {
-        return $this->render('candidatureBack/index.html.twig', [
-            'candidatures' => $candidatureRepository->findAllWithOffre(),
-        ]);
+    // src/Controller/CandidatureBackController.php
+
+#[Route(name: 'app_candidatureBack_index', methods: ['GET'])]
+public function index(Request $request, CandidatureRepository $candidatureRepository): Response
+{
+    $statut = $request->query->get('statut');
+    
+    $candidatures = $statut 
+        ? $candidatureRepository->findByStatut($statut)
+        : $candidatureRepository->findAllWithOffre();
+
+    return $this->render('candidatureBack/index.html.twig', [
+        'candidatures' => $candidatures,
+    ]);
+}
+
+#[Route('/export-pdf/{offreId}', name: 'app_candidatureBack_export_pdf', defaults: ['offreId' => null], methods: ['GET'])]
+public function exportPdf(
+    CandidatureRepository $candidatureRepository, 
+    Request $request,
+    ?int $offreId = null,
+    ?OffreRepository $offreRepository = null
+): Response
+{
+    $pdfOptions = new Options();
+    $pdfOptions->set('defaultFont', 'Arial');
+    $pdfOptions->set('isRemoteEnabled', true);
+    $pdfOptions->set('isHtml5ParserEnabled', true);
+
+    $dompdf = new Dompdf($pdfOptions);
+
+    // Récupérer les candidatures selon le filtre
+    if ($offreId) {
+        $offre = $offreRepository->find($offreId);
+        $candidatures = $candidatureRepository->findBy(['offre' => $offreId]);
+        $title = "Candidatures pour l'offre : " . $offre->getTitre();
+    } else {
+        $candidatures = $candidatureRepository->findAllWithOffre();
+        $title = "Liste de toutes les candidatures";
     }
 
-    #[Route('/export-pdf', name: 'app_candidatureBack_export_pdf', methods: ['GET'])]
-    public function exportPdf(CandidatureRepository $candidatureRepository): Response
-    {
-        $pdfOptions = new Options();
-        $pdfOptions->set('defaultFont', 'Arial');
-        $pdfOptions->set('isRemoteEnabled', true);
-        $pdfOptions->set('isHtml5ParserEnabled', true);
-        
-        $dompdf = new Dompdf($pdfOptions);
-        
-        // Chemin absolu vers l'image
-        $logoPath = $this->getParameter('kernel.project_dir').'/public/images/logoRH360.png';
-        $logoExists = file_exists($logoPath);
-        
-        $html = $this->renderView('candidatureBack/pdf.html.twig', [
-            'candidatures' => $candidatureRepository->findAllWithOffre(),
-            'title' => "Liste des candidatures",
-            'logo_path' => $logoExists ? $logoPath : null,
-            'logo_exists' => $logoExists
-        ]);
-        
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
+    // Générer une URL absolue vers l'image publique
+    $logoRelativePath = '/images/logoRH360.png';
+    $logoAbsoluteUrl = $request->getSchemeAndHttpHost() . $logoRelativePath;
+    $logoFilePath = $this->getParameter('kernel.project_dir') . '/public' . $logoRelativePath;
+    $logoExists = file_exists($logoFilePath);
+
+    $html = $this->renderView('candidatureBack/pdf.html.twig', [
+        'candidatures' => $candidatures,
+        'title' => $title,
+        'logo_path' => $logoExists ? $logoAbsoluteUrl : null,
+        'logo_exists' => $logoExists,
+        'offre' => $offreId ? $offre : null
+    ]);
+
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+
+    $output = $dompdf->output();
+
+    $filename = $offreId 
+        ? sprintf('candidatures_offre_%d.pdf', $offreId)
+        : 'liste_toutes_candidatures.pdf';
+
+    $response = new Response($output);
+    $response->headers->set('Content-Type', 'application/pdf');
+    $response->headers->set('Content-Disposition', sprintf('attachment; filename="%s"', $filename));
+
+    return $response;
+}
     
-        $output = $dompdf->output();
-        
-        $response = new Response($output);
-        $response->headers->set('Content-Type', 'application/pdf');
-        $response->headers->set('Content-Disposition', 'attachment; filename="liste_candidatures.pdf"');
-        
-        return $response;
-    }
     #[Route('/{idCandidature}', name: 'app_candidatureBack_show', methods: ['GET'])]
     public function show(Candidature $candidature): Response
     {

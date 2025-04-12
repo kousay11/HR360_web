@@ -1,6 +1,7 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseRH.html.twig' %}
 
 {% block title %}{{ offre.titre }}{% endblock %}
+{% block heading %}{{ offre.titre }}{% endblock %}
 
 {% block body %}
 {% set isExpired = date() > date(offre.dateExpiration) %}
@@ -16,10 +17,13 @@
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <a href="{{ path('app_offre_index') }}" class="btn btn-outline-dark btn-sm">
-            <i class="fas fa-arrow-left me-1"></i>Retour
-        </a>
-    </div>
+    <a href="{{ path('app_offre_index') }}" class="btn btn-outline-dark btn-sm">
+        <i class="fas fa-arrow-left me-1"></i>Retour
+    </a>
+    <a href="{{ path('app_offre_candidatures', {'idoffre': offre.idoffre}) }}" class="btn btn-primary btn-sm">
+        <i class="fas fa-users me-1"></i>Voir les candidatures
+    </a>
+</div>
 
     <div class="list-view-card mb-4">
         <div class="list-view-header">
@@ -91,73 +95,76 @@
         </div>
     </div>
 </div>
-
-<style>
-    .list-view-card {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        overflow: hidden;
-    }
+{% endblock %}
     
-    .list-view-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1.25rem;
-        background: #f8f9fa;
-        border-bottom: 1px solid #eee;
-    }
-    
-    .list-view-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.25rem;
-    }
-    
-    .list-view-body {
-        padding: 1.25rem;
-    }
-    
-    .list-view-footer {
-        padding: 1.25rem;
-        background: #f8f9fa;
-        border-top: 1px solid #eee;
-    }
-    
-    .detail-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 8px 0;
-    }
-    
-    .detail-item i {
-        font-size: 1.25rem;
-    }
-    
-    .detail-item div {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .detail-item span {
-        font-size: 0.85rem;
-        color: #6c757d;
-    }
-    
-    .detail-item strong {
-        font-weight: 500;
-    }
-    
-    .badge {
-        font-size: 0.85rem;
-        padding: 0.5em 0.8em;
-        font-weight: 500;
-    }
-</style>
+{% block css %}
+    {{ parent() }}
+    <style>
+        .list-view-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .list-view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .list-view-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .list-view-body {
+            padding: 1.25rem;
+        }
+        
+        .list-view-footer {
+            padding: 1.25rem;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+        }
+        
+        .detail-item i {
+            font-size: 1.25rem;
+        }
+        
+        .detail-item div {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-item span {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .detail-item strong {
+            font-weight: 500;
+        }
+        
+        .badge {
+            font-size: 0.85rem;
+            padding: 0.5em 0.8em;
+            font-weight: 500;
+        }
+    </style>
 {% endblock %}

@@ -24,4 +24,17 @@ public function findAllWithOffre()
         ->getQuery()
         ->getResult();
 }
+// src/Repository/CandidatureRepository.php
+
+public function findByStatut(string $statut)
+{
+    return $this->createQueryBuilder('c')
+        ->leftJoin('c.offre', 'o')
+        ->addSelect('o')
+        ->where('c.statut = :statut')
+        ->setParameter('statut', $statut)
+        ->orderBy('c.dateCandidature', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
 }

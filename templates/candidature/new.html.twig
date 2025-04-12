@@ -1,8 +1,9 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseCAN.html.twig' %}
 
 {% block title %}Postuler à l'offre{% endblock %}
-
-{% block body %}
+{% block form %}
+{% endblock %}
+{% block index %}
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
@@ -17,7 +18,7 @@
 
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    {{ form_start(form) }}
+                     {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
                         <div class="mb-4">
                             <h4 class="text-dark mb-3">
                                 <i class="fas fa-file-pdf text-danger me-2"></i>CV
@@ -100,7 +101,10 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block js %}
+    {{ parent() }}
 <script>
     function displayFileName(input, containerId) {
         const container = document.getElementById(containerId);
@@ -119,7 +123,9 @@
         }
     }
 </script>
-
+{% endblock %}
+{% block css %}
+    {{ parent() }}
 <style>
     .card {
         border-radius: 10px;

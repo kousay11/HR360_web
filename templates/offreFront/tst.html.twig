@@ -1,8 +1,9 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseCAN.html.twig' %}
 
 {% block title %}Modifier l'offre - {{ offre.titre }}{% endblock %}
-
-{% block body %}
+{% block form %}
+{% endblock %}
+{% block index %}
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
@@ -16,34 +17,24 @@
             </div>
 
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-dark text-white">
-                    <h3 class="mb-0">
-                        <i class="fas fa-briefcase me-2"></i>Édition de l'offre
-                    </h3>
-                </div>
                 <div class="card-body">
                     {{ include('offre/_form.html.twig', {
                         'button_label': 'Mettre à jour',
-                        'form_title': 'Modifier l\'offre'
+                        'form_title': 'Fair modification'
                     }) }}
                 </div>
-            </div>
-
-            <div class="mt-4 text-end">
-                {{ include('offre/_delete_form.html.twig') }}
             </div>
         </div>
     </div>
 </div>
-
+{% endblock %}
+{% block css %}
+    {{ parent() }}
 <style>
     .card {
         border-radius: 10px;
         border-width: 2px;
         border-color: #dc3545;
-    }
-    .card-header {
-        border-bottom: 2px solid #dc3545;
     }
     .form-control:focus {
         border-color: #dc3545;
@@ -58,8 +49,10 @@
         color: white;
     }
 </style>
-
-<script>
+{% endblock %}
+{% block js %}
+    {{ parent() }}
+    <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
     const datePublication = document.querySelector('#{{ form.datePublication.vars.id }}');
@@ -100,3 +93,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+

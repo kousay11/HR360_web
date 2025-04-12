@@ -1,6 +1,7 @@
-{% extends 'base.html.twig' %}
-
-{% block body %}
+{% extends 'baseCAN.html.twig' %}
+{% block form %}
+{% endblock %}
+{% block index %}
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
@@ -87,7 +88,9 @@
         </div>
     </div>
 </div>
-
+{% endblock %}
+{% block css %}
+{{ parent() }}
 <style>
     .card {
         border-radius: 10px;
@@ -131,6 +134,9 @@
         padding: 0.35em 0.65em;
     }
 </style>
+{% endblock %}
+{% block js %}
+{{ parent() }}
 <script>
 function updateFileDisplay(input, currentElementId, previewElementId) {
     if (input.files && input.files[0]) {

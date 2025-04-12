@@ -1,0 +1,192 @@
+{% extends 'baseRH.html.twig' %}
+
+{% block title %}Candidatures pour {{ offre.titre }}{% endblock %}
+{% block heading %}{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    {# Reprenez ici tous vos styles CSS existants depuis index.html.twig #}
+    <style>
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        /* ... (tous vos autres styles) ... */
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="{{ path('app_offre_show', {'idoffre': offre.idoffre}) }}" class="btn btn-outline-dark btn-sm">
+                <i class="fas fa-arrow-left me-1"></i>Retour à l'offre
+            </a>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <div class="search-container">
+                    <div class="input-group" style="width: 300px;">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <select id="statutSearch" class="form-select">
+                            <option value="">Tous les statuts</option>
+                            <option value="Accepté">Accepté</option>
+                            <option value="Refusé">Refusé</option>
+                            <option value="En attente">En attente</option>
+                        </select>
+                    </div>
+                </div>
+                <h2 class="mb-0">Candidatures pour "{{ offre.titre }}"</h2>
+            </div>
+            
+            {% if candidatures|length > 0 %}
+                {# Reprenez ici le tableau des candidatures depuis votre index.html.twig #}
+                <div class="table-responsive">
+                    <table class="table table-hover" id="candidaturesTable">
+                        <thead>
+                            <tr>
+                                <th>Statut</th>
+                                <th>Documents</th>
+                                <th>Description</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for candidature in candidatures %}
+                                <tr>
+                                    <td>
+                                        <span class="status-badge bg-{{ candidature.statut == 'Accepté' ? 'success' : (candidature.statut == 'Refusé' ? 'danger' : 'warning') }}">
+                                            {{ candidature.statut }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="documents-container">
+                                            <div class="document-item">
+                                                <a href="{{ asset('uploads/cvs/' ~ candidature.cv) }}" class="file-link" target="_blank">
+                                                    <i class="fas fa-file-pdf"></i>
+                                                    <span>CV.pdf</span>
+                                                </a>
+                                            </div>
+                                            <div class="document-item">
+                                                <a href="{{ asset('uploads/lettres/' ~ candidature.lettreMotivation) }}" class="file-link" target="_blank">
+                                                    <i class="fas fa-file-pdf"></i>
+                                                    <span>Lettre.pdf</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if candidature.description %}
+                                            <div style="
+                                                max-height: 120px;
+                                                overflow: hidden;
+                                                display: -webkit-box;
+                                                -webkit-line-clamp: 3;
+                                                -webkit-box-orient: vertical;
+                                                text-overflow: ellipsis;
+                                                white-space: normal;
+                                                word-break: break-word;
+                                            " title="{{ candidature.description }}">
+                                                {{ candidature.description }}
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">Aucune description</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <small class="d-block">{{ candidature.dateModification|date('d/m/Y H:i') }}</small>
+                                            {% if candidature.dateModification and candidature.dateModification != candidature.dateCandidature %}
+                                                <small class="text-modified">
+                                                    <i class="fas fa-clock me-1"></i>Modifié
+                                                </small>
+                                            {% else %}
+                                                <small class="text-original">
+                                                    <i class="fas fa-check-circle me-1"></i>Original
+                                                </small>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <a href="{{ path('app_candidatureBack_edit', {'idCandidature': candidature.idCandidature}) }}" 
+                                               class="btn btn-sm btn-outline-secondary action-btn" title="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {# Boutons d'action et modal comme dans votre index.html.twig #}
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-statistics" data-bs-toggle="modal" data-bs-target="#statisticsModal">
+                        <i class="fas fa-chart-pie me-2"></i>Statistiques
+                    </button>
+                    <a href="{{ path('app_candidatureBack_export_pdf', {'offreId': offre.idoffre}) }}" class="btn btn-export">
+                        <i class="fas fa-file-pdf me-2"></i>Exporter en PDF
+                    </a>
+                </div>
+
+                {# Modal pour les statistiques #}
+                <div class="modal fade" id="statisticsModal" tabindex="-1" aria-labelledby="statisticsModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="statisticsModalLabel">Statistiques des Candidatures</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="chart-container"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-folder-open"></i>
+                    <h4 class="h5 text-gray-800 mb-3">Aucune candidature trouvée</h4>
+                    <p class="mb-4">Aucune candidature n'a été soumise pour cette offre pour le moment.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ parent() }}
+    {# Reprenez ici tous vos scripts JavaScript depuis index.html.twig #}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Mêmes scripts que dans votre index.html.twig
+        document.getElementById('statutSearch').addEventListener('change', function() {
+            const statut = this.value;
+            if (statut) {
+                window.location.href = "{{ path('app_offre_candidatures', {'idoffre': offre.idoffre}) }}?statut=" + encodeURIComponent(statut);
+            } else {
+                window.location.href = "{{ path('app_offre_candidatures', {'idoffre': offre.idoffre}) }}";
+            }
+        });
+
+        // ... (tous vos autres scripts) ...
+    </script>
+{% endblock %}

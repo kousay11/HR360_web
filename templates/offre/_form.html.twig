@@ -6,7 +6,7 @@
                     <h3 class="mb-0">{{ form_title|default('Formulaire Offre') }}</h3>
                 </div>
                 <div class="card-body">
-                    {{ form_start(form) }}
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
                         <div class="form-group mb-4">
                             {{ form_label(form.titre, 'Titre de l\'offre', {'label_attr': {'class': 'form-label text-dark'}}) }}
                             {{ form_widget(form.titre, {'attr': {'class': 'form-control' ~ (form.titre.vars.valid ? '' : ' is-invalid')}}) }}
@@ -27,7 +27,7 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-4">
                                     {{ form_label(form.datePublication, 'Date de publication', {'label_attr': {'class': 'form-label text-dark'}}) }}
-                                    {{ form_widget(form.datePublication, {'attr': {'class': 'form-control' ~ (form.datePublication.vars.valid ? '' : ' is-invalid')}}) }}
+                                    {{ form_widget(form.datePublication, {'attr': {'class': 'form-control' ~ (form.datePublication.vars.valid ? '' : ' is-invalid'), 'data-allow-null': 'true'}} )}}
                                     <div class="invalid-feedback">
                                         {{ form_errors(form.datePublication) }}
                                     </div>
@@ -36,7 +36,7 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-4">
                                     {{ form_label(form.dateExpiration, 'Date d\'expiration', {'label_attr': {'class': 'form-label text-dark'}}) }}
-                                    {{ form_widget(form.dateExpiration, {'attr': {'class': 'form-control' ~ (form.dateExpiration.vars.valid ? '' : ' is-invalid')}}) }}
+                                    {{ form_widget(form.dateExpiration, {'attr': {'class': 'form-control' ~ (form.dateExpiration.vars.valid ? '' : ' is-invalid'), 'data-allow-null': 'true'}})}}
                                     <div class="invalid-feedback">
                                         {{ form_errors(form.dateExpiration) }}
                                     </div>

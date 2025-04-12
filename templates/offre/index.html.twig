@@ -1,7 +1,7 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseRH.html.twig' %}
 
 {% block title %}Nos Offres d'Emploi{% endblock %}
-
+{% block heading %}Nos Offres d'Emploi{% endblock %}
 {% block body %}
 <div class="container py-4">
     <h1 class="text-center mb-4 text-dark">
@@ -138,7 +138,9 @@
         </div>
     {% endif %}
 </div>
-
+{% endblock %}
+{% block css %}
+{{ parent() }}
 <style>
     .list-group-item {
         border: 1px solid rgba(0,0,0,0.1);

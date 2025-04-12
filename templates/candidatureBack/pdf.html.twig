@@ -91,16 +91,14 @@
     </style>
 </head>
 <body>
-    <div class="header">
-       <div class="header">
+   <div class="header">
     {% if logo_exists and logo_path %}
-        <img src="{{ logo_path }}" class="logo">
+        <img src="{{ logo_path }}" class="logo" alt="Logo RH360">
     {% endif %}
     <div class="company-info">
         <h1 class="company-name">RH Entreprise 360</h1>
     </div>
 </div>
-    </div>
 
     <h2 class="report-title">Liste des Candidatures</h2>
     <p>Date d'export : {{ "now"|date("d/m/Y H:i") }}</p>

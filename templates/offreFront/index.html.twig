@@ -1,8 +1,9 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseCAN.html.twig' %}
 
 {% block title %}Nos Offres d'Emploi{% endblock %}
-
-{% block body %}
+{% block form %}
+{% endblock %}
+{% block index %}
 <div class="container py-5">
     <h1 class="text-center mb-5 text-dark">
         <i class="fas fa-briefcase me-2"></i>Nos Offres d'Emploi
@@ -85,7 +86,9 @@
         </div>
     {% endif %}
 </div>
-
+{% endblock %}
+{% block css %}
+    {{ parent() }}
 <style>
     .card {
         transition: all 0.3s ease;

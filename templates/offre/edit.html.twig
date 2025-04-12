@@ -1,7 +1,7 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseRH.html.twig' %}
 
 {% block title %}Modifier l'offre - {{ offre.titre }}{% endblock %}
-
+{% block heading %}Modifier l'offre -{% endblock %}
 {% block body %}
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -26,7 +26,9 @@
         </div>
     </div>
 </div>
-
+{% endblock %}
+{% block css %}
+    {{ parent() }}
 <style>
     .card {
         border-radius: 10px;
@@ -46,8 +48,10 @@
         color: white;
     }
 </style>
-
-<script>
+{% endblock %}
+{% block js %}
+    {{ parent() }}
+    <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
     const datePublication = document.querySelector('#{{ form.datePublication.vars.id }}');
@@ -88,3 +92,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+

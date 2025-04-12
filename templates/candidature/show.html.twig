@@ -1,8 +1,9 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseCAN.html.twig' %}
 
 {% block title %}Détails de la candidature{% endblock %}
-
-{% block body %}
+{% block form %}
+{% endblock %}
+{% block index %}
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
@@ -104,7 +105,9 @@
         </div>
     </div>
 </div>
-
+{% endblock %}
+{% block css %}
+    {{ parent() }}
 <style>
     .card {
         border-radius: 10px;

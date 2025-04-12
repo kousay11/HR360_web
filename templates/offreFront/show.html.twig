@@ -1,8 +1,9 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseCAN.html.twig' %}
 
 {% block title %}{{ offre.titre }}{% endblock %}
-
-{% block body %}
+{% block form %}
+{% endblock %}
+{% block index %}
 {% set isExpired = date() > date(offre.dateExpiration) %}
 {% set offreIcon %}
     {% if offre.titre matches '/développeur|programmeur|devops/i' %}laptop-code
@@ -98,13 +99,17 @@
         </div>
     </div>
 </div>
-
+{% endblock %}
+{% block js %}
+    {{ parent() }}
 <script>
     function showExpiredAlert() {
         alert("Cette offre a expiré et n'accepte plus de candidatures.");
     }
 </script>
-
+{% endblock %}
+{% block css %}
+    {{ parent() }}
 <style>
     .card {
         border-radius: 10px;
