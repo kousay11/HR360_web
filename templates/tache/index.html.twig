@@ -51,8 +51,11 @@
                     <div class="task-details-header">
                         <h2>{{ taches|first.nom }}</h2>
                         {% if taches|first.trelloboardid %}
-                            <a href="#" class="btn trello-btn">
-                                <i class="fab fa-trello"></i> View Trello
+                            <a href="https://trello.com/b/{{ taches|first.trelloboardid }}" 
+                            class="btn trello-btn" 
+                            target="_blank" 
+                            rel="noopener noreferrer">
+                            <i class="fab fa-trello"></i> View Trello
                             </a>
                         {% else %}
                             <a href="#" class="btn trello-btn">
@@ -211,6 +214,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     trelloBtn.innerHTML = '<i class="fab fa-trello"></i> Enable Trello';
                 } else {
                     trelloBtn.innerHTML = '<i class="fab fa-trello"></i> View Trello';
+                    trelloBtn.href = `https://trello.com/b/${taskTrelloId}`;
+                    trelloBtn.target = '_blank';
+                    trelloBtn.rel = 'noopener noreferrer';
                 }
             }
         }
