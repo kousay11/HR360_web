@@ -19,24 +19,18 @@ class Evaluation
 
     #[ORM\Column(name:'titreEva', type: 'string', length: 100, nullable: false)]
     #[Assert\NotBlank(message: "Le titre de l'évaluation est obligatoire")]
-    #[Assert\Length(
-        min: 5,
-        max: 100,
-        minMessage: "Le titre doit contenir au moins {{ limit }} caractères",
-        maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères"
-    )]
     private ?string $titreEva = null;
 
-    #[ORM\Column(name:'noteTechnique', type: 'float', nullable: false)]
+    #[ORM\Column(name: 'noteTechnique', type: 'float')]
     #[Assert\NotBlank(message: "La note technique est obligatoire")]
     #[Assert\Range(
         min: 0,
         max: 20,
-        notInRangeMessage: "La note technique doit être entre {{ min }} et {{ max }}"
+        notInRangeMessage: "La note Technique doit être entre {{ min }} et {{ max }}",
     )]
     private ?float $noteTechnique = null;
 
-    #[ORM\Column(name:'noteSoftSkills', type: 'float', nullable: false)]
+    #[ORM\Column(name:'noteSoftSkills', type: 'float')]
     #[Assert\NotBlank(message: "La note soft skills est obligatoire")]
     #[Assert\Range(
         min: 0,

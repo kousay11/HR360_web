@@ -49,3 +49,52 @@
     </div>
     <!-- /.container-fluid -->
 {% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Gestion de la visibilité des champs
+    $('.entretien-type-selector').change(function() {
+        if ($(this).val() === 'En_ligne') {
+            $('.lienmeet-field').show();
+            $('.localisation-field').hide();
+        } else if ($(this).val() === 'Presentiel') {
+            $('.lienmeet-field').hide();
+            $('.localisation-field').show();
+        } else {
+            // Cas par défaut (les deux cachés)
+            $('.lienmeet-field').hide();
+            $('.localisation-field').hide();
+        }
+    }).trigger('change'); // Exécute immédiatement au chargement
+
+    // Initialisation du timepicker avec format HH:MM
+    $('#timepicker-input').flatpickr({
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: true,
+        minuteIncrement: 15,
+        defaultHour: 9,
+        defaultMinute: 0,
+        locale: "fr",
+        allowInput: true
+    });
+
+    $('#timepicker-icon').click(function() {
+        $('#timepicker-input').flatpickr().open();
+    });
+
+    // Validation du format HH:MM
+    $('#timepicker-input').on('change', function() {
+        if (!/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test($(this).val())) {
+            $(this).addClass('is-invalid');
+        } else {
+            $(this).removeClass('is-invalid');
+        }
+    });
+});
+</script>
+{% endblock %}

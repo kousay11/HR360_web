@@ -10,6 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 
 
@@ -18,27 +19,31 @@ class EvaluationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('titreEva', null, [
-                'attr' => ['class' => 'form-control'],
-                'label' => 'Titre de l\'évaluation'
-            ])
-            ->add('noteTechnique', null, [
+        ->add('titreEva', null, [
+            'attr' => ['class' => 'form-control'],
+            'label' => 'Titre de l\'évaluation',
+            'empty_data' => '' 
+        ])
+        ->add('noteTechnique', NumberType::class, [
+            'label' => 'Note Technique (/20)',
+            'attr' => [
+                'class' => 'form-control',
+                'min' => 0,
+                'max' => 20,
+                'step' => 0.5,
+            ],
+            'empty_data' => 0.0, // Important pour la validation
+        ])
+            ->add('noteSoftSkills', NumberType::class,[
+                
                 'attr' => [
                     'class' => 'form-control',
                     'min' => 0,
                     'max' => 20,
                     'step' => 0.5
                 ],
-                'label' => 'Note Technique (/20)'
-            ])
-            ->add('noteSoftSkills', null, [
-                'attr' => [
-                    'class' => 'form-control',
-                    'min' => 0,
-                    'max' => 20,
-                    'step' => 0.5
-                ],
-                'label' => 'Note Soft Skills (/20)'
+                'label' => 'Note Soft Skills (/20)',
+                'empty_data' => 0.0
             ])
             ->add('commentaire', null, [
                 'attr' => [

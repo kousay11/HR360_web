@@ -12,8 +12,7 @@
         {{ form_widget(form.date, {
             'attr': {
                 'class': 'form-control' ~ (form.date.vars.errors|length ? ' is-invalid' : ''),
-                'value': form.heure.vars.value|default('')|slice(0, 5)
-
+                'value': entretien.date ? entretien.date|date('Y-m-d') : ''
             }
         }) }}
         <div class="invalid-feedback">
@@ -24,29 +23,30 @@
     </div>
     
     <div class="col-md-6 mb-3">
-    {{ form_label(form.heure, 'Heure (HH:MM)', {'label_attr': {'class': 'form-label'}}) }}
-    <div class="input-group">
-        {{ form_widget(form.heure, {
-            'attr': {
-                'class': 'form-control' ~ (form.heure.vars.errors|length ? ' is-invalid' : ''),
-                'id': 'timepicker-input',
-                'autocomplete': 'off'
-            }
-        }) }}
-        <div class="input-group-append">
-            <span class="input-group-text" id="timepicker-icon">
-                <i class="far fa-clock"></i>
-            </span>
-        </div>
-        {% if form.heure.vars.errors|length %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.heure.vars.errors %}
-                    <div>{{ error.message }}</div>
-                {% endfor %}
+        {{ form_label(form.heure, 'Heure (HH:MM)', {'label_attr': {'class': 'form-label'}}) }}
+        <div class="input-group">
+            {{ form_widget(form.heure, {
+                'attr': {
+                    'class': 'form-control' ~ (form.heure.vars.errors|length ? ' is-invalid' : ''),
+                    'id': 'timepicker-input',
+                    'autocomplete': 'off',
+                    'value': entretien.heure ? entretien.heure|slice(0,5) : ''
+                }
+            }) }}
+            <div class="input-group-append">
+                <span class="input-group-text" id="timepicker-icon">
+                    <i class="far fa-clock"></i>
+                </span>
             </div>
-        {% endif %}
+            {% if form.heure.vars.errors|length %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.heure.vars.errors %}
+                        <div>{{ error.message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
     </div>
-</div>
 </div>
 
 <div class="form-group row">

@@ -104,31 +104,29 @@ public function new(Request $request, EntityManagerInterface $entityManager, Val
         ]);
     }
     #[Route('/{idEntretien}/edit', name: 'app_entretien_edit', methods: ['GET', 'POST'])]
-public function edit(Request $request, Entretien $entretien, EntityManagerInterface $entityManager, ValidatorInterface $validator): Response
+public function edit(Request $request, Entretien $entretien, EntityManagerInterface $entityManager): Response
 {
+    // Formatage de l'heure avant affichage
+    if ($entretien->getHeure()) {
+        $entretien->setHeure(substr($entretien->getHeure(), 0, 5));
+    }
+
     $form = $this->createForm(EntretienType::class, $entretien);
     $form->handleRequest($request);
 
-    if ($form->isSubmitted()) {
-        // Validation manuelle avant $form->isValid()
-        $errors = $validator->validate($entretien);
-        
-        if (count($errors) === 0 && $form->isValid()) {
-            $entityManager->flush();
-
-            $this->addFlash('success', 'L\'entretien a été modifié avec succès.');
-            return $this->redirectToRoute('app_entretien_index', [], Response::HTTP_SEE_OTHER);
-        } else {
-            // Afficher les erreurs de validation
-            foreach ($errors as $error) {
-                $this->addFlash('error', $error->getMessage());
-            }
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Formatage de l'heure avant enregistrement
+        if ($entretien->getHeure()) {
+            $entretien->setHeure(substr($entretien->getHeure(), 0, 5));
         }
+        
+        $entityManager->flush();
+        return $this->redirectToRoute('app_entretien_index');
     }
 
     return $this->render('entretien/edit.html.twig', [
         'entretien' => $entretien,
-        'form' => $form,
+        'form' => $form->createView(),
     ]);
 }
 
