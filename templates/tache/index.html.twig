@@ -49,20 +49,22 @@
             <div class="task-details-card" id="taskDetails">
                 {% if taches|length > 0 %}
                     <div class="task-details-header">
-                        <h2>{{ taches|first.nom }}</h2>
-                        {% if taches|first.trelloboardid %}
-                            <a href="https://trello.com/b/{{ taches|first.trelloboardid }}" 
-                            class="btn trello-btn" 
-                            target="_blank" 
-                            rel="noopener noreferrer">
-                            <i class="fab fa-trello"></i> View Trello
-                            </a>
-                        {% else %}
-                            <a href="#" class="btn trello-btn">
-                                <i class="fab fa-trello"></i> Enable Trello
-                            </a>
-                        {% endif %}
-                    </div>
+    <h2>{{ taches|first.nom }}</h2>
+    {% if taches|first.projet.hasEquipe() %}
+        {% if taches|first.trelloboardid %}
+            <a href="https://trello.com/b/{{ taches|first.trelloboardid }}" 
+               class="btn trello-btn" 
+               target="_blank" 
+               rel="noopener noreferrer">
+                <i class="fab fa-trello"></i> View Trello
+            </a>
+        {% else %}
+            <a href="#" class="btn trello-btn">
+                <i class="fab fa-trello"></i> Enable Trello
+            </a>
+        {% endif %}
+    {% endif %}
+</div>
                     
                     <div class="task-content">
                         <p class="task-description">{{ taches|first.description }}</p>
@@ -113,19 +115,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Use event delegation for task item clicks
     tasksContainer.addEventListener('click', function(event) {
-        const taskItem = event.target.closest('.task-item');
-        if (taskItem) {
-            const taskId = taskItem.dataset.tacheId;
-            const taskName = taskItem.querySelector('.task-name').textContent;
-            const taskDescription = taskItem.dataset.description || '';
-            const taskDateDebut = taskItem.dataset.dateDebut || 'null';
-            const taskDateFin = taskItem.dataset.dateFin || 'null';
-            const taskStatut = taskItem.querySelector('.task-status').textContent.replace(/\s+/g, ' ').trim();
-            const taskTrelloId = taskItem.dataset.trelloId || 'null';
-            
-            selectTask(taskId, taskName, taskDescription, taskDateDebut, taskDateFin, taskStatut, taskTrelloId);
-        }
-    });
+    const taskItem = event.target.closest('.task-item');
+    if (taskItem) {
+        const taskId = taskItem.dataset.tacheId;
+        const taskName = taskItem.querySelector('.task-name').textContent;
+        const taskDescription = taskItem.dataset.description || '';
+        const taskDateDebut = taskItem.dataset.dateDebut || 'null';
+        const taskDateFin = taskItem.dataset.dateFin || 'null';
+        const taskStatut = taskItem.querySelector('.task-status').textContent.replace(/\s+/g, ' ').trim();
+        const taskTrelloId = taskItem.dataset.trelloId || 'null';
+        const hasTeamAssociation = taskItem.dataset.hasTeam;
+        
+        selectTask(taskId, taskName, taskDescription, taskDateDebut, taskDateFin, taskStatut, taskTrelloId, hasTeamAssociation);
+    }
+});
+});
 
     searchInput.addEventListener('input', function() {
         clearTimeout(searchTimeout);
@@ -168,60 +172,65 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function selectTask(taskId, taskName, taskDescription, taskDateDebut, taskDateFin, taskStatut, taskTrelloId) {
-        // Remove selected class from all items
-        document.querySelectorAll('.task-item').forEach(item => {
-            item.classList.remove('selected');
-        });
+    function selectTask(taskId, taskName, taskDescription, taskDateDebut, taskDateFin, taskStatut, taskTrelloId, hasTeamAssociation) {
+    // Remove selected class from all items
+    document.querySelectorAll('.task-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked item
+    const clickedItem = document.querySelector(`.task-item[data-tache-id="${taskId}"]`);
+    if (clickedItem) {
+        clickedItem.classList.add('selected');
+    }
+    
+    // Update task details
+    const detailsContainer = document.getElementById('taskDetails');
+    if (taskName && detailsContainer) {
+        const titleElement = detailsContainer.querySelector('h2');
+        const descriptionElement = detailsContainer.querySelector('.task-description');
         
-        // Add selected class to clicked item
-        const clickedItem = document.querySelector(`.task-item[data-tache-id="${taskId}"]`);
-        if (clickedItem) {
-            clickedItem.classList.add('selected');
+        if (titleElement) titleElement.textContent = taskName;
+        if (descriptionElement) descriptionElement.textContent = taskDescription;
+        
+        const formatDate = (dateString) => {
+            if (!dateString || dateString === 'null') return 'Not set';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        };
+        
+        const dateElements = detailsContainer.querySelectorAll('.task-date-value');
+        if (dateElements[0]) dateElements[0].textContent = formatDate(taskDateDebut);
+        if (dateElements[1]) dateElements[1].textContent = formatDate(taskDateFin);
+        
+        const statusBadge = detailsContainer.querySelector('.task-status-badge');
+        if (statusBadge) {
+            statusBadge.className = `task-status-badge status-${taskStatut.toLowerCase().replace(' ', '-')}`;
+            statusBadge.innerHTML = `
+                <i class="fas fa-${taskStatut == 'A faire' ? 'clock' : (taskStatut == 'En cours' ? 'spinner' : 'check-circle')}"></i>
+                ${taskStatut}
+            `;
         }
         
-        // Update task details
-        const detailsContainer = document.getElementById('taskDetails');
-        if (taskName && detailsContainer) {
-            const titleElement = detailsContainer.querySelector('h2');
-            const descriptionElement = detailsContainer.querySelector('.task-description');
-            
-            if (titleElement) titleElement.textContent = taskName;
-            if (descriptionElement) descriptionElement.textContent = taskDescription;
-            
-            const formatDate = (dateString) => {
-                if (!dateString || dateString === 'null') return 'Not set';
-                const date = new Date(dateString);
-                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            };
-            
-            const dateElements = detailsContainer.querySelectorAll('.task-date-value');
-            if (dateElements[0]) dateElements[0].textContent = formatDate(taskDateDebut);
-            if (dateElements[1]) dateElements[1].textContent = formatDate(taskDateFin);
-            
-            const statusBadge = detailsContainer.querySelector('.task-status-badge');
-            if (statusBadge) {
-                statusBadge.className = `task-status-badge status-${taskStatut.toLowerCase().replace(' ', '-')}`;
-                statusBadge.innerHTML = `
-                    <i class="fas fa-${taskStatut == 'A faire' ? 'clock' : (taskStatut == 'En cours' ? 'spinner' : 'check-circle')}"></i>
-                    ${taskStatut}
-                `;
-            }
-            
-            const trelloBtn = detailsContainer.querySelector('.trello-btn');
-            if (trelloBtn) {
-                if (taskTrelloId === 'null') {
-                    trelloBtn.innerHTML = '<i class="fab fa-trello"></i> Enable Trello';
-                } else {
-                    trelloBtn.innerHTML = '<i class="fab fa-trello"></i> View Trello';
+        const trelloBtn = detailsContainer.querySelector('.trello-btn');
+        if (trelloBtn) {
+            if (hasTeamAssociation === 'true') {
+                if (taskTrelloId && taskTrelloId !== 'null') {
+                    trelloBtn.style.display = 'inline-block';
                     trelloBtn.href = `https://trello.com/b/${taskTrelloId}`;
                     trelloBtn.target = '_blank';
                     trelloBtn.rel = 'noopener noreferrer';
+                    trelloBtn.innerHTML = '<i class="fab fa-trello"></i> View Trello';
+                } else {
+                    trelloBtn.style.display = 'inline-block';
+                    trelloBtn.href = '#';
+                    trelloBtn.innerHTML = '<i class="fab fa-trello"></i> Enable Trello';
                 }
+            } else {
+                trelloBtn.style.display = 'none';
             }
         }
     }
-    }
-);
+}
 </script>
 {% endblock %}

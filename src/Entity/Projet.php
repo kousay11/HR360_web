@@ -139,6 +139,10 @@ class Projet
         $this->getProjetequipes()->removeElement($projetequipe);
         return $this;
     }
+    public function hasEquipe(): bool
+    {
+        return !$this->projetequipes->isEmpty();
+    }
 
     #[ORM\OneToMany(targetEntity: Tache::class, mappedBy: 'projet')]
     private Collection $taches;

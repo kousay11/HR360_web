@@ -5,7 +5,8 @@
          data-date-debut="{{ tache.dateDebut ? tache.dateDebut|date('Y-m-d') : '' }}"
          data-date-fin="{{ tache.dateFin ? tache.dateFin|date('Y-m-d') : '' }}"
          data-statut="{{ tache.statut.value }}"
-         data-trello-id="{{ tache.trelloboardid ? tache.trelloboardid : '' }}">
+         data-trello-id="{{ tache.trelloboardid ? tache.trelloboardid : '' }}"
+         data-has-team="{{ tache.projet.projetequipes|length > 0 ? 'true' : 'false' }}">
         <div class="task-name">{{ tache.nom }}</div>
         <div class="task-status status-{{ tache.statut.value|lower|replace({' ': '-'}) }}">
             <i class="fas fa-{{ tache.statut.value == 'A faire' ? 'clock' : (tache.statut.value == 'En cours' ? 'spinner' : 'check-circle') }}"></i>
