@@ -1,0 +1,109 @@
+{% extends 'baseEMP.html.twig' %}
+{% block title %}{{ projet.nom }} - Project Details{% endblock %}
+{% block form %}{% endblock %}
+{% block css %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('front/css/styleProjet.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/styleEquipe.css') }}">
+{% endblock %}
+{% block index %}
+{% set n=0 %}{% set na=0 %}{% set ne=0 %}{% set nt=0 %}
+{% for tache in taches %}
+    {% set n = n + 1 %}
+    {% if tache.statut.value == 'A faire' %}
+        {% set na = na + 1 %}
+    {% elseif tache.statut.value == 'En cours' %}
+        {% set ne = ne + 1 %}
+    {% elseif tache.statut.value == 'Terminée' %}
+        {% set nt = nt + 1 %}
+    {% endif %}
+{% endfor %}
+{% if (n!=0) %}
+    {% set per = ((na*0 + ne*0.5 + nt*1)/n)*100 %}
+{% else %}
+    {% set per = 0 %}
+{% endif %}
+    <div class="project-detail-container">
+        <div class="project-header">
+            <h1>{{ projet.nom }}</h1>
+        </div>
+
+        <div class="project-description">
+            <h3>Project Description</h3>
+            <p>{{ projet.description }}</p>
+        </div>
+
+        <div class="project-dates">
+            <div class="date-card">
+                <h4>Start Date</h4>
+                <div class="date-value">
+                    <i class="fas fa-calendar-day"></i>
+                    {{ projet.dateDebut ? projet.dateDebut|date('M d, Y') : 'Not set' }}
+                </div>
+            </div>
+            <div class="date-card">
+                <h4>End Date</h4>
+                <div class="date-value">
+                    <i class="fas fa-calendar-check"></i>
+                    {{ projet.dateFin ? projet.dateFin|date('M d, Y') : 'Not set' }}
+                </div>
+            </div>
+        </div>
+
+        <div class="project-meta-section">
+            {# show.html.twig - update the project-actions div #}
+<div class="project-actions">
+    {% if equipe.equipeemployes|length > 0 %}
+            <div class="members-list">
+                {% for equipeEmploye in equipe.equipeemployes %}
+                {% set member = equipeEmploye.utilisateur %}
+                <div class="member-card">
+                    <div class="member-info">
+                        <div class="member-name-role">
+                            <span class="member-name">{{ member.nom }} {{ member.prenom }}</span>
+                            <span class="member-role">{{ member.poste }}</span>
+                        </div>
+                        <div class="member-contact">
+                            <span class="member-email">{{ member.email }}</span>
+                            {% if member.competence %}
+                            <span class="member-skills">{{ member.competence }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-user-friends"></i>
+                <h4>No Members Found</h4>
+                <p>This team doesn't have any members yet. Add some to get started!</p>
+            </div>
+        {% endif %}
+</div>
+            <div class="progress-container">
+                <div class="progress-header">
+                    <h4>Project Progress</h4>
+                </div>
+                <div class="progress-circle">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="progress-circle-bg" cx="50" cy="50" r="40"></circle>
+                        <circle class="progress-circle-fill" cx="50" cy="50" r="40" style="{{ '--progress: ' ~ completionPercentage }}"></circle>
+                    </svg>
+                    <div class="progress-percent">{{ completionPercentage|round }}%</div>
+                </div>
+                <div class="progress-text">Project completion</div>
+                <button class="btn btn-tasks" onclick="window.location='{{ path('app_tache_by_project', {'id': projet.id}) }}'">
+                    <i class="fas fa-tasks"></i> Voir Tâches
+                </button>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="{{ path('app_projet_front_index') }}" class="btn btn-back">
+                <i class="fas fa-arrow-left"></i> Back to list
+            </a>
+        </div>
+    </div>
+{% endblock %}

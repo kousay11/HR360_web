@@ -56,7 +56,6 @@ final class ProjetController extends AbstractController
             'projets' => $projets,
         ]);
     }
-    // In ProjetController.php
 
 #[Route('/projet/{id}/associate-team', name: 'app_projet_associate_team', methods: ['GET', 'POST'])]
 public function associateTeam(Request $request, Projet $projet, EntityManagerInterface $entityManager): Response
