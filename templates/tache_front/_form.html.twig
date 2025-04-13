@@ -1,0 +1,13 @@
+{{ form_start(form, {'attr': {'class': 'task-form'}}) }}
+    <div class="form-group mb-3">
+        {{ form_label(form.statut) }}
+        {{ form_widget(form.statut, {
+            'attr': {
+                'class': 'form-select' ~ (form.statut.vars.errors|length ? ' is-invalid' : '')
+            }
+        }) }}
+        {{ form_errors(form.statut) }}
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">{{ button_label|default('Update Status') }}</button>
+{{ form_end(form) }}

@@ -118,6 +118,7 @@ class Tache
     }
 
     #[ORM\Column(type: 'statustache', nullable: false)]
+    #[Assert\NotNull(groups: ['status_update', 'default'])]
     private ?StatusTache $statut = null;
 
     public function getStatut(): ?StatusTache
