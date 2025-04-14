@@ -42,26 +42,24 @@ class LoginFormAuthentificatorAuthentificator extends AbstractLoginFormAuthentic
         );
     }
 
-    /*public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
-    {
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
-            return new RedirectResponse($this->urlGenerator->generate('app_formation_front_index'));
-        }
-
-        // For example:
-        // return new RedirectResponse($this->urlGenerator->generate('some_route'));
-        throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
-    }*/
-
-
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
-    {
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
-            return new RedirectResponse($targetPath);
-        }
     
-        // Redirection après une connexion réussie
-        return new RedirectResponse($this->urlGenerator->generate('app_formation_front_index'));
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): RedirectResponse
+    {
+        $user = $token->getUser();
+
+        if (in_array('RH', $user->getRoles())) {
+            return new RedirectResponse($this->urlGenerator->generate('app_dashboard'));
+        }
+
+        if (in_array('Employe', $user->getRoles())) {
+            return new RedirectResponse($this->urlGenerator->generate('app_formation_front_index')); // ou une autre route
+        }
+
+        if (in_array('Candidat', $user->getRoles())) {
+            return new RedirectResponse($this->urlGenerator->generate('app_formation_front_index')); // ou une autre route
+        }
+
+        return new RedirectResponse($this->urlGenerator->generate('app_auth'));
     }
 
 

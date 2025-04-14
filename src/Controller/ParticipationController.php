@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Formation;
 use App\Entity\Participation;
 use App\Form\ParticipationType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,19 +26,20 @@ final class ParticipationController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_participation_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+
+    
+
+    #[Route('/new/{id}', name: 'app_participation_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager,int $id): Response
     {
         $participation = new Participation();
-        $form = $this->createForm(ParticipationType::class, $participation);
-        $form->handleRequest($request);
+        $participation->setIdUser($this->getUser());
+        $formation=$entityManager->getRepository(Formation::class)->findBy(['id' => $id]);
+        $participation->setIdFormation($formation[0]);
+     $entityManager->persist($participation);
+         $entityManager->flush();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($participation);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_participation_index', [], Response::HTTP_SEE_OTHER);
-        }
+        return $this->redirectToRoute('app_participation_index', [], Response::HTTP_SEE_OTHER);
 
         return $this->render('participation/new.html.twig', [
             'participation' => $participation,

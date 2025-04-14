@@ -9,17 +9,16 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>actions</th>
+                <th>Formation</th>
+                <th>Participant</th>
             </tr>
         </thead>
         <tbody>
         {% for participation in participations %}
             <tr>
                 <td>{{ participation.id }}</td>
-                <td>
-                    <a href="{{ path('app_participation_show', {'id': participation.id}) }}">show</a>
-                    <a href="{{ path('app_participation_edit', {'id': participation.id}) }}">edit</a>
-                </td>
+                <td>{{ participation.idFormation.titre }}</td>
+                <td>{{ participation.idUser.nom }} {{ participation.idUser.prenom }}</td>
             </tr>
         {% else %}
             <tr>
@@ -28,6 +27,4 @@
         {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ path('app_participation_new') }}">Create new</a>
 {% endblock %}

@@ -5,7 +5,9 @@
 
 {% block css %}
 	{{ parent() }}
-	<link rel="stylesheet" href="{{ asset('css/front/formation.css') }}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="{{ asset('front/css/project-card.css') }}">
 {% endblock %}
 
 {% block index %}
@@ -19,46 +21,81 @@
 			<div class="row mb-4">
 				<div class="col-md-6">
 					<form method="get" class="search-form">
-						<div
-							class="input-group">
-							{# Initialiser search avec une valeur par défaut si non définie #}
-							<input type="text" name="search" class="form-control" placeholder="Rechercher..." value="{{ app.request.query.get('search') ?? '' }}">
-							<button class="btn btn-primary" type="submit">
-								<i class="bi bi-search"></i>
+						<div class="input-group search-container">
+							<input type="text" name="search" class="form-control search-box" placeholder="Rechercher..." value="{{ app.request.query.get('search') ?? '' }}">
+							<button class="btn btn-outline-danger" type="submit">
+								<i class="fas fa-search"></i>
 							</button>
 						</div>
 					</form>
 				</div>
 				<div class="col-md-6 text-end">
-					<a href="{{ path('app_formation_front_new') }}" class="btn btn-success">
-						<i class="bi bi-plus-circle"></i>
-						Nouvelle Formation
+					<a href="{{ path('app_formation_front_new') }}" class="btn btn-outline-danger">
+						<i class="fas fa-plus me-2"></i>
+						Ajouter
 					</a>
 				</div>
 			</div>
 
 			<div class="row">
 				{% for formation in formations %}
-					<div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
-						<div class="formation-card h-100">
-							<div class="card-body">
-								<h5 class="card-title">{{ formation.titre }}</h5>
-								<p class="card-text text-muted">
-									<i class="bi bi-calendar"></i>
-									{{ formation.dateFormation }}
+					<div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+						<div class="card entity-card">
+							<div class="card-header entity-header">
+								<i class="fas fa-graduation-cap entity-icon"></i>
+								<h5 class="entity-title">{{ formation.titre }}</h5>
+								<span class="badge bg-success badge-position">
+									<i class="fas fa-check-circle me-1"></i>
+									{{ formation.isFavorite ? 'Favori' : 'Disponible' }}
+								</span>
+							</div>
+							<div class="card-body entity-body">
+								<p>
+									<i class="fas fa-align-left"></i>
+									{{ formation.description|u.truncate(100, '...') }}
 								</p>
-								<p class="card-text">{{ formation.description|u.truncate(100, '...') }}</p>
-								<div class="d-flex justify-content-between align-items-center">
-									<a href="{{ path('app_formation_front_show', {'id': formation.id}) }}" class="btn btn-sm btn-primary">
-										<i class="bi bi-eye"></i>
-										Détails
-									</a>
+								<hr>
+								<div class="project-meta">
+									<i class="fas fa-clock"></i>
+									<span>Durée:
+										{{ formation.duree }}
+										jours</span>
+								</div>
+								<div class="project-meta">
+									<i class="fas fa-calendar-day"></i>
+									<span>Date:
+										{{ formation.dateFormation|date('d/m/Y') }}</span>
+								</div>
+							</div>
+
+							<div class="card-footer entity-footer">
+								<div
+									class="d-flex justify-content-between align-items-center">
+									{# Groupe gauche - Boutons principaux #}
+									<div class="btn-group btn-group-sm" role="group">
+										<a href="{{ path('app_formation_front_show', {'id': formation.id}) }}" class="btn btn-outline-dark">
+											<i class="fas fa-eye me-1"></i>
+											Détails
+										</a>
+										<a href="{{ path('app_participation_new', {'id': formation.id}) }}" class="btn btn-outline-success">
+											<i class="fas fa-user-check me-1"></i>
+											Participer
+										</a>
+									</div>
+
 									<div>
-										<span class="badge bg-primary me-2">{{ formation.duree }}
-											jours</span>
-										{% if formation.isFavorite %}
-											<i class="bi bi-star-fill text-warning"></i>
-										{% endif %}
+										<button class="btn btn-outline-warning btn-sm">
+											<i class="fas fa-star"></i>
+										</button>
+										<a href="{{ path('app_formation_front_edit', {'id': formation.id}) }}" class="btn btn-outline-danger btn-sm">
+											<i class="fas fa-edit"></i>
+										</a>
+										<form action="{{ path('app_formation_front_delete', {'id': formation.id}) }}" method="post" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette formation ?');">
+											<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ formation.id) }}">
+											<button type="submit" class="btn btn-outline-dark btn-sm">
+												<i class="fas fa-trash"></i>
+											</button>
+										</form>
 									</div>
 								</div>
 							</div>
@@ -109,12 +146,19 @@
 {% block js %}
 	{{ parent() }}
 	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-const formationCards = document.querySelectorAll('.formation-card');
+		document.addEventListener('DOMContentLoaded', function () { // Animation des cartes
+const formationCards = document.querySelectorAll('.entity-card');
 formationCards.forEach((card, index) => {
 card.style.animationDelay = `${
 index * 0.1
 }s`;
+});
+
+// Gestion des favoris
+document.querySelectorAll('.btn-outline-warning').forEach(btn => {
+btn.addEventListener('click', function () {
+this.classList.toggle('active');
+});
 });
 });
 	</script>

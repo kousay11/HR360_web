@@ -1,51 +1,73 @@
-<!DOCTYPE html>
+{% extends 'baseRH.html.twig' %}
 
-<title>Utilisateur index</title>
+{% block title %}Gestion des Employés{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    <link href="{{ asset('back/css/project-card.css') }}" rel="stylesheet">
+    <link href="{{ asset('back/css/buttons.css') }}" rel="stylesheet">
+{% endblock %}
 
 {% block body %}
-    <h1>Utilisateur index</h1>
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Gestion des Employés</h1>
+        <a href="{{ path('app_utilisateur_new') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Ajouter un employé
+        </a>
+    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>Prenom</th>
-                <th>Email</th>
-                <th>Password</th>
-                <th>Role</th>
-                <th>Image</th>
-                <th>Salaire</th>
-                <th>Poste</th>
-                <th>Competence</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="row">
         {% for utilisateur in utilisateurs %}
-            <tr>
-                <td>{{ utilisateur.id }}</td>
-                <td>{{ utilisateur.nom }}</td>
-                <td>{{ utilisateur.prenom }}</td>
-                <td>{{ utilisateur.email }}</td>
-                <td>{{ utilisateur.password }}</td>
-                <td>{{ utilisateur.role }}</td>
-                <td>{{ utilisateur.image }}</td>
-                <td>{{ utilisateur.salaire }}</td>
-                <td>{{ utilisateur.poste }}</td>
-                <td>{{ utilisateur.competence }}</td>
-                <td>
-                    <a href="{{ path('app_utilisateur_show', {'id': utilisateur.id}) }}">show</a>
-                    <a href="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}">edit</a>
-                </td>
-            </tr>
+        <!-- Card Employe -->
+        <div class="col-md-4 mb-4">
+            <div class="entity-card employee-card">
+                <div class="entity-header">
+                    {% if utilisateur.image %}
+                        <img src="{{ asset('uploads/images/' ~ utilisateur.image) }}" class="employee-image" alt="{{ utilisateur.prenom }} {{ utilisateur.nom }}">
+                    {% else %}
+                        <img src="{{ asset('back/img/undraw_profile.svg') }}" class="employee-image" alt="Photo par défaut">
+                    {% endif %}
+                    <h5 class="entity-title">{{ utilisateur.prenom }} {{ utilisateur.nom }}</h5>
+                    <span class="employee-role">{{ utilisateur.role }}</span>
+                </div>
+                <div class="entity-body">
+                    <div class="employee-meta">
+                        <i class="fas fa-envelope"></i>
+                        <span>{{ utilisateur.email }}</span>
+                    </div>
+                    <div class="employee-meta">
+                        <i class="fas fa-user-tag"></i>
+                        <span>{{ utilisateur.poste ?? 'Non spécifié' }}</span>
+                    </div>
+                    <div class="employee-meta">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Salaire: {{ utilisateur.salaire ? utilisateur.salaire ~ '€' : 'Non spécifié' }}</span>
+                    </div>
+                </div>
+                <div class="employee-card-footer">
+                    <div class="action-buttons">
+                        <a href="{{ path('app_utilisateur_show', {'id': utilisateur.id}) }}" class="btn btn-view">
+                            <i class="fas fa-eye"></i> Voir
+                        </a>
+                        <a href="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" class="btn btn-modify">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        <form method="post" action="{{ path('app_utilisateur_delete', {'id': utilisateur.id}) }}" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet employé?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ utilisateur.id) }}">
+                            <button type="submit" class="btn btn-delete">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% else %}
-            <tr>
-                <td colspan="11">no records found</td>
-            </tr>
+        <div class="col-12">
+            <div class="alert alert-info">Aucun employé trouvé</div>
+        </div>
         {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_utilisateur_new') }}">Create new</a>
+    </div>
+</div>
 {% endblock %}
