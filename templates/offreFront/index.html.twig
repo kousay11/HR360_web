@@ -34,7 +34,7 @@
                     <div class="card h-100 shadow-sm border-0 {% if isExpired %}border-secondary{% else %}border-danger{% endif %}">
                         <div class="card-header bg-dark text-white position-relative" style="min-height: 60px;">
                             <h5 class="card-title mb-0 pe-5">
-                                <i class="fas fa-heading me-2"></i>{{ offre.titre }}
+                                <i class="fas fa-briefcase entity-icon-red"></i>{{ offre.titre }}
                             </h5>
                             <span class="position-absolute top-50 end-0 translate-middle-y badge rounded-pill {% if isExpired %}bg-secondary{% else %}bg-success{% endif %} me-3">
                                 {% if isExpired %}
@@ -89,6 +89,7 @@
 {% endblock %}
 {% block css %}
     {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <style>
     .card {
         transition: all 0.3s ease;
@@ -123,5 +124,9 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+    .entity-icon-red {
+    color: #dc3545; /* Rouge danger de Bootstrap */
+    margin-right: 10px;
+}
 </style>
 {% endblock %}

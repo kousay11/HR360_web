@@ -27,7 +27,7 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-4">
                                     {{ form_label(form.datePublication, 'Date de publication', {'label_attr': {'class': 'form-label text-dark'}}) }}
-                                    {{ form_widget(form.datePublication, {'attr': {'class': 'form-control' ~ (form.datePublication.vars.valid ? '' : ' is-invalid'), 'data-allow-null': 'true'}} )}}
+                                    {{ form_widget(form.datePublication, {'attr': {'class': 'form-control datepicker' ~ (form.datePublication.vars.valid ? '' : ' is-invalid'), 'data-allow-null': 'true'}} )}}
                                     <div class="invalid-feedback">
                                         {{ form_errors(form.datePublication) }}
                                     </div>
@@ -36,7 +36,7 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-4">
                                     {{ form_label(form.dateExpiration, 'Date d\'expiration', {'label_attr': {'class': 'form-label text-dark'}}) }}
-                                    {{ form_widget(form.dateExpiration, {'attr': {'class': 'form-control' ~ (form.dateExpiration.vars.valid ? '' : ' is-invalid'), 'data-allow-null': 'true'}})}}
+                                    {{ form_widget(form.dateExpiration, {'attr': {'class': 'form-control datepicker' ~ (form.dateExpiration.vars.valid ? '' : ' is-invalid'), 'data-allow-null': 'true'}})}}
                                     <div class="invalid-feedback">
                                         {{ form_errors(form.dateExpiration) }}
                                     </div>

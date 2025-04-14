@@ -59,4 +59,19 @@ public function findWithSearchAndSort(?string $searchTerm = null, string $sort =
 
     return $qb->getQuery()->getResult();
 }
+// src/Repository/OffreRepository.php
+public function findOffresExpiringIn(int $days): array
+{
+    $now = new \DateTime();
+    $threshold = (new \DateTime())->add(new \DateInterval("P{$days}D"));
+
+    return $this->createQueryBuilder('o')
+        ->where('o.dateExpiration BETWEEN :now AND :threshold')
+        ->andWhere('o.statut = :statut')
+        ->setParameter('now', $now)
+        ->setParameter('threshold', $threshold)
+        ->setParameter('statut', 'Publiée')
+        ->getQuery()
+        ->getResult();
+}
 }

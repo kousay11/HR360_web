@@ -19,5 +19,9 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+    App\Service\TwilioService:
+        arguments:
+            $accountSid: '%env(twilio_account_sid)%'
+            $authToken: '%env(twilio_auth_token)%'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
