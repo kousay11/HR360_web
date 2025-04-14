@@ -27,25 +27,44 @@ final class ParticipationController extends AbstractController
     }
 
 
-    
 
     #[Route('/new/{id}', name: 'app_participation_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager,int $id): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, int $id): Response
     {
-        $participation = new Participation();
-        $participation->setIdUser($this->getUser());
-        $formation=$entityManager->getRepository(Formation::class)->findBy(['id' => $id]);
-        $participation->setIdFormation($formation[0]);
-     $entityManager->persist($participation);
-         $entityManager->flush();
+        $user = $this->getUser();
+        if (!$user) {
+            throw $this->createAccessDeniedException("Vous devez être connecté pour participer.");
+        }
 
-        return $this->redirectToRoute('app_participation_index', [], Response::HTTP_SEE_OTHER);
+        $formation = $entityManager->getRepository(Formation::class)->find($id);
+        if (!$formation) {
+            throw $this->createNotFoundException("Formation introuvable.");
+        }
 
-        return $this->render('participation/new.html.twig', [
-            'participation' => $participation,
-            'form' => $form,
+        // Vérifier si l'utilisateur est déjà inscrit à cette formation
+        $existing = $entityManager->getRepository(Participation::class)->findOneBy([
+            'idUser' => $user,
+            'idFormation' => $formation,
         ]);
+
+        if ($existing) {
+            $this->addFlash('warning', 'Vous participez déjà à cette formation.');
+            //return $this->redirectToRoute('app_participation_index');
+            return $this->redirectToRoute('app_formation_front_index');
+        }
+
+        $participation = new Participation();
+        $participation->setIdUser($user);
+        $participation->setIdFormation($formation);
+
+        $entityManager->persist($participation);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Votre participation a été enregistrée avec succès !');
+
+        return $this->redirectToRoute('app_formation_front_index');
     }
+
 
     #[Route('/{id}', name: 'app_participation_show', methods: ['GET'])]
     public function show(Participation $participation): Response
@@ -76,7 +95,7 @@ final class ParticipationController extends AbstractController
     #[Route('/{id}', name: 'app_participation_delete', methods: ['POST'])]
     public function delete(Request $request, Participation $participation, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$participation->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $participation->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($participation);
             $entityManager->flush();
         }
