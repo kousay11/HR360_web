@@ -19,23 +19,23 @@ class EvaluationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-        ->add('titreEva', null, [
-            'attr' => ['class' => 'form-control'],
-            'label' => 'Titre de l\'évaluation',
-            'empty_data' => '' 
-        ])
-        ->add('noteTechnique', NumberType::class, [
-            'label' => 'Note Technique (/20)',
-            'attr' => [
-                'class' => 'form-control',
-                'min' => 0,
-                'max' => 20,
-                'step' => 0.5,
-            ],
-            'empty_data' => 0.0, // Important pour la validation
-        ])
-            ->add('noteSoftSkills', NumberType::class,[
-                
+            ->add('titreEva', null, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Titre de l\'évaluation',
+                'empty_data' => '' 
+
+            ])
+            ->add('noteTechnique', null, [
+                'attr' => [
+                    'class' => 'form-control',
+                    'min' => 0,
+                    'max' => 20,
+                    'step' => 0.5
+                ],
+                'label' => 'Note Technique (/20)',
+                'empty_data' => 0.0
+            ])
+            ->add('noteSoftSkills', null, [
                 'attr' => [
                     'class' => 'form-control',
                     'min' => 0,
@@ -44,6 +44,7 @@ class EvaluationType extends AbstractType
                 ],
                 'label' => 'Note Soft Skills (/20)',
                 'empty_data' => 0.0
+
             ])
             ->add('commentaire', null, [
                 'attr' => [
@@ -54,6 +55,7 @@ class EvaluationType extends AbstractType
             ])
             ->add('dateEvaluation', DateTimeType::class, [
                 'widget' => 'single_text',
+                'html5' => false,
                 'attr' => [
                     'class' => 'form-control datetimepicker',
                     'data-timezone' => 'Africa/Tunis'
@@ -68,11 +70,9 @@ class EvaluationType extends AbstractType
                 ],
                 'label' => 'Score Quiz (/10)',
                 'required' => false
-            ])
-            ->add('entretien', EntityType::class, [
-                'class' => Entretien::class,
-                'choice_label' => 'idEntretien',
             ]);
+            
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -1,114 +1,64 @@
-{{ form_start(form, {'attr': {'class': 'form-horizontal','novalidate': 'novalidate'}}) }}
-
-{% if not form.vars.valid %}
-    <div class="alert alert-danger">
-        <strong>Erreurs :</strong> Veuillez corriger les erreurs ci-dessous
-    </div>
-{% endif %}
+{{ form_start(form, {'attr': {'class': 'form-horizontal'}, 'attr': {'novalidate': 'novalidate'}}) }}
 
 <div class="form-group row">
     <div class="col-md-6 mb-3">
-        {{ form_label(form.date, 'Date', {'label_attr': {'class': 'form-label'}}) }}
-        {{ form_widget(form.date, {
+    <label for="inputText" class="col-sm-4 col-form-label">Date</label>
+        {{ form_widget(form.date, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.date, {'attr': {'class': 'text-danger'}}) }}
+    </div>
+    <div class="col-md-6 mb-3">
+    <label for="inputText" class="col-sm-4 col-form-label">Heure</label>
+    <div class="input-group">
+        {{ form_widget(form.heure, {
             'attr': {
-                'class': 'form-control' ~ (form.date.vars.errors|length ? ' is-invalid' : ''),
-                'value': entretien.date ? entretien.date|date('Y-m-d') : ''
+                'class': 'form-control',
+                'id': 'timepicker-input',
+                'autocomplete': 'off'
             }
         }) }}
-        <div class="invalid-feedback">
-            {% for error in form.date.vars.errors %}
-                <div style="color: red;">{{ error.message }}</div>
-            {% endfor %}
+        <div class="input-group-append">
+            <span class="input-group-text" id="timepicker-icon" style="cursor: pointer;">
+                <i class="far fa-clock"></i>
+            </span>
         </div>
     </div>
-    
-    <div class="col-md-6 mb-3">
-        {{ form_label(form.heure, 'Heure (HH:MM)', {'label_attr': {'class': 'form-label'}}) }}
-        <div class="input-group">
-            {{ form_widget(form.heure, {
-                'attr': {
-                    'class': 'form-control' ~ (form.heure.vars.errors|length ? ' is-invalid' : ''),
-                    'id': 'timepicker-input',
-                    'autocomplete': 'off',
-                    'value': entretien.heure ? entretien.heure|slice(0,5) : ''
-                }
-            }) }}
-            <div class="input-group-append">
-                <span class="input-group-text" id="timepicker-icon">
-                    <i class="far fa-clock"></i>
-                </span>
-            </div>
-            {% if form.heure.vars.errors|length %}
-                <div class="invalid-feedback d-block">
-                    {% for error in form.heure.vars.errors %}
-                        <div>{{ error.message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
-    </div>
+    {{ form_errors(form.heure, {'attr': {'class': 'text-danger'}}) }}
+</div>
 </div>
 
 <div class="form-group row">
     <div class="col-md-6 mb-3">
-        {{ form_label(form.type, 'Type d\'entretien', {'label_attr': {'class': 'form-label'}}) }}
+    <label for="inputText" class="col-sm-4 col-form-label">Type d'entretien</label>
         {{ form_widget(form.type, {
             'attr': {
-                'class': 'form-control' ~ (form.type.vars.errors|length ? ' is-invalid' : '')
+                'class': 'form-control entretien-type-selector'
             }
         }) }}
-        <div class="invalid-feedback">
-            {% for error in form.type.vars.errors %}
-                <div style="color: red;">{{ error.message }}</div>
-            {% endfor %}
-        </div>
+        {{ form_errors(form.type, {'attr': {'class': 'text-danger'}}) }}
     </div>
-    
     <div class="col-md-6 mb-3">
-        {{ form_label(form.statut, 'Statut', {'label_attr': {'class': 'form-label'}}) }}
-        {{ form_widget(form.statut, {
-            'attr': {
-                'class': 'form-control' ~ (form.statut.vars.errors|length ? ' is-invalid' : '')
-            }
-        }) }}
-        <div class="invalid-feedback">
-            {% for error in form.statut.vars.errors %}
-                <div style="color: red;">{{ error.message }}</div>
-            {% endfor %}
-        </div>
+    <label for="inputText" class="col-sm-4 col-form-label">Statut</label>
+        {{ form_widget(form.statut, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.statut, {'attr': {'class': 'text-danger'}}) }}
     </div>
 </div>
 
-<div class="form-group mb-3">
-    {{ form_label(form.lienmeet, 'Lien de visioconférence', {'label_attr': {'class': 'form-label'}}) }}
-    {{ form_widget(form.lienmeet, {
-        'attr': {
-            'class': 'form-control' ~ (form.lienmeet.vars.errors|length ? ' is-invalid' : ''),
-            'placeholder': 'https://meet.google.com/...'
-        }
-    }) }}
-    <div class="invalid-feedback">
-        {% for error in form.lienmeet.vars.errors %}
-            <div style="color: red;">{{ error.message }}</div>
-        {% endfor %}
-    </div>
+<div class="form-group lienmeet-field">
+   
+    <label for="inputText" class="col-sm-4 col-form-label">Lien Meet</label>
+    {{ form_widget(form.lienmeet, {'attr': {'class': 'form-control', 'placeholder': 'https://meet.google.com/...'}}) }}
+    {{ form_errors(form.lienmeet, {'attr': {'class': 'text-danger'}}) }}
     <small class="form-text text-muted">Laissez vide si l'entretien est en présentiel</small>
 </div>
 
-<div class="form-group mb-3">
-    {{ form_label(form.localisation, 'Localisation', {'label_attr': {'class': 'form-label'}}) }}
-    {{ form_widget(form.localisation, {
-        'attr': {
-            'class': 'form-control' ~ (form.localisation.vars.errors|length ? ' is-invalid' : '')
-        }
-    }) }}
-    <div class="invalid-feedback">
-        {% for error in form.localisation.vars.errors %}
-            <div style="color: red;">{{ error.message }}</div>
-        {% endfor %}
-    </div>
+<div class="form-group localisation-field">
+    <label for="inputText" class="col-sm-4 col-form-label">Localisation</label>
+    {{ form_widget(form.localisation, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.localisation, {'attr': {'class': 'text-danger'}}) }}
     <small class="form-text text-muted">Adresse physique si entretien en présentiel</small>
 </div>
+
+
 
 <div class="form-group text-right mt-4">
     <button type="submit" class="btn btn-primary">

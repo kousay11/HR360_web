@@ -52,12 +52,17 @@ class EntretienType extends AbstractType
                 'label' => 'Statut',
                 'placeholder' => 'Sélectionnez une statut',
             ])
-            ->add('lienmeet')
-            ->add('localisation')
-            ->add('candidature', EntityType::class, [
-                'class' => Candidature::class,
-                'choice_label' => 'id_candidature',
+            ->add('lienmeet' ,null, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'lien meet',
+                'empty_data' => '' 
             ])
+            ->add('localisation', null, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'localisation',
+                'empty_data' => '' 
+            ])
+            
         ;
     }
 

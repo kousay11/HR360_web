@@ -1,30 +1,20 @@
 {{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
 
-{% if not form.vars.valid %}
-    <div class="alert alert-danger">
-        <strong>Erreurs :</strong> Veuillez corriger les erreurs ci-dessous
-    </div>
-{% endif %}
-
 <div class="form-group row">
     <div class="col-md-12 mb-3">
-        {{ form_label(form.titreEva, 'Titre de l\'évaluation', {'label_attr': {'class': 'font-weight-bold'}}) }}
-        {{ form_widget(form.titreEva, {'attr': {'class': 'form-control' ~ (form.titreEva.vars.errors|length ? ' is-invalid' : '')}}) }}
-        <div class="invalid-feedback">
-            {% for error in form.titreEva.vars.errors %}
-                <div style="color: red;">{{ error.message }}</div>
-            {% endfor %}
-        </div>
+        <label for="inputText" class="col-sm-4 col-form-label">Titre de l'évaluation</label>
+        {{ form_widget(form.titreEva, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.titreEva) }}
     </div>
 </div>
 
 <div class="form-group row">
     <div class="col-md-6 mb-3">
-        {{ form_label(form.dateEvaluation, 'Date et heure d\'évaluation', {'label_attr': {'class': 'font-weight-bold'}}) }}
+        <label for="inputText" class="col-sm-4 col-form-label">Date et heure</label>
         <div class="input-group">
             {{ form_widget(form.dateEvaluation, {
                 'attr': {
-                    'class': 'form-control datetimepicker' ~ (form.dateEvaluation.vars.errors|length ? ' is-invalid' : ''),
+                    'class': 'form-control datetimepicker',
                     'data-timezone': 'Africa/Tunis'
                 }
             }) }}
@@ -32,81 +22,47 @@
                 <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
             </div>
         </div>
-        <div class="invalid-feedback">
-            {% for error in form.dateEvaluation.vars.errors %}
-                <div style="color: red;">{{ error.message }}</div>
-            {% endfor %}
-        </div>
         <small class="form-text text-muted">Fuseau horaire: Tunis (UTC+1)</small>
+        {{ form_errors(form.dateEvaluation) }}
     </div>
-    
     <div class="col-md-6 mb-3">
-        {{ form_label(form.scorequiz, 'Score Quiz (/10)', {'label_attr': {'class': 'font-weight-bold'}}) }}
+        <label for="inputText" class="col-sm-4 col-form-label">Score Quiz (/10)</label>
         {{ form_widget(form.scorequiz, {
             'attr': {
-                'class': 'form-control' ~ (form.scorequiz.vars.errors|length ? ' is-invalid' : ''),
+                'class': 'form-control',
                 'min': 0,
                 'max': 10,
                 'onchange': 'updateCommentaire(this.value)'
             }
         }) }}
-        <div class="invalid-feedback">
-            {% for error in form.scorequiz.vars.errors %}
-                <div style="color: red;">{{ error.message }}</div>
-            {% endfor %}
-        </div>
+        {{ form_errors(form.scorequiz) }}
     </div>
 </div>
 
 <div class="form-group row">
     <div class="col-md-6 mb-3">
-        {{ form_label(form.noteTechnique, 'Note Technique (/20)', {'label_attr': {'class': 'font-weight-bold'}}) }}
-        {{ form_widget(form.noteTechnique, {
-            'attr': {
-                'class': 'form-control' ~ (form.noteTechnique.vars.errors|length ? ' is-invalid' : ''),
-                'min': 0,
-                'max': 20,
-                'step': 0.5
-            }
-        }) }}
-        <div class="invalid-feedback">
-            {% for error in form.noteTechnique.vars.errors %}
-                <div style="color: red;">{{ error.message }}</div>
-            {% endfor %}
-        </div>
+        <label for="inputText" class="col-sm-4 col-form-label">Note Technique (/20)</label>
+        {{ form_widget(form.noteTechnique, {'attr': {'class': 'form-control', 'min': 0, 'max': 20}}) }}
+        {{ form_errors(form.noteTechnique) }}
     </div>
-    
     <div class="col-md-6 mb-3">
-        {{ form_label(form.noteSoftSkills, 'Note Soft Skills (/20)', {'label_attr': {'class': 'font-weight-bold'}}) }}
-        {{ form_widget(form.noteSoftSkills, {
-            'attr': {
-                'class': 'form-control' ~ (form.noteSoftSkills.vars.errors|length ? ' is-invalid' : ''),
-                'min': 0,
-                'max': 20,
-                'step': 0.5
-            }
-        }) }}
-        <div class="invalid-feedback">
-            {% for error in form.noteSoftSkills.vars.errors %}
-                <div style="color: red;">{{ error.message }}</div>
-            {% endfor %}
-        </div>
+        <label for="inputText" class="col-sm-4 col-form-label">Note Soft Skills (/20)</label>
+        {{ form_widget(form.noteSoftSkills, {'attr': {'class': 'form-control', 'min': 0, 'max': 20}}) }}
+        {{ form_errors(form.noteSoftSkills) }}
     </div>
 </div>
 
-<div class="form-group">
-    {{ form_label(form.commentaire, 'Décision', {'label_attr': {'class': 'font-weight-bold'}}) }}
-    {{ form_widget(form.commentaire, {
-        'attr': {
-            'class': 'form-control' ~ (form.commentaire.vars.errors|length ? ' is-invalid' : ''),
-            'rows': 1,
-            'readonly': 'readonly'
-        }
-    }) }}
-    <div class="invalid-feedback">
-        {% for error in form.commentaire.vars.errors %}
-            <div style="color: red;">{{ error.message }}</div>
-        {% endfor %}
+<div class="form-group row">
+    <div class="col-md-4">
+    <label for="inputText" class="col-sm-4 col-form-label">Décision</label>
+        {{ form_widget(form.commentaire, {
+            'attr': {
+                'class': 'form-control',
+                'rows': 1,
+                'readonly': 'readonly'
+            }
+        }) }}
+        {{ form_errors(form.commentaire) }}
     </div>
 </div>
 
