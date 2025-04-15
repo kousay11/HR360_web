@@ -1,0 +1,314 @@
+:root {
+    --primary: #4361ee;
+    --primary-light: #e0e7ff;
+    --secondary: #3f37c9;
+    --success: #4cc9f0;
+    --danger: #f72585;
+    --warning: #f8961e;
+    --info: #4895ef;
+    --light: #f8f9fa;
+    --dark: #212529;
+    --gray: #6c757d;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --transition: all 0.3s ease;
+}
+
+h1 {
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 2rem;
+    position: relative;
+    display: inline-block;
+}
+
+h1:after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: var(--primary);
+    border-radius: 2px;
+}
+
+.project-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 0;
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.project-card-header {
+    padding: 20px 20px 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: var(--primary-light);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between icon and title */
+    padding: 20px;
+}
+
+.project-card-body {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.project-card-footer {
+    padding: 15px 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: #f9fafc;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+.project-icon {
+    font-size: 24px;
+    color: var(--primary);
+    background: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    flex-shrink: 0;
+}
+
+.project-title {
+    font-weight: 600;
+    margin: 0;
+    color: var(--dark);
+    font-size: 1.1rem;
+}
+
+.project-meta {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+.project-meta i {
+    margin-right: 8px;
+    width: 20px;
+    text-align: center;
+    color: var(--primary);
+}
+
+.btn {
+    border-radius: var(--border-radius);
+    padding: 8px 16px;
+    font-weight: 500;
+    transition: var(--transition);
+    border: none;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-modify {
+    background-color: var(--warning);
+    color: white;
+}
+
+.btn-modify:hover {
+    background-color: #f9a03f;
+    color: white;
+}
+
+.btn-delete {
+    background-color: var(--danger);
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #f83f93;
+    color: white;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.action-buttons .btn {
+    flex: 1;
+    text-align: center;
+}
+
+/* Add these styles to your existing CSS file */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -10px; /* Negative margin to counteract the padding */
+}
+
+.col-md-4 {
+    flex: 0 0 calc(33.333% - 20px); /* 3 cards per row with gap */
+    margin: 10px; /* Half of the desired gap */
+    max-width: calc(33.333% - 20px);
+}
+
+/* Optional: Responsive adjustments */
+@media (max-width: 992px) {
+    .col-md-4 {
+        flex: 0 0 calc(50% - 20px); /* 2 cards per row on medium screens */
+        max-width: calc(50% - 20px);
+    }
+}
+
+@media (max-width: 576px) {
+    .col-md-4 {
+        flex: 0 0 100%; /* 1 card per row on small screens */
+        max-width: 100%;
+    }
+}
+.d-flex {
+    display: flex !important;
+}
+
+.align-items-center {
+    align-items: center !important;
+}
+
+.gap-3 {
+    gap: 1rem !important; /* Adjust if needed */
+}
+
+/* Entity Cards - General Style */
+.entity-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 0;
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.entity-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.entity-icon {
+    font-size: 20px;
+    color: var(--primary);
+    background: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    flex-shrink: 0;
+}
+
+.entity-header {
+    padding: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: var(--primary-light);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.entity-title {
+    font-weight: 600;
+    margin: 0;
+    color: var(--dark);
+    font-size: 1rem;
+}
+
+.entity-body {
+    padding: 15px;
+    flex-grow: 1;
+}
+
+.entity-footer {
+    padding: 12px 15px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: #f9fafc;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+/* Progress Bar Styles */
+.progress {
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    margin: 5px 0;
+}
+
+.progress-bar {
+    border-radius: 4px;
+    transition: width 0.6s ease;
+}
+
+.bg-success {
+    background-color: var(--success) !important;
+}
+
+.bg-warning {
+    background-color: var(--warning) !important;
+}
+
+/* Star Rating */
+.star-rating {
+    color: var(--warning);
+    font-size: 1rem;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.status-active {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-expired {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Employee Image */
+.employee-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary-light);
+}

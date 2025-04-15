@@ -1,0 +1,139 @@
+:root {
+    --danger: #dc3545;
+    --dark: #212529;
+    --gray: #6c757d;
+    --light: #f8f9fa;
+}
+
+body {
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+
+.entity-card {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.entity-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.entity-header {
+    padding: 1rem 1.25rem;
+    background-color: var(--dark);
+    color: white;
+    position: relative;
+    min-height: 60px;
+    border-radius: 8px 8px 0 0 !important;
+    display: flex;
+    align-items: center;
+}
+
+.entity-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0;
+    margin-left: 10px;
+}
+
+.entity-icon {
+    color: var(--danger);
+    font-size: 1.2rem;
+}
+
+.entity-body {
+    padding: 1.25rem;
+    flex-grow: 1;
+    background: white;
+}
+
+.entity-footer {
+    background-color: white;
+    padding: 1rem 1.25rem;
+    border-radius: 0 0 8px 8px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.project-meta {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.project-meta i {
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    color: var(--danger);
+}
+
+.status-badge {
+    font-size: 0.75rem;
+    padding: 0.5em 0.8em;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.status-active {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-expired {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.badge-position {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    margin-right: 1rem;
+}
+
+.employee-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--danger);
+}
+
+.progress {
+    height: 8px;
+    background-color: #e9ecef;
+}
+
+.progress-bar {
+    background-color: var(--danger);
+}
+
+.star-rating {
+    color: #ffc107;
+}
+
+hr {
+    opacity: 0.1;
+    margin: 1rem 0;
+}
+
+.search-box {
+    max-width: 300px;
+}
+
+.top-controls {
+    margin-bottom: 2rem;
+}

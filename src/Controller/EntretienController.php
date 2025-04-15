@@ -34,7 +34,7 @@ public function indexfront(EntretienRepository $entretienRepository): Response
 #[Route('/entfront/{page}', name: 'app_entretien_front', defaults: ['page' => 1], methods: ['GET'])]
 public function indexfront(EntretienRepository $entretienRepository, int $page = 1): Response
 {
-    $limit = 4; // 4 entretiens par page
+    $limit = 3; // 4 entretiens par page
     $query = $entretienRepository->createQueryBuilder('e')
         ->orderBy('e.date', 'ASC')
         ->getQuery();
