@@ -279,6 +279,12 @@
                                                class="btn btn-sm btn-outline-secondary action-btn" title="Modifier">
                                                 <i class="fas fa-edit"></i>
                                             </a>
+                                            <button class="btn btn-sm btn-outline-primary action-btn analyse-btn" 
+                                                    title="Analyser" 
+                                                    data-cv-path="{{ asset('uploads/cvs/' ~ candidature.cv) }}"
+                                                    data-candidature-id="{{ candidature.idCandidature }}">
+                                                <i class="fas fa-search"></i>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -330,6 +336,54 @@
                 </div>
             {% endif %}
         </div>
+        <!-- Ajoutez ce modal avant la fermeture du div.container -->
+<div class="modal fade" id="analyseModal" tabindex="-1" aria-labelledby="analyseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="analyseModalLabel">Analyse de correspondance CV/Offre</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="analyseForm" enctype="multipart/form-data">
+                    <input type="hidden" id="cvPath" name="cvPath">
+                    <input type="hidden" id="candidatureId" name="candidatureId">
+                    
+                    <div class="mb-3">
+                        <label for="jobOfferFile" class="form-label">Télécharger l'offre d'emploi (PDF ou TXT)</label>
+                        <input class="form-control" type="file" id="jobOfferFile" name="jobOfferFile" accept=".pdf,.txt" required>
+                    </div>
+                    <!-- Champ pour afficher le nom du fichier CV -->
+<div class="mb-3">
+    <label for="cvFileName" class="form-label">Nom du fichier CV</label>
+    <input type="text" class="form-control" id="cvFileName" disabled>
+</div>
+
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Analyser
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Dans la partie du modal d'analyse -->
+<div id="analysisResult" class="mt-4 d-none">
+    <h5>Résultat de l'analyse</h5>
+    <div class="alert" id="resultMessage"></div>
+    <div id="analysisDetails" class="mt-3"></div>
+    
+    <!-- Bouton PDF plus visible -->
+    <div class="text-center mt-4">
+        <a href="#" id="downloadPdf" class="btn btn-primary">
+            <i class="fas fa-file-pdf me-2"></i>Télécharger le rapport complet
+        </a>
+    </div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
     </div>
     {% endblock %}
     {% block js %}
@@ -457,5 +511,77 @@
         const rows = document.querySelectorAll('#candidaturesTable tbody tr');
         rows.forEach(row => row.style.display = '');
     });
+    // Gestion de l'analyse
+document.querySelectorAll('.analyse-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const cvPath = this.getAttribute('data-cv-path');
+        const candidatureId = this.getAttribute('data-candidature-id');
+        
+        document.getElementById('cvPath').value = cvPath;
+        document.getElementById('candidatureId').value = candidatureId;
+
+        // Extraire le nom du fichier à partir du chemin du fichier
+        const fileName = cvPath.split('/').pop();  // Récupère le dernier élément après le dernier '/'
+        
+        // Afficher le nom du fichier CV dans le modal
+        document.getElementById('cvFileName').value = fileName;
+
+        // Réinitialiser le modal
+        document.getElementById('analysisResult').classList.add('d-none');
+        document.getElementById('downloadPdf').classList.add('d-none');
+        
+        // Afficher le modal
+        const modal = new bootstrap.Modal(document.getElementById('analyseModal'));
+        modal.show();
+    });
+});
+
+
+// Soumission du formulaire d'analyse
+document.getElementById('analyseForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData();
+    formData.append('cvPath', document.getElementById('cvPath').value);
+    formData.append('candidatureId', document.getElementById('candidatureId').value);
+    formData.append('jobOfferFile', document.getElementById('jobOfferFile').files[0]);
+    
+    try {
+        const response = await fetch('{{ path("app_analyse_candidature") }}', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        // Dans la partie qui gère la réponse de l'analyse
+if (result.success) {
+    // Afficher les résultats
+    const resultDiv = document.getElementById('analysisResult');
+    resultDiv.classList.remove('d-none');
+    
+    const messageDiv = document.getElementById('resultMessage');
+    messageDiv.textContent = result.message;
+    messageDiv.className = 'alert ' + (result.score < 50 ? 'alert-danger' : 'alert-success');
+    
+    document.getElementById('analysisDetails').innerHTML = result.details;
+    
+    // Gestion du PDF - toujours afficher le bouton si l'analyse réussit
+    const downloadBtn = document.getElementById('downloadPdf');
+    downloadBtn.classList.remove('d-none');
+    downloadBtn.href = result.pdfPath;
+    downloadBtn.onclick = function(e) {
+        e.preventDefault();
+        window.open(this.href, '_blank');
+    };
+
+        } else {
+            alert('Erreur: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Une erreur est survenue lors de l\'analyse');
+    }
+});
     </script>
 {% endblock %}

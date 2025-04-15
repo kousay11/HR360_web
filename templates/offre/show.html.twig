@@ -5,30 +5,35 @@
 
 {% block body %}
 {% set isExpired = date() > date(offre.dateExpiration) %}
-{% set offreIcon %}
-    {% if offre.titre matches '/développeur|programmeur|devops/i' %}laptop-code
-    {% elseif offre.titre matches '/commercial|vente|marketing/i' %}handshake
-    {% elseif offre.titre matches '/design|graphique|UI|UX/i' %}palette
-    {% elseif offre.titre matches '/comptabilité|finance/i' %}calculator
-    {% elseif offre.titre matches '/rh|ressources humaines/i' %}users
-    {% else %}briefcase
-    {% endif %}
-{% endset %}
+{% set offreIcon = 'handshake' %} {# Valeur par défaut #}
+
+{# Déterminer l'icône en fonction du titre #}
+{% if 'développeur' in offre.titre|lower or 'programmeur' in offre.titre|lower or 'devops' in offre.titre|lower %}
+    {% set offreIcon = 'laptop-code' %}
+{% elseif 'commercial' in offre.titre|lower or 'vente' in offre.titre|lower or 'marketing' in offre.titre|lower %}
+    {% set offreIcon = 'handshake' %}
+{% elseif 'design' in offre.titre|lower or 'graphique' in offre.titre|lower or 'ui' in offre.titre|lower or 'ux' in offre.titre|lower %}
+    {% set offreIcon = 'palette' %}
+{% elseif 'comptabilité' in offre.titre|lower or 'finance' in offre.titre|lower %}
+    {% set offreIcon = 'calculator' %}
+{% elseif 'rh' in offre.titre|lower or 'ressources humaines' in offre.titre|lower %}
+    {% set offreIcon = 'users' %}
+{% endif %}
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-    <a href="{{ path('app_offre_index') }}" class="btn btn-outline-dark btn-sm">
-        <i class="fas fa-arrow-left me-1"></i>Retour
-    </a>
-    <a href="{{ path('app_offre_candidatures', {'idoffre': offre.idoffre}) }}" class="btn btn-primary btn-sm">
-        <i class="fas fa-users me-1"></i>Voir les candidatures
-    </a>
-</div>
+        <a href="{{ path('app_offre_index') }}" class="btn btn-outline-dark btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Retour
+        </a>
+        <a href="{{ path('app_offre_candidatures', {'idoffre': offre.idoffre}) }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-users me-1"></i>Voir les candidatures
+        </a>
+    </div>
 
     <div class="list-view-card mb-4">
         <div class="list-view-header">
             <div class="d-flex align-items-center">
-                <div class="list-view-icon bg-danger text-white">
+                <div class="list-view-icon bg-primary text-white">
                     <i class="fas fa-{{ offreIcon }}"></i>
                 </div>
                 <div class="ms-3">
@@ -39,7 +44,7 @@
                     </small>
                 </div>
             </div>
-            <span class="badge {% if isExpired %}bg-secondary{% else %}bg-success{% endif %}">
+            <span class="badge {% if isExpired %}bg-secondary{% else %}bg-success{% endif %}"> {# Gardé bg-success pour Publiée #}
                 {% if isExpired %}
                     <i class="fas fa-clock me-1"></i>Expirée
                 {% else %}
@@ -51,7 +56,8 @@
         <div class="list-view-body">
             <div class="mb-3">
                 <h5 class="text-dark mb-2">
-                    <i class="fas fa-align-left text-muted me-2"></i>Description
+                    <i class="fas fa-align-left text-primary me-2"></i>
+                    Description
                 </h5>
                 <p>{{ offre.description }}</p>
             </div>
@@ -59,7 +65,7 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <div class="detail-item">
-                        <i class="fas fa-calendar-plus text-danger"></i>
+                        <i class="fas fa-calendar-plus text-primary"></i>
                         <div>
                             <span>Publiée le</span>
                             <strong>{{ offre.datePublication|date('d/m/Y à H:i') }}</strong>
@@ -68,7 +74,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="detail-item">
-                        <i class="fas fa-calendar-times text-danger"></i>
+                        <i class="fas fa-calendar-times text-primary"></i>
                         <div>
                             <span>Expire le</span>
                             <strong>{{ offre.dateExpiration|date('d/m/Y à H:i') }}</strong>
@@ -81,13 +87,13 @@
         <div class="list-view-footer">
             {% if isExpired %}
             <div class="alert alert-warning mb-0">
-                <i class="fas fa-exclamation-triangle me-2"></i>
+                <i class="fas fa-exclamation-triangle text-primary me-2"></i>
                 Cette offre a expiré le {{ offre.dateExpiration|date('d/m/Y') }}
             </div>
             {% else %}
             <div class="d-flex justify-content-between align-items-center">
                 <div class="alert alert-info mb-0">
-                    <i class="fas fa-info-circle me-2"></i>
+                    <i class="fas fa-info-circle text-primary me-2"></i>
                     Temps restant : {{ date(offre.dateExpiration).diff(date())|date('%a jours') }}
                 </div>
             </div>
@@ -124,6 +130,7 @@
             align-items: center;
             justify-content: center;
             font-size: 1.25rem;
+            background-color: #0d6efd !important;
         }
         
         .list-view-body {
@@ -145,6 +152,7 @@
         
         .detail-item i {
             font-size: 1.25rem;
+            color: #0d6efd;
         }
         
         .detail-item div {
@@ -165,6 +173,14 @@
             font-size: 0.85rem;
             padding: 0.5em 0.8em;
             font-weight: 500;
+        }
+        
+        .bg-success {
+            background-color: #198754 !important;
+        }
+        
+        .bg-secondary {
+            background-color: #6c757d !important;
         }
     </style>
 {% endblock %}

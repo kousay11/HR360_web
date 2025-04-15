@@ -3,19 +3,24 @@
 namespace App\Controller;
 
 use App\Entity\Candidature;
-use App\Service\EmailService;
 use App\Entity\Offre;
 use App\Form\CandidatureOtherType;
 use App\Repository\CandidatureRepository;
 use App\Repository\OffreRepository;
+use App\Service\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Dompdf\Dompdf;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Routing\Annotation\Route; // ou Symfony\Component\Routing\Attribute\Route si tu utilises Symfony 6+
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpClient\HttpClient;
 use Psr\Log\LoggerInterface;
-use Dompdf\Options;
+
 
 #[Route('/candidatureBack')]
 final class CandidatureBackController extends AbstractController
@@ -150,4 +155,223 @@ public function edit(
         'form' => $form->createView(),
     ]);
 }
+#[Route('/analyse', name: 'app_analyse_candidature', methods: ['POST'])]
+public function analyseCandidature(Request $request, LoggerInterface $logger): JsonResponse
+{
+    try {
+        $cvPath = $request->request->get('cvPath');
+        $jobOfferFile = $request->files->get('jobOfferFile');
+
+        $logger->info("CV Path: " . $cvPath);
+        $logger->info("Job Offer File: " . ($jobOfferFile ? $jobOfferFile->getClientOriginalName() : 'null'));
+
+        if (!$cvPath || !$jobOfferFile) {
+            throw new \Exception('Fichiers manquants: CV ou offre d\'emploi non reçus');
+        }
+
+        $fullCvPath = $this->getParameter('kernel.project_dir') . '/public' . parse_url($cvPath, PHP_URL_PATH);
+        $logger->info("Full CV Path: " . $fullCvPath);
+
+        if (!file_exists($fullCvPath)) {
+            throw new \Exception('Fichier CV introuvable: ' . $fullCvPath);
+        }
+
+        // Correction ici - ajout du 3ème argument ($logger)
+        $apiResponse = $this->callAnalysisApi($fullCvPath, $jobOfferFile->getPathname(), $logger);
+        $logger->info("API Response: " . json_encode($apiResponse));
+
+        $score = $this->extractScoreFromApiResponse($apiResponse);
+        $message = $this->getResultMessage($score);
+        $details = $this->formatAnalysisDetails($apiResponse);
+        $pdfPath = $this->generateAnalysisPdf([
+            'score' => $score,
+            'message' => $message,
+            'details' => $details
+        ], $request);
+
+        return $this->json([
+            'success' => true,
+            'score' => $score,
+            'message' => $message,
+            'details' => $details,
+            'pdfPath' => $pdfPath
+        ]);
+    } catch (\Exception $e) {
+        $logger->error("Analysis error: " . $e->getMessage());
+        return $this->json([
+            'success' => false,
+            'message' => 'Erreur lors de l\'analyse',
+            'error' => $e->getMessage(),
+            'cvPath' => $cvPath ?? 'null',
+            'jobOfferFile' => $jobOfferFile ? $jobOfferFile->getClientOriginalName() : 'null'
+        ]);
+    }
+}
+
+private function getResultMessage(int $score): string
+{
+    if ($score >= 80) {
+        return "Excellente correspondance entre le CV et l'offre.";
+    } elseif ($score >= 60) {
+        return "Bonne correspondance, mais des améliorations sont possibles.";
+    } elseif ($score >= 40) {
+        return "Correspondance moyenne. Il y a des écarts importants.";
+    } else {
+        return "Faible correspondance. Le CV ne semble pas adapté à l'offre.";
+    }
+}
+
+private function formatAnalysisDetails(array $apiResponse): string
+{
+    if (isset($apiResponse['analysis_details']['content'])) {
+        return $apiResponse['analysis_details']['content'];
+    }
+    
+    if (isset($apiResponse['analysis_details'])) {
+        $details = '';
+        foreach ($apiResponse['analysis_details'] as $key => $value) {
+            $details .= '<strong>'.ucfirst($key).':</strong> '.$value.'<br>';
+        }
+        return $details;
+    }
+    
+    if (isset($apiResponse['raw_text'])) {
+        return $this->formatTextToHtml($apiResponse['raw_text']);
+    }
+
+    return 'Les détails complets ne sont pas disponibles.';
+}
+
+
+private function callAnalysisApi(string $cvPath, string $jobOfferPath, LoggerInterface $logger): array
+{
+    $client = HttpClient::create([
+        'timeout' => 30,
+        'verify_peer' => false,
+    ]);
+
+    try {
+        $response = $client->request('POST', 'https://cv-resume-to-job-match-analysis-api.p.rapidapi.com/api:QQ6fvSXH/good_fit_external_API', [
+            'headers' => [
+                'X-RapidAPI-Host' => 'cv-resume-to-job-match-analysis-api.p.rapidapi.com',
+                'X-RapidAPI-Key' => '58781479a8msh50ee0c2c7fb876ap1b2da2jsnaf8f922475b2',
+                'Accept' => 'application/json', // Force le retour JSON
+            ],
+            'body' => [
+                'cv_file' => fopen($cvPath, 'r'),
+                'job_offer_file' => fopen($jobOfferPath, 'r')
+            ]
+        ]);
+
+        $content = $response->getContent(false);
+        
+        // Tentative de décodage JSON
+        $decoded = json_decode($content, true);
+        
+        // Si le décodage échoue mais que le contenu semble être une analyse
+        if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
+            if (str_contains($content, 'Skills Analysis')) {
+                return $this->parseTextAnalysis($content);
+            }
+            throw new \Exception('Réponse API non-JSON non reconnue');
+        }
+
+        return $decoded ?? [];
+
+    } catch (\Exception $e) {
+        $logger->error("API Error: ".$e->getMessage());
+        return [
+            'error' => 'API Error',
+            'message' => $e->getMessage()
+        ];
+    }
+}
+private function parseTextAnalysis(string $textResponse): array
+{
+    // Extraction du score
+    $score = 0;
+    if (preg_match('/APPLICATION (LITTLE|SOME|STRONGLY) CORRESPONDING/', $textResponse, $matches)) {
+        $score = match($matches[1]) {
+            'STRONGLY' => 80,
+            'SOME' => 60,
+            default => 40,
+        };
+    }
+
+    // Formatage des détails
+    $details = [
+        'analysis' => 'Analyse textuelle convertie',
+        'content' => $this->formatTextToHtml($textResponse)
+    ];
+
+    return [
+        'score' => $score,
+        'analysis_details' => $details,
+        'raw_text' => $textResponse
+    ];
+}
+
+private function formatTextToHtml(string $text): string
+{
+    // Conversion basique des sauts de ligne
+    $html = nl2br(htmlspecialchars($text));
+    
+    // Amélioration des sections
+    $html = preg_replace('/\• (.*?)\n/', '<strong>• $1</strong><br>', $html);
+    $html = preg_replace('/→ (.*?)\n/', '<div class="section">$1</div>', $html);
+    
+    return '<div class="text-analysis">'.$html.'</div>';
+}
+
+private function extractScoreFromApiResponse(array $apiResponse): int
+{
+    if (isset($apiResponse['score'])) {
+        return (int) $apiResponse['score'];
+    }
+
+    // Valeur par défaut si le score n'existe pas
+    return 0;
+}
+
+
+private function generateAnalysisPdf(array $analysisData, Request $request): ?string
+{
+    try {
+        $pdfOptions = new Options();
+        $pdfOptions->set('defaultFont', 'Arial');
+        $pdfOptions->set('isRemoteEnabled', true);
+
+        $dompdf = new Dompdf($pdfOptions);
+
+        $html = $this->renderView('candidatureBack/analysis_pdf.html.twig', [
+            'analysis' => $analysisData,
+            'date' => new \DateTime(),
+        ]);
+
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        $output = $dompdf->output();
+
+        // Créer le répertoire s'il n'existe pas
+        $pdfDir = $this->getParameter('kernel.project_dir') . '/public/uploads/pdfs/';
+        if (!file_exists($pdfDir)) {
+            mkdir($pdfDir, 0777, true);
+        }
+
+        $pdfFileName = 'analysis_' . uniqid() . '.pdf';
+        $pdfFilePath = $pdfDir . $pdfFileName;
+
+        file_put_contents($pdfFilePath, $output);
+
+        // Retourner le chemin relatif pour le web
+        return '/uploads/pdfs/' . $pdfFileName;
+
+    } catch (\Exception $e) {
+        // Logger l'erreur si nécessaire
+        return null;
+    }
+}
+
 }

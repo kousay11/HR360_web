@@ -84,6 +84,10 @@
                                         'placeholder': 'Décrivez vos motivations et compétences...'
                                     }
                                 }) }}
+                                <button type="button" id="check-grammar-btn" class="btn btn-outline-secondary mt-2">
+                                    <i class="fas fa-spell-check"></i> Vérifier la grammaire
+                                </button>
+                                <div id="grammar-correction" class="mt-2"></div>
                                 <div class="invalid-feedback">
                                     {{ form_errors(form.description) }}
                                 </div>
@@ -122,8 +126,98 @@
             container.classList.add('d-none');
         }
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const descriptionField = document.querySelector('#candidature_description');
+        const checkGrammarBtn = document.getElementById('check-grammar-btn');
+        const correctionContainer = document.getElementById('grammar-correction');
+
+        checkGrammarBtn.addEventListener('click', function() {
+            const text = descriptionField.value;
+            if (!text.trim()) {
+                correctionContainer.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>Veuillez saisir du texte à vérifier
+                    </div>
+                `;
+                return;
+            }
+
+            // Afficher un indicateur de chargement
+            correctionContainer.innerHTML = `
+                <div class="alert alert-info">
+                    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                    Vérification en cours...
+                </div>
+            `;
+            checkGrammarBtn.disabled = true;
+
+            fetch('{{ path('app_candidature_new', {idOffre: offre.idOffre}) }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new URLSearchParams({
+                    text: text
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.errors) {
+                    correctionContainer.innerHTML = `
+                        <div class="alert alert-warning">
+                            <strong><i class="fas fa-exclamation-triangle me-2"></i>Corrections suggérées :</strong>
+                            <div class="mt-2">${data.errors}</div>
+                            <div class="d-flex gap-2 mt-3">
+                                <button type="button" class="btn btn-sm btn-success" onclick="applyCorrection()">
+                                    <i class="fas fa-check me-1"></i> Appliquer
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="dismissCorrection()">
+                                    <i class="fas fa-times me-1"></i> Ignorer
+                                </button>
+                            </div>
+                            <input type="hidden" id="corrected-text" value="${data.correction}">
+                        </div>
+                    `;
+                } else {
+                    correctionContainer.innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i> Aucune erreur détectée
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                correctionContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>Erreur lors de la vérification
+                    </div>
+                `;
+                console.error(error);
+            })
+            .finally(() => {
+                checkGrammarBtn.disabled = false;
+            });
+        });
+    });
+
+    function applyCorrection() {
+        const correctedText = document.getElementById('corrected-text').value;
+        document.querySelector('#candidature_description').value = correctedText;
+        document.getElementById('grammar-correction').innerHTML = `
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle me-2"></i> Corrections appliquées
+            </div>
+        `;
+    }
+
+    function dismissCorrection() {
+        document.getElementById('grammar-correction').innerHTML = '';
+    }
 </script>
 {% endblock %}
+
 {% block css %}
     {{ parent() }}
 <style>
@@ -169,6 +263,21 @@
     }
     #cv-file-link:hover, #lettre-file-link:hover {
         text-decoration: underline;
+    }
+    #grammar-correction .alert {
+        padding: 12px;
+        border-radius: 6px;
+        margin-top: 10px;
+    }
+    #check-grammar-btn {
+        transition: all 0.3s ease;
+    }
+    #check-grammar-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    #grammar-correction button {
+        transition: all 0.2s ease;
     }
 </style>
 {% endblock %}

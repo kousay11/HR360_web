@@ -10,6 +10,7 @@ use App\Repository\CandidatureRepository;
 use App\Repository\OffreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Service\GrammarCheckerService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -25,10 +26,15 @@ final class CandidatureController extends AbstractController
     }
 
     #[Route('/new/{idOffre}', name: 'app_candidature_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, OffreRepository $offreRepository, int $idOffre): Response
-    {
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        OffreRepository $offreRepository,
+        GrammarCheckerService $grammarCheckerService,
+        int $idOffre
+    ): Response {
         $offre = $offreRepository->find($idOffre);
-        
+    
         if (!$offre) {
             throw $this->createNotFoundException('Offre non trouvée');
         }
@@ -38,48 +44,61 @@ final class CandidatureController extends AbstractController
         $candidature->setDateCandidature(new \DateTime());
         $candidature->setDateModification(new \DateTime());
         $candidature->setStatut('En attente');
-        
-        // Ajoutez l'ID de l'utilisateur connecté
-        
-            $candidature->setIduser(1);
-           
+        $candidature->setIduser(1); // À remplacer par l'utilisateur connecté
+    
         $form = $this->createForm(CandidatureType::class, $candidature);
         $form->handleRequest($request);
     
         if ($form->isSubmitted() && $form->isValid()) {
-            // Gestion du fichier CV
-            $cvFile = $form->get('cv')->getData();
-            if ($cvFile) {
-                $newFilename = uniqid().'.'.$cvFile->guessExtension();
-                $cvFile->move(
-                    $this->getParameter('cvs_directory'),
-                    $newFilename
-                );
-                $candidature->setCv($newFilename);
-            }
+            // Gestion des fichiers
+            $this->handleUploadedFiles($form, $candidature);
     
-            // Gestion de la lettre de motivation
-            $lettreFile = $form->get('lettreMotivation')->getData();
-            if ($lettreFile) {
-                $newFilename = uniqid().'.'.$lettreFile->guessExtension();
-                $lettreFile->move(
-                    $this->getParameter('lettres_directory'),
-                    $newFilename
-                );
-                $candidature->setLettreMotivation($newFilename);
-            }
-    
+            // Enregistrement sans correction automatique
             $entityManager->persist($candidature);
             $entityManager->flush();
     
             return $this->redirectToRoute('app_candidature_index', [], Response::HTTP_SEE_OTHER);
         }
     
+        // Vérification grammaticale en temps réel si AJAX
+        if ($request->isXmlHttpRequest() && $request->request->has('text')) {
+            $text = $request->request->get('text');
+            $correctionResult = $grammarCheckerService->checkGrammar($text);
+            
+            return $this->json([
+                'original' => $text,
+                'correction' => $correctionResult['errors']['correction'] ?? $text,
+                'errors' => $correctionResult['errors']['error'] ?? null,
+                'details' => $correctionResult['errors']['details'] ?? []
+            ]);
+        }
+    
         return $this->render('candidature/new.html.twig', [
             'candidature' => $candidature,
-            'form' => $form,
+            'form' => $form->createView(),
+            'offre' => $offre
         ]);
     }
+    
+    private function handleUploadedFiles($form, $candidature): void
+    {
+        // Gestion du CV
+        $cvFile = $form->get('cv')->getData();
+        if ($cvFile) {
+            $newFilename = uniqid().'.'.$cvFile->guessExtension();
+            $cvFile->move($this->getParameter('cvs_directory'), $newFilename);
+            $candidature->setCv($newFilename);
+        }
+    
+        // Gestion de la lettre de motivation
+        $lettreFile = $form->get('lettreMotivation')->getData();
+        if ($lettreFile) {
+            $newFilename = uniqid().'.'.$lettreFile->guessExtension();
+            $lettreFile->move($this->getParameter('lettres_directory'), $newFilename);
+            $candidature->setLettreMotivation($newFilename);
+        }
+    }
+
     #[Route('/{idCandidature}', name: 'app_candidature_show', methods: ['GET'])]
     public function show(Candidature $candidature): Response
     {

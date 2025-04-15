@@ -7,10 +7,10 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="text-center mb-0 text-dark">
+                <h1 class="text-center mb-0 text-primary">
                     <i class="fas fa-edit me-2"></i>Modifier l'offre
                 </h1>
-                <a href="{{ path('app_offre_index') }}" class="btn btn-outline-dark">
+                <a href="{{ path('app_offre_index') }}" class="btn btn-outline-primary">
                     <i class="fas fa-arrow-left me-2"></i>Retour à la liste
                 </a>
             </div>
@@ -19,7 +19,7 @@
                 <div class="card-body">
                     {{ include('offre/_form.html.twig', {
                         'button_label': 'Mettre à jour',
-                        'form_title': 'Fair modification'
+                        'form_title': 'Faire modification'
                     }) }}
                 </div>
             </div>
@@ -33,19 +33,27 @@
     .card {
         border-radius: 10px;
         border-width: 2px;
-        border-color: #dc3545;
+        border-color: #0d6efd; /* Bleu Bootstrap */
     }
     .form-control:focus {
-        border-color: #dc3545;
-        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
     }
-    .btn-outline-dark {
-        border-color: #000;
-        color: #000;
+    .btn-outline-primary {
+        border-color: #0d6efd;
+        color: #0d6efd;
     }
-    .btn-outline-dark:hover {
-        background-color: #000;
+    .btn-outline-primary:hover {
+        background-color: #0d6efd;
         color: white;
+    }
+    .btn-primary {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
     }
 </style>
 {% endblock %}
@@ -92,4 +100,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
-

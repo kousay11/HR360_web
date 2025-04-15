@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Offre;
-use App\Service\GrammarCheckerService;
 use App\Form\OffreType;
 use App\Repository\OffreRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -57,7 +56,6 @@ final class OffreController extends AbstractController
             'form' => $form,
         ]);
     }
-
     #[Route('/{idoffre}', name: 'app_offre_show', methods: ['GET'])]
     public function show(Offre $offre): Response
     {
@@ -103,33 +101,5 @@ final class OffreController extends AbstractController
         return $this->redirectToRoute('app_offre_index', [], Response::HTTP_SEE_OTHER);
     }
    
-    #[Route('/validate-grammar', name: 'app_offre_validate_grammar', methods: ['POST'])]
-    public function validateGrammar(Request $request, GrammarCheckerService $grammarCheckerService): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-        $text = $data['text'] ?? '';
-        
-        if (empty($text)) {
-            return new JsonResponse([
-                'status' => 'error',
-                'message' => 'Le texte à vérifier est vide'
-            ], Response::HTTP_BAD_REQUEST);
-        }
-        
-        $result = $grammarCheckerService->checkGrammar($text);
-        
-        return new JsonResponse([
-            'status' => 'success',
-            'error' => $result['errors']['error'] ?? null,
-            'correction' => $result['errors']['correction'] ?? null
-        ]);
-    }
-    #[Route('/test-grammar', name: 'test_grammar')]
-public function testGrammar(GrammarCheckerService $grammarChecker): Response
-{
-    $testText = "Je suis une phrase avec une erreur gramatique.";
-    $result = $grammarChecker->checkGrammar($testText);
-    
-    dd($result); // Affiche le résultat brut
-}
+   
 }
