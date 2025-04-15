@@ -29,8 +29,8 @@ class RessourceType extends AbstractType
             ])
             ->add('etat', ChoiceType::class, [
                 'choices' => [
-                    'Neuf' => 'neuf',
-                    'Usé' => 'use',
+                    'Disponible' => 'Disponible',
+                    'Indisponible' => 'Indisponible',
                 ],
                 'required' => false,
             ])

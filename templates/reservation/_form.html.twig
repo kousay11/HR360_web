@@ -1,146 +1,152 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulaire de Réservation</title>
+{% extends 'baseEMP.html.twig' %}
+
+{% block title %}Nouvelle Réservation{% endblock %}
+
+{% block css %}
+    {{ parent() }}
     <style>
-        /* Styles globaux */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            color: #495057;
-            margin: 0;
-            padding: 0;
+        .reservation-form-container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         }
 
-        h1 {
+        .form-title {
             text-align: center;
-            color: #007bff;
-            margin-top: 20px;
-        }
-
-        /* Styles du formulaire */
-        .form-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+            font-weight: 600;
         }
 
         .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: border-color 0.3s ease;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: all 0.3s ease;
         }
 
         .form-control:focus {
             border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.15);
             outline: none;
         }
 
-        .btn {
-            padding: 12px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            width: 100%;
-        }
-
-        .btn:hover {
-            background-color: #0056b3;
-        }
-
-        .btn:active {
-            background-color: #004085;
-        }
-
-        /* Style du lien "Créer une nouvelle réservation" */
-        .create-new-btn {
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.85em;
+            margin-top: 5px;
             display: block;
-            width: 200px;
-            margin: 20px auto;
+        }
+
+        .form-actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .btn-submit {
             background-color: #28a745;
             color: white;
-            padding: 10px;
-            text-align: center;
-            border-radius: 5px;
-            font-size: 16px;
-            text-decoration: none;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
 
-        .create-new-btn:hover {
+        .btn-submit:hover {
             background-color: #218838;
+            transform: translateY(-1px);
         }
 
-        .create-new-btn:focus {
-            outline: none;
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.3s ease;
         }
 
-        /* Erreurs */
-        .invalid-feedback {
-            color: red;
-            font-size: 14px;
+        .btn-cancel:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
         }
     </style>
-</head>
-<body>
+{% endblock %}
 
-<div class="form-container">
-    {{ form_start(form) }}
-    
-    <div class="form-group">
-        {{ form_label(form.datedebut) }}
-        {{ form_widget(form.datedebut, { 'attr': {'class': 'form-control'} }) }}
-        {% if form.datedebut.vars.errors|length > 0 %}
-            <div class="invalid-feedback">
-                {{ form_errors(form.datedebut) }}
-            </div>
-        {% endif %}
+{% block index %}
+    <div class="container section-title" data-aos="fade-up">
+        <h2>{{ button_label|default('Nouvelle Réservation') }}</h2>
+        <p>Réservez une ressource pour votre équipe</p>
     </div>
 
-    <div class="form-group">
-        {{ form_label(form.datefin) }}
-        {{ form_widget(form.datefin, { 'attr': {'class': 'form-control'} }) }}
-        {% if form.datefin.vars.errors|length > 0 %}
-            <div class="invalid-feedback">
-                {{ form_errors(form.datefin) }}
-            </div>
-        {% endif %}
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="reservation-form-container">
+            <h3 class="form-title">{{ button_label|default('Créer une réservation') }}</h3>
+            
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                <div class="form-group">
+                    {{ form_label(form.datedebut, 'Date de début', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.datedebut, {
+                        'attr': {
+                            'class': 'form-control' ~ (form.datedebut.vars.valid ? '' : ' is-invalid'),
+                            'placeholder': 'Sélectionnez une date de début'
+                        }
+                    }) }}
+                    {{ form_errors(form.datedebut) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.datefin, 'Date de fin', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.datefin, {
+                        'attr': {
+                            'class': 'form-control' ~ (form.datefin.vars.valid ? '' : ' is-invalid'),
+                            'placeholder': 'Sélectionnez une date de fin'
+                        }
+                    }) }}
+                    {{ form_errors(form.datefin) }}
+                </div>
+
+                {% if form.ressource is defined %}
+                <div class="form-group">
+                    {{ form_label(form.ressource, 'Ressource', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.ressource, {
+                        'attr': {
+                            'class': 'form-control' ~ (form.ressource.vars.valid ? '' : ' is-invalid')
+                        }
+                    }) }}
+                    {{ form_errors(form.ressource) }}
+                </div>
+                {% endif %}
+
+                <div class="form-actions">
+                    <a href="{{ path('app_reservation_index') }}" class="btn-cancel">
+                        <i class="bi bi-x-circle"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn-submit">
+                        <i class="bi bi-check-circle"></i> {{ button_label|default('Créer') }}
+                    </button>
+                </div>
+            {{ form_end(form) }}
+        </div>
     </div>
-
-    <button type="submit" class="btn">{{ button_label|default('Créer une nouvelle réservation') }}</button>
-    
-    {{ form_end(form) }}
-</div>
-
-</body>
-</html>
+{% endblock %}

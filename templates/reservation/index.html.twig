@@ -1,113 +1,222 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Index des Réservations</title>
-    <style>
-        /* Styles globaux */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            color: #495057;
-            margin: 0;
-            padding: 0;
-        }
+{% extends 'baseEMP.html.twig' %}
 
-        h1 {
-            text-align: center;
+{% block title %}Mes Réservations{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    <style>
+        /* Style personnalisé pour les réservations */
+        .reservation-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            border-left: 4px solid #007bff;
+        }
+        
+        .reservation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+        }
+        
+        .reservation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .reservation-title {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .reservation-dates {
+            color: #7f8c8d;
+            font-size: 0.95em;
+            background: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        .reservation-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .reservation-actions a {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        
+        .action-view {
             color: #007bff;
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+        
+        .action-edit {
+            color: #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+        
+        .reservation-actions a:hover {
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+        
+        .action-view:hover {
+            background-color: rgba(0, 123, 255, 0.2);
+        }
+        
+        .action-edit:hover {
+            background-color: rgba(40, 167, 69, 0.2);
+        }
+        
+        .no-reservations {
+            text-align: center;
+            padding: 50px 20px;
+            color: #7f8c8d;
+            background: #f8f9fa;
+            border-radius: 10px;
             margin-top: 20px;
         }
-
-        /* Styles du tableau */
-        .table {
-            width: 80%;
-            margin: 20px auto;
-            border-collapse: collapse;
-            border: 1px solid #ddd;
-        }
-
-        .table th, .table td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .table th {
-            background-color: #007bff;
-            color: white;
-        }
-
-        /* Styles des liens d'action */
-        .table a {
-            margin-right: 10px;
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .table a:hover {
-            color: #0056b3;
-        }
-
-        .table a:focus {
-            outline: none;
-        }
-
-        /* Style du bouton "Créer une nouvelle réservation" */
-        .create-new-btn {
-            display: block;
-            width: 200px;
-            margin: 20px auto;
+        
+        .btn-new-reservation {
             background-color: #28a745;
             color: white;
-            padding: 10px;
-            text-align: center;
-            border-radius: 5px;
-            font-size: 16px;
+            padding: 12px 25px;
+            border-radius: 6px;
             text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+            border: none;
         }
-
-        .create-new-btn:hover {
+        
+        .btn-new-reservation:hover {
             background-color: #218838;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
         }
-
-        .create-new-btn:focus {
-            outline: none;
+        
+        .reservation-details {
+            line-height: 1.6;
+        }
+        
+        .reservation-details p {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .reservation-details strong {
+            min-width: 100px;
+            display: inline-block;
+            color: #2c3e50;
+        }
+        
+        @media (max-width: 768px) {
+            .reservation-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .reservation-details p {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .reservation-details strong {
+                margin-bottom: 5px;
+            }
         }
     </style>
-</head>
-<body>
-    <h1>Index des Réservations</h1>
+{% endblock %}
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Date de début</th>
-                <th>Date de fin</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for reservation in reservations %}
-            <tr>
-                <td>{{ reservation.id }}</td>
-                <td>{{ reservation.datedebut ? reservation.datedebut|date('Y-m-d') : '' }}</td>
-                <td>{{ reservation.datefin ? reservation.datefin|date('Y-m-d') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_reservation_show', {'id': reservation.id}) }}">Afficher</a>
-                    <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}">Modifier</a>
-                </td>
-            </tr>
+{% block index %}
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+        <h2>Mes Réservations</h2>
+        <p>Gérez vos réservations de ressources</p>
+    </div><!-- End Section Title -->
+
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <a href="{{ path('app_ressource_index_employee') }}" class="btn-new-reservation">
+            <i class="bi bi-plus-circle"></i> Nouvelle réservation
+        </a>
+
+        {% if reservations|length > 0 %}
+            <div class="row">
+                {% for reservation in reservations %}
+                    <div class="col-lg-6">
+                        <div class="reservation-card">
+                            <div class="reservation-header">
+                                <span class="reservation-title">
+                                    {{ reservation.ressource ? reservation.ressource.nom : 'Réservation' }}
+                                </span>
+                                <span class="reservation-dates">
+                                    {{ reservation.datedebut ? reservation.datedebut|date('d/m/Y') : '' }} 
+                                    → 
+                                    {{ reservation.datefin ? reservation.datefin|date('d/m/Y') : '' }}
+                                </span>
+                            </div>
+                            
+                            <div class="reservation-details">
+                                <p>
+                                    <strong>Date de début:</strong> 
+                                    {{ reservation.datedebut ? reservation.datedebut|date('d/m/Y H:i') : '' }}
+                                </p>
+                                <p>
+                                    <strong>Date de fin:</strong> 
+                                    {{ reservation.datefin ? reservation.datefin|date('d/m/Y H:i') : '' }}
+                                </p>
+                                {% if reservation.ressource %}
+                                    <p>
+                                        <strong>Type:</strong> 
+                                        {{ reservation.ressource.type }}
+                                    </p>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="reservation-actions">
+                                <a href="{{ path('app_reservation_show', {'id': reservation.id}) }}" class="action-view">
+                                    <i class="bi bi-eye"></i> Détails
+                                </a>
+                                <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="action-edit">
+                                    <i class="bi bi-pencil"></i> Modifier
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         {% else %}
-            <tr>
-                <td colspan="4">Aucune réservation trouvée.</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    
-</body>
-</html>
+            <div class="no-reservations">
+                <i class="bi bi-calendar-x" style="font-size: 3rem; color: #ddd;"></i>
+                <h3>Aucune réservation trouvée</h3>
+                <p>Vous n'avez pas encore fait de réservation.</p>
+                <a href="{{ path('app_reservation_new') }}" class="btn-new-reservation">
+                    <i class="bi bi-plus-circle"></i> Créer une première réservation
+                </a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

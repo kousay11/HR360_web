@@ -26,7 +26,7 @@ final class RessourceController extends AbstractController
 
     
 
-    #[Route('/ressource/employee', name: 'app_ressource_index_employee', methods: ['GET'])]
+    #[Route('/employee', name: 'app_ressource_index_employee', methods: ['GET'])]
 public function indexForEmployees(RessourceRepository $ressourceRepository): Response
 {
     return $this->render('ressource/index_employee.html.twig', [
