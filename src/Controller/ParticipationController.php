@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Formation;
 use App\Entity\Participation;
 use App\Form\ParticipationType;
+use App\Repository\ParticipationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,22 +15,24 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/participation')]
 final class ParticipationController extends AbstractController
 {
-    #[Route(name: 'app_participation_index', methods: ['GET'])]
-    public function index(EntityManagerInterface $entityManager): Response
-    {
-        $participations = $entityManager
-            ->getRepository(Participation::class)
-            ->findAll();
+    // ----------------- FRONT -----------------
 
-        return $this->render('participation/index.html.twig', [
+    #[Route('/front', name: 'app_participation_front_index', methods: ['GET'])]
+    public function indexFront(EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+
+        $participations = $entityManager->getRepository(Participation::class)->findBy([
+            'idUser' => $user,
+        ]);
+
+        return $this->render('participation/front/index.html.twig', [
             'participations' => $participations,
         ]);
     }
 
-
-
-    #[Route('/new/{id}', name: 'app_participation_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, int $id): Response
+    #[Route('/front/new/{id}', name: 'app_participation_front_new', methods: ['GET', 'POST'])]
+    public function newFront(Request $request, EntityManagerInterface $entityManager, int $id): Response
     {
         $user = $this->getUser();
         if (!$user) {
@@ -41,7 +44,6 @@ final class ParticipationController extends AbstractController
             throw $this->createNotFoundException("Formation introuvable.");
         }
 
-        // Vérifier si l'utilisateur est déjà inscrit à cette formation
         $existing = $entityManager->getRepository(Participation::class)->findOneBy([
             'idUser' => $user,
             'idFormation' => $formation,
@@ -49,7 +51,6 @@ final class ParticipationController extends AbstractController
 
         if ($existing) {
             $this->addFlash('warning', 'Vous participez déjà à cette formation.');
-            //return $this->redirectToRoute('app_participation_index');
             return $this->redirectToRoute('app_formation_front_index');
         }
 
@@ -65,41 +66,81 @@ final class ParticipationController extends AbstractController
         return $this->redirectToRoute('app_formation_front_index');
     }
 
+    // ----------------- BACK -----------------
 
-    #[Route('/{id}', name: 'app_participation_show', methods: ['GET'])]
-    public function show(Participation $participation): Response
+    /*#[Route('/back', name: 'app_participation_back_index', methods: ['GET'])]
+    public function indexBack(ParticipationRepository $participationRepository, EntityManagerInterface $entityManager): Response
     {
-        return $this->render('participation/show.html.twig', [
+
+        $participations = $entityManager->getRepository(Participation::class)
+            ->findAllWithUsersAndFormations(); // À créer dans votre Repository
+        return $this->render('participation/back/index.html.twig', [
+            'participations' => $participations,
+        ]);
+
+        /*$participations = $entityManager->getRepository(Participation::class)->findAll();
+
+        return $this->render('participation/back/index.html.twig', [
+            'participations' => $participations,
+        ]);
+    }*/
+
+
+    #[Route('/back', name: 'app_participation_back_index', methods: ['GET'])]
+    public function indexBack(EntityManagerInterface $entityManager): Response
+    {
+        // On récupère le repository en précisant le type
+        $repository = $entityManager->getRepository(Participation::class);
+
+        // On vérifie que la méthode existe avant de l'appeler
+        if (method_exists($repository, 'findAllWithRelations')) {
+            $participations = $repository->findAllWithRelations();
+            // Ajoutez ce debug temporaire
+            dd($participations); // Affiche et arrête l'exécution
+        } else {
+            // Fallback si la méthode n'existe pas
+            $participations = $repository->findAll();
+        }
+
+        return $this->render('participation/back/index.html.twig', [
+            'participations' => $participations,
+        ]);
+    }
+
+    #[Route('/back/{id}', name: 'app_participation_back_show', methods: ['GET'])]
+    public function showBack(Participation $participation): Response
+    {
+        return $this->render('participation/back/show.html.twig', [
             'participation' => $participation,
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_participation_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Participation $participation, EntityManagerInterface $entityManager): Response
+    #[Route('/back/{id}/edit', name: 'app_participation_back_edit', methods: ['GET', 'POST'])]
+    public function editBack(Request $request, Participation $participation, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(ParticipationType::class, $participation);
+        $form = $this->createForm(\App\Form\ParticipationType::class, $participation);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_participation_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_participation_back_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('participation/edit.html.twig', [
+        return $this->render('participation/back/edit.html.twig', [
             'participation' => $participation,
             'form' => $form,
         ]);
     }
 
-    #[Route('/{id}', name: 'app_participation_delete', methods: ['POST'])]
-    public function delete(Request $request, Participation $participation, EntityManagerInterface $entityManager): Response
+    #[Route('/back/{id}/delete', name: 'app_participation_back_delete', methods: ['POST'])]
+    public function deleteBack(Request $request, Participation $participation, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete' . $participation->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($participation);
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_participation_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_participation_back_index', [], Response::HTTP_SEE_OTHER);
     }
 }

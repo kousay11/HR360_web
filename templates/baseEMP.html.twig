@@ -34,12 +34,12 @@
 			<link href="{{ asset('front/css/main.css') }}" rel="stylesheet">
 		{% endblock %}
 		<!-- =======================================================
-						  * Template Name: Dewi
-						  * Template URL: https://bootstrapmade.com/dewi-free-multi-purpose-html-template/
-						  * Updated: Aug 07 2024 with Bootstrap v5.3.3
-						  * Author: BootstrapMade.com
-						  * License: https://bootstrapmade.com/license/
-						  ======================================================== -->
+										  * Template Name: Dewi
+										  * Template URL: https://bootstrapmade.com/dewi-free-multi-purpose-html-template/
+										  * Updated: Aug 07 2024 with Bootstrap v5.3.3
+										  * Author: BootstrapMade.com
+										  * License: https://bootstrapmade.com/license/
+										  ======================================================== -->
 	</head>
 
 	<body class="index-page">
@@ -72,7 +72,7 @@
 									<i class="bi bi-chevron-down toggle-dropdown"></i>
 								</a>
 								<ul>
-									<li><ahref="{{path('app_formation_index')}}">Voir formations</a></li>
+									<li><ahref="{{path('app_formation_front_index')}}">Voir formations</a></li>
 									<li><a href="#">Favoris</a></li>
 								</ul>
 							</li>
@@ -93,19 +93,38 @@
 								</ul>
 							</li>
 							<li>
-								<a href="{{ path('app_participation_index') }}">Participations</a>
+								<a href="{{ path('app_participation_front_index') }}">Participations</a>
 							</li>
 						</ul>
 					{% endblock %}
 					<i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
 				</nav>
 
-				<form id="logout-form" action="{{ path('app_logout') }}" method="POST" class="d-inline">
-					<input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
-					<button type="button" class="cta-btn" onclick="if(confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) { this.form.submit(); }">
-						Déconnexion
-					</button>
-				</form>
+				<div style="margin-inline-start: auto;">
+					<form id="logout-form" action="{{ path('app_logout') }}" method="POST" class="d-inline">
+						<input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+						<button type="button" class="btn-deconnexion" onclick="if(confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) { this.form.submit(); }">
+							Log Out
+						</button>
+					</form>
+				</div>
+				<style>
+					.btn-deconnexion {
+						background-color: #000000; /* noir */
+						color: rgb(255, 98, 0); /* orange */
+						font-weight: bold;
+						padding: 8px 16px;
+						border: 2px solidrgb(255, 98, 0);
+						border-radius: 6px;
+						transition: all 0.3s ease;
+					}
+
+					.btn-deconnexion:hover {
+						background-color: rgb(255, 98, 0); /* orange plein */
+						color: #ffffff; /* texte blanc */
+						cursor: pointer;
+					}
+				</style>
 
 			</div>
 		</header>
@@ -541,7 +560,8 @@
 			<strong class="px-1 sitename">Dewi</strong>
 			<span>All Rights Reserved</span>
 		</p>
-		<div class="credits"><!-- All the links in the footer should remain intact. -->
+		<div class="credits">
+			<!-- All the links in the footer should remain intact. -->
 			<!-- You can delete the links only if you've purchased the pro version. -->
 			<!-- Licensing information: https://bootstrapmade.com/license/ -->
 			<!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
