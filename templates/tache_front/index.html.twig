@@ -2,32 +2,224 @@
 
 {% block title %}Tasks for {{ projet.nom }}{% endblock %}
 
-
 {% block css %}
     {{ parent() }}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('front/css/styleTache.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/project-card.css') }}">
+    <style>
+        .task-container {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        
+        .task-header {
+            margin-bottom: 2rem;
+        }
+        
+        .task-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .search-box {
+            max-width: 300px;
+        }
+        
+        .task-layout {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .task-list-column {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .task-details-column {
+            flex: 2;
+            min-width: 400px;
+        }
+        
+        .task-list {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .task-details-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: 100%;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            background: white;
+            border: 1px solid rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .task-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .task-item.selected {
+            border-left: 4px solid var(--danger);
+            background-color: #f8f9fa;
+        }
+        
+        .task-name {
+            font-weight: 500;
+            flex: 1;
+        }
+        
+        .task-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin: 0 1rem;
+        }
+        
+        .status-a-faire {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-en-cours {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-terminee {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .task-actions .btn {
+            padding: 0.25rem 0.5rem;
+        }
+        
+        .task-details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding-bottom: 1rem;
+        }
+        
+        .task-description {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .task-meta {
+            margin-top: 1.5rem;
+        }
+        
+        .task-dates {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .task-date {
+            flex: 1;
+        }
+        
+        .task-date-label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 0.25rem;
+        }
+        
+        .task-date-value {
+            font-weight: 500;
+        }
+        
+        .task-status-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .task-status-label {
+            color: var(--gray);
+        }
+        
+        .task-status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .trello-btn {
+            background-color: #0079bf;
+            color: white;
+            border: none;
+        }
+        
+        .trello-btn:hover {
+            background-color: #026aa7;
+            color: white;
+        }
+        
+        .task-empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+        }
+        
+        @media (max-width: 992px) {
+            .task-layout {
+                flex-direction: column;
+            }
+        }
+    </style>
 {% endblock %}
+
 {% block form %}{% endblock %}
+
 {% block index %}
-<div class="task-container">
-    <div class="task-header">
-        <a href="{{ path('app_projet_front_show', {'id': projet.id}) }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Project
+<div class="container task-container">
+    <div class="task-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <a href="{{ path('app_projet_front_show', {'id': projet.id}) }}" class="btn btn-outline-dark">
+            <i class="fas fa-arrow-left me-2"></i> Back to Project
         </a>
+        <h2 class="mb-0">Tasks for {{ projet.nom }}</h2>
     </div>
 
-    <div class="task-controls">
-        <input type="text" class="search-box" placeholder="Search tasks..." id="searchInput">
-        <div class="action-buttons">
-            <a href="{{ path('app_tache_front_prioritize_project',{'id': projet.id}) }}" class="btn btn-primary">
-                <i class="fas fa-sort-amount-up"></i> Prioritize
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 top-controls">
+        <div class="input-group search-container">
+            <input type="text" class="form-control search-box" placeholder="Search tasks..." id="searchInput">
+            <button class="btn btn-outline-danger" type="button">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ path('app_tache_front_prioritize_project',{'id': projet.id}) }}" class="btn btn-outline-danger">
+                <i class="fas fa-sort-amount-up me-2"></i> Prioritize
             </a>
-            <a href="{{ path('app_tache_front_export_project', {'id': projet.id}) }}" class="btn btn-primary">
-                <i class="fas fa-file-export"></i> Export
+            <a href="{{ path('app_tache_front_export_project', {'id': projet.id}) }}" class="btn btn-outline-danger">
+                <i class="fas fa-file-export me-2"></i> Export
             </a>
-            <a href="{{ path('app_tache_front_by_project',{'id': projet.id}) }}" class="btn btn-primary">
-                <i class="fas fa-sync-alt"></i> Refresh
+            <a href="{{ path('app_tache_front_by_project',{'id': projet.id}) }}" class="btn btn-outline-dark">
+                <i class="fas fa-sync-alt me-2"></i> Refresh
             </a>
         </div>
     </div>
@@ -35,59 +227,78 @@
     <div class="task-layout">
         <!-- Left Column - Task List -->
         <div class="task-list-column">
-            <div class="task-list" id="tasksContainer">
-                {{ include('tache_front/_task_list.html.twig') }}
+            <div class="card entity-card">
+                <div class="card-header entity-header">
+                    <i class="fas fa-tasks entity-icon"></i>
+                    <h5 class="entity-title">Task List</h5>
+                </div>
+                <div class="card-body entity-body" style="padding: 0;">
+                    <div class="task-list" id="tasksContainer">
+                        {{ include('tache_front/_task_list.html.twig') }}
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Right Column - Task Details -->
         <div class="task-details-column">
-            <div class="task-details-card" id="taskDetails">
+            <div class="card entity-card" id="taskDetails">
                 {% if taches|length > 0 %}
-                    <div class="task-details-header">
-                        <h2>{{ taches|first.nom }}</h2>
-                        {% if taches|first.trelloboardid %}
-                            <a href="https://trello.com/b/{{ taches|first.trelloboardid }}" 
-                            class="btn trello-btn" 
-                            target="_blank" 
-                            rel="noopener noreferrer">
-                            <i class="fab fa-trello"></i> View Trello
-                            </a>
-                        {% endif %}
+                    <div class="card-header entity-header">
+                        <i class="fas fa-info-circle entity-icon"></i>
+                        <h5 class="entity-title">Task Details</h5>
                     </div>
-                    
-                    <div class="task-content">
-                        <p class="task-description">{{ taches|first.description }}</p>
+                    <div class="card-body entity-body">
+                        <div class="task-details-header">
+                            <h2>{{ taches|first.nom }}</h2>
+                            {% if taches|first.trelloboardid %}
+                                <a href="https://trello.com/b/{{ taches|first.trelloboardid }}" 
+                                class="btn trello-btn btn-sm" 
+                                target="_blank" 
+                                rel="noopener noreferrer">
+                                <i class="fab fa-trello me-2"></i> View on Trello
+                                </a>
+                            {% endif %}
+                        </div>
                         
-                        <div class="task-meta">
-                            <div class="task-dates">
-                                <div class="task-date">
-                                    <span class="task-date-label">Start Date</span>
-                                    <span class="task-date-value">
-                                        {{ taches|first.dateDebut ? taches|first.dateDebut|date('M d, Y') : 'Not set' }}
-                                    </span>
-                                </div>
-                                <div class="task-date">
-                                    <span class="task-date-label">End Date</span>
-                                    <span class="task-date-value">
-                                        {{ taches|first.dateFin ? taches|first.dateFin|date('M d, Y') : 'Not set' }}
-                                    </span>
-                                </div>
-                            </div>
+                        <div class="task-content">
+                            <p class="task-description">{{ taches|first.description }}</p>
                             
-                            <div class="task-status-display">
-                                <span class="task-status-label">Status:</span>
-                                <span class="task-status-badge status-{{ taches|first.statut.value|lower|replace({' ': '-'}) }}">
-                                    <i class="fas fa-{{ taches|first.statut.value == 'A faire' ? 'clock' : (taches|first.statut.value == 'En cours' ? 'spinner' : 'check-circle') }}"></i>
-                                    {{ taches|first.statut.value }}
-                                </span>
+                            <div class="task-meta">
+                                <div class="task-dates">
+                                    <div class="task-date">
+                                        <span class="task-date-label">Start Date</span>
+                                        <span class="task-date-value">
+                                            <i class="fas fa-calendar-day me-2"></i>
+                                            {{ taches|first.dateDebut ? taches|first.dateDebut|date('M d, Y') : 'Not set' }}
+                                        </span>
+                                    </div>
+                                    <div class="task-date">
+                                        <span class="task-date-label">End Date</span>
+                                        <span class="task-date-value">
+                                            <i class="fas fa-calendar-check me-2"></i>
+                                            {{ taches|first.dateFin ? taches|first.dateFin|date('M d, Y') : 'Not set' }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="task-status-display">
+                                    <span class="task-status-label">Status:</span>
+                                    <span class="task-status-badge status-{{ taches|first.statut.value|lower|replace({' ': '-'}) }}">
+                                        <i class="fas fa-{{ taches|first.statut.value == 'A faire' ? 'clock' : (taches|first.statut.value == 'En cours' ? 'spinner' : 'check-circle') }} me-2"></i>
+                                        {{ taches|first.statut.value }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 {% else %}
-                    <div class="task-empty-state">
-                        <i class="fas fa-tasks"></i>
-                        <p>No tasks found</p>
+                    <div class="card-body entity-body">
+                        <div class="task-empty-state">
+                            <i class="fas fa-tasks fa-3x mb-3 text-muted"></i>
+                            <h4 class="text-muted">No tasks found</h4>
+                            <p class="text-muted">Create your first task to get started</p>
+                        </div>
                     </div>
                 {% endif %}
             </div>
@@ -95,9 +306,11 @@
     </div>
 </div>
 {% endblock %}
+
 {% block js %}
 {{ parent() }}
 <script>
+// Your existing JavaScript remains the same
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const tasksContainer = document.getElementById('tasksContainer');
@@ -195,25 +408,24 @@ document.addEventListener('DOMContentLoaded', function() {
             if (statusBadge) {
                 statusBadge.className = `task-status-badge status-${taskStatut.toLowerCase().replace(' ', '-')}`;
                 statusBadge.innerHTML = `
-                    <i class="fas fa-${taskStatut == 'A faire' ? 'clock' : (taskStatut == 'En cours' ? 'spinner' : 'check-circle')}"></i>
+                    <i class="fas fa-${taskStatut == 'A faire' ? 'clock' : (taskStatut == 'En cours' ? 'spinner' : 'check-circle')} me-2"></i>
                     ${taskStatut}
                 `;
             }
 
-    const trelloBtn = detailsContainer.querySelector('.trello-btn');
-    if (trelloBtn) {
-        if (taskTrelloId && taskTrelloId !== 'null') {
-            trelloBtn.style.display = 'inline-block';
-            trelloBtn.href = `https://trello.com/b/${taskTrelloId}`;
-            trelloBtn.target = '_blank';
-            trelloBtn.rel = 'noopener noreferrer';
-        } else {
-            trelloBtn.style.display = 'none';
+            const trelloBtn = detailsContainer.querySelector('.trello-btn');
+            if (trelloBtn) {
+                if (taskTrelloId && taskTrelloId !== 'null') {
+                    trelloBtn.style.display = 'inline-block';
+                    trelloBtn.href = `https://trello.com/b/${taskTrelloId}`;
+                    trelloBtn.target = '_blank';
+                    trelloBtn.rel = 'noopener noreferrer';
+                } else {
+                    trelloBtn.style.display = 'none';
+                }
+            }
         }
     }
-        }
-    }
-    }
-);
+});
 </script>
 {% endblock %}

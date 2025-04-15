@@ -8,16 +8,20 @@
          data-trello-id="{{ tache.trelloboardid ? tache.trelloboardid : '' }}">
         <div class="task-name">{{ tache.nom }}</div>
         <div class="task-status status-{{ tache.statut.value|lower|replace({' ': '-'}) }}">
-            <i class="fas fa-{{ tache.statut.value == 'A faire' ? 'clock' : (tache.statut.value == 'En cours' ? 'spinner' : 'check-circle') }}"></i>
+            <i class="fas fa-{{ tache.statut.value == 'A faire' ? 'clock' : (tache.statut.value == 'En cours' ? 'spinner' : 'check-circle') }} me-1"></i>
             {{ tache.statut.value }}
         </div>
         <div class="task-actions">
             <a href="{{ path('app_tache_front_edit', {'id': tache.id, 'projetId': projet.id}) }}" 
-               class="btn btn-primary btn-sm">
+               class="btn btn-outline-danger btn-sm">
                 <i class="fas fa-edit"></i>
             </a>
         </div>
     </div>
 {% else %}
-    <div class="alert alert-info">No tasks found</div>
+    <div class="empty-state p-4 text-center">
+        <i class="fas fa-tasks fa-2x mb-3 text-muted"></i>
+        <h5 class="text-muted">No tasks found</h5>
+        <p class="text-muted">Create your first task to get started</p>
+    </div>
 {% endfor %}
