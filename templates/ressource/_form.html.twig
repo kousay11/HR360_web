@@ -1,4 +1,5 @@
-{{ form_start(form) }}
+{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
     <!-- Champ 'nom' -->
     <div class="form-group">
         {{ form_label(form.nom) }}
@@ -42,6 +43,13 @@
             </div>
         {% endif %}
     </div>
+
+    <div class="form-group">
+    {{ form_label(form.image) }}
+    {{ form_widget(form.image, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.image) }}
+    </div>
+
 
     <!-- Bouton de soumission -->
     <button class="btn btn-primary" type="submit">Ajouter la ressource</button>

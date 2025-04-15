@@ -10,6 +10,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DecimalType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File;
 
 class RessourceType extends AbstractType
 {
@@ -36,6 +38,18 @@ class RessourceType extends AbstractType
             ])
             ->add('prix', NumberType::class, [
                 'required' => false,
+            ])
+            ->add('image', FileType::class, [
+                'label' => 'Image de la ressource',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '12M',
+                        'mimeTypes' => ['image/jpeg', 'image/png', 'image/jpg'],
+                        'mimeTypesMessage' => 'Merci d\'uploader une image valide (JPG ou PNG)',
+                    ])
+                ],
             ]);
     }
 

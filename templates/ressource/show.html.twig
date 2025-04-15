@@ -15,6 +15,14 @@
                 <tr><th>Type</th><td>{{ ressource.type }}</td></tr>
                 <tr><th>État</th><td>{{ ressource.etat }}</td></tr>
                 <tr><th>Prix</th><td>{{ ressource.prix }}</td></tr>
+                {% if ressource.image %}
+                    <tr>
+                        <th>Image</th>
+                        <td>
+                            <img src="{{ asset('uploads/images/' ~ ressource.image) }}" alt="Image de la ressource" style="max-width: 300px; height: auto;">
+                        </td>
+                    </tr>
+                {% endif %}
             </table>
 
             <a href="{{ path('app_ressource_edit', {'id': ressource.id}) }}" class="btn btn-warning">Modifier</a>

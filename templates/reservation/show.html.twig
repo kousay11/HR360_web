@@ -4,176 +4,131 @@
 
 {% block css %}
     {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('front/css/project-card.css') }}">
     <style>
-        .reservation-detail-card {
-            max-width: 800px;
-            margin: 2rem auto;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            background: #fff;
-            overflow: hidden;
-        }
-
-        .card-header {
-            background: #007bff;
-            color: white;
+        .entity-body {
             padding: 1.5rem;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .card-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .detail-list {
-            padding: 1.5rem;
-            display: grid;
-            gap: 1rem;
-        }
-
-        .detail-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
             background: #f8f9fa;
-            border-radius: 8px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .detail-label {
             font-weight: 600;
-            min-width: 120px;
-            color: #495057;
+            color: #343a40;
         }
 
         .detail-value {
             color: #6c757d;
-            margin-left: 1rem;
         }
 
         .action-buttons {
+            padding: 1rem 1.5rem;
             display: flex;
-            gap: 1rem;
-            padding: 1.5rem;
-            border-top: 1px solid #eee;
             justify-content: flex-end;
+            gap: 0.75rem;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            border-radius: 0 0 12px 12px;
         }
 
         .btn-icon {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.75rem 1.25rem;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-        }
-
-        .btn-icon i {
-            font-size: 1.1em;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: background 0.2s ease;
         }
 
         .btn-back {
-            background: #6c757d;
-            color: white;
+            background-color: #6c757d;
+            color: #fff;
         }
 
         .btn-back:hover {
-            background: #5a6268;
+            background-color: #5a6268;
         }
 
         .btn-edit {
-            background: #17a2b8;
-            color: white;
+            background-color: #17a2b8;
+            color: #fff;
         }
 
         .btn-edit:hover {
-            background: #138496;
+            background-color: #138496;
         }
 
         .btn-delete {
-            background: #dc3545;
-            color: white;
+            background-color: #dc3545;
+            color: #fff;
         }
 
         .btn-delete:hover {
-            background: #c82333;
+            background-color: #c82333;
         }
 
         @media (max-width: 768px) {
-            .reservation-detail-card {
-                margin: 1rem;
-            }
-            
-            .detail-item {
+            .detail-row {
                 flex-direction: column;
                 align-items: flex-start;
             }
-            
+
             .action-buttons {
                 flex-direction: column;
+                align-items: stretch;
             }
         }
     </style>
 {% endblock %}
 
 {% block index %}
-    <div class="reservation-detail-card">
-        <div class="card-header">
-            <h2>
-                <i class="bi bi-calendar-event"></i>
-                Détails de la réservation
-            </h2>
+<br>
+<div class="container">
+    <div class="card entity-card">
+        <div class="card-header entity-header">
+            <i class="fas fa-calendar-alt entity-icon"></i>
+            <h5 class="entity-title text-white">Détails de la réservation</h5>
         </div>
-
-        <div class="detail-list">
-            <div class="detail-item">
+        <div class="entity-body">
+            <div class="detail-row">
                 <span class="detail-label">Date de début :</span>
-                <span class="detail-value">
-                    {{ reservation.datedebut|date('d/m/Y H:i') }}
-                </span>
+                <span class="detail-value">{{ reservation.datedebut|date('d/m/Y H:i') }}</span>
             </div>
-
-            <div class="detail-item">
+            <div class="detail-row">
                 <span class="detail-label">Date de fin :</span>
-                <span class="detail-value">
-                    {{ reservation.datefin|date('d/m/Y H:i') }}
-                </span>
+                <span class="detail-value">{{ reservation.datefin|date('d/m/Y H:i') }}</span>
             </div>
-
             {% if reservation.ressource %}
-            <div class="detail-item">
+            <div class="detail-row">
                 <span class="detail-label">Ressource :</span>
-                <span class="detail-value">
-                    {{ reservation.ressource.nom }}
-                </span>
+                <span class="detail-value">{{ reservation.ressource.nom }}</span>
             </div>
             {% endif %}
-
-            <div class="detail-item">
+            <div class="detail-row">
                 <span class="detail-label">Durée :</span>
-                <span class="detail-value">
-                    {{ reservation.datedebut.diff(reservation.datefin).format('%d jours %h heures') }}
-                </span>
+                <span class="detail-value">{{ reservation.datedebut.diff(reservation.datefin).format('%d jours %h heures') }}</span>
             </div>
         </div>
-
         <div class="action-buttons">
             <a href="{{ path('app_reservation_index') }}" class="btn-icon btn-back">
-                <i class="bi bi-arrow-left"></i>
-                Retour
+                <i class="fas fa-arrow-left"></i> Retour
             </a>
             <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="btn-icon btn-edit">
-                <i class="bi bi-pencil"></i>
-                Modifier
+                <i class="fas fa-edit"></i> Modifier
             </a>
             {{ include('reservation/_delete_form.html.twig', {
-                button_label: '
-                    <i class="bi bi-trash"></i>
-                    Supprimer
-                ',
+                button_label: '<i class="fas fa-trash"></i> Supprimer',
                 button_attr: {
                     class: 'btn-icon btn-delete',
                     onclick: 'return confirm("Êtes-vous sûr de vouloir supprimer cette réservation ?")'
@@ -181,4 +136,5 @@
             }) }}
         </div>
     </div>
+</div>
 {% endblock %}

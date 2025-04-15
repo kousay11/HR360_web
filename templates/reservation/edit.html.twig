@@ -4,136 +4,76 @@
 
 {% block css %}
     {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="{{ asset('front/css/project-card.css') }}" rel="stylesheet" >
     <style>
-        .edit-reservation-container {
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 30px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        .status-form-container {
+            max-width: 600px;
+            margin: 0 auto;
         }
-        
-        .form-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875em;
+            margin-top: 0.25rem;
         }
-        
-        .form-title {
-            font-size: 1.8rem;
-            color: #2c3e50;
-            margin: 0;
-            font-weight: 600;
+
+        .is-invalid {
+            border-color: #dc3545 !important;
         }
-        
-        .form-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            justify-content: flex-end;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
+
+        .entity-title {
+            color: #fff;
+            margin-left: 10px;
         }
-        
-        .btn-save {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 25px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-save:hover {
-            background-color: #218838;
-            transform: translateY(-2px);
-        }
-        
+
         .btn-cancel {
             background-color: #6c757d;
             color: white;
-            padding: 10px 25px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
         }
-        
+
         .btn-cancel:hover {
             background-color: #5a6268;
             color: white;
-            transform: translateY(-2px);
         }
-        
+
+        .btn-save {
+            background-color: #198754;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background-color: #157347;
+        }
+
         .btn-delete {
             background-color: #dc3545;
             color: white;
-            padding: 10px 25px;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: all 0.3s ease;
         }
-        
+
         .btn-delete:hover {
             background-color: #c82333;
-            transform: translateY(-2px);
-        }
-        
-        .form-group {
-            margin-bottom: 25px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #495057;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 15px;
-            transition: border-color 0.3s ease;
-        }
-        
-        .form-control:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-            outline: none;
-        }
-        
-        /* Style pour les messages d'erreur */
-        .invalid-feedback {
-            color: #dc3545;
-            font-size: 0.85em;
-            margin-top: 5px;
         }
     </style>
 {% endblock %}
 
 {% block index %}
-    <div class="container section-title" data-aos="fade-up">
-        <h2>Modifier la réservation</h2>
-        <p>Mettez à jour les détails de votre réservation</p>
-    </div>
-
-    <div class="container" data-aos="fade-up" data-aos-delay="100">
-        <div class="edit-reservation-container">
-            <div class="form-header">
-                <h3 class="form-title">Modifier la réservation</h3>
-                <a href="{{ path('app_reservation_index') }}" class="btn btn-cancel">
-                    <i class="bi bi-arrow-left"></i> Retour à la liste
-                </a>
+<br>
+<div class="container">
+    <div class="card entity-card status-form-container">
+        <div class="card-header entity-header d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-edit entity-icon"></i>
+                <h5 class="entity-title">Modifier la réservation</h5>
             </div>
-            
+            <a href="{{ path('app_reservation_index') }}" class="btn btn-cancel">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+
+        <div class="card-body entity-body">
             {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-                <div class="form-group">
+                <div class="form-group mb-3">
                     {{ form_label(form.datedebut, 'Date de début') }}
                     {{ form_widget(form.datedebut, {
                         'attr': {
@@ -142,8 +82,8 @@
                     }) }}
                     {{ form_errors(form.datedebut) }}
                 </div>
-                
-                <div class="form-group">
+
+                <div class="form-group mb-3">
                     {{ form_label(form.datefin, 'Date de fin') }}
                     {{ form_widget(form.datefin, {
                         'attr': {
@@ -152,9 +92,9 @@
                     }) }}
                     {{ form_errors(form.datefin) }}
                 </div>
-                
+
                 {% if form.ressource is defined %}
-                <div class="form-group">
+                <div class="form-group mb-3">
                     {{ form_label(form.ressource, 'Ressource') }}
                     {{ form_widget(form.ressource, {
                         'attr': {
@@ -164,18 +104,19 @@
                     {{ form_errors(form.ressource) }}
                 </div>
                 {% endif %}
-                
-                <div class="form-actions">
+
+                <div class="d-flex justify-content-between mt-4">
                     <button type="submit" class="btn btn-save">
-                        <i class="bi bi-check-circle"></i> Enregistrer les modifications
+                        <i class="fas fa-save"></i> Enregistrer
                     </button>
-                    
+
                     {{ include('reservation/_delete_form.html.twig', {
-                        'button_label': '<i class="bi bi-trash"></i> Supprimer',
+                        'button_label': '<i class="fas fa-trash"></i> Supprimer',
                         'button_attr': {'class': 'btn btn-delete'}
                     }) }}
                 </div>
             {{ form_end(form) }}
         </div>
     </div>
+</div>
 {% endblock %}
