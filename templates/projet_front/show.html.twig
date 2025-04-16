@@ -1,0 +1,296 @@
+{% extends 'baseEMP.html.twig' %}
+
+{% block title %}{{ projet.nom }} - Project Details{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('front/css/project-card.css') }}">
+    <style>
+        .project-detail-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .project-header {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding-bottom: 1rem;
+        }
+        
+        .project-header h1 {
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        .project-description {
+            margin-bottom: 2rem;
+        }
+        
+        .project-dates {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .date-card {
+            flex: 1;
+            min-width: 200px;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .date-card h4 {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .date-value {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .project-meta-section {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .members-list {
+            flex: 2;
+            min-width: 300px;
+        }
+        
+        .member-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .member-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .member-name {
+            font-weight: 600;
+            color: var(--dark);
+            display: block;
+        }
+        
+        .member-role {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .member-email {
+            font-size: 0.9rem;
+            color: var(--danger);
+            display: block;
+            margin-top: 0.5rem;
+        }
+        
+        .member-skills {
+            font-size: 0.8rem;
+            color: var(--gray);
+            display: block;
+            margin-top: 0.3rem;
+        }
+        
+        .progress-container {
+            flex: 1;
+            min-width: 250px;
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .progress-circle {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 1rem auto;
+        }
+        
+        .progress-circle svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .progress-circle-bg {
+            fill: none;
+            stroke: #e9ecef;
+            stroke-width: 8;
+        }
+        
+        .progress-circle-fill {
+            fill: none;
+            stroke: var(--danger);
+            stroke-width: 8;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: calc(251.2 - (251.2 * var(--progress)) / 100);
+        }
+        
+        .progress-percent {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .progress-text {
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+        
+        .btn-tasks {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            width: 100%;
+        }
+        
+        .btn-tasks:hover {
+            background-color: #c82333;
+            color: white;
+        }
+        
+        .action-buttons {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .btn-back {
+            background-color: var(--dark);
+            color: white;
+        }
+        
+        .btn-back:hover {
+            background-color: #1a1e21;
+            color: white;
+        }
+    </style>
+{% endblock %}
+
+{% block form %}{% endblock %}
+
+{% block index %}
+{% set n=0 %}{% set na=0 %}{% set ne=0 %}{% set nt=0 %}
+{% for tache in taches %}
+    {% set n = n + 1 %}
+    {% if tache.statut.value == 'A faire' %}
+        {% set na = na + 1 %}
+    {% elseif tache.statut.value == 'En cours' %}
+        {% set ne = ne + 1 %}
+    {% elseif tache.statut.value == 'Terminée' %}
+        {% set nt = nt + 1 %}
+    {% endif %}
+{% endfor %}
+{% if (n!=0) %}
+    {% set per = ((na*0 + ne*0.5 + nt*1)/n)*100 %}
+{% else %}
+    {% set per = 0 %}
+{% endif %}
+
+<div class="container">
+    <div class="project-detail-container">
+        <div class="project-header">
+            <h1>{{ projet.nom }}</h1>
+            <span class="badge bg-success">
+                <i class="fas fa-check-circle me-1"></i> Active
+            </span>
+        </div>
+
+        <div class="project-description">
+            <h3><i class="fas fa-align-left me-2"></i>Project Description</h3>
+            <p>{{ projet.description }}</p>
+        </div>
+
+        <div class="project-dates">
+            <div class="date-card">
+                <h4><i class="fas fa-calendar-day me-2"></i>Start Date</h4>
+                <div class="date-value">
+                    {{ projet.dateDebut ? projet.dateDebut|date('M d, Y') : 'Not set' }}
+                </div>
+            </div>
+            <div class="date-card">
+                <h4><i class="fas fa-calendar-check me-2"></i>End Date</h4>
+                <div class="date-value">
+                    {{ projet.dateFin ? projet.dateFin|date('M d, Y') : 'Not set' }}
+                </div>
+            </div>
+        </div>
+
+        <div class="project-meta-section">
+            <div class="members-list">
+                <h4><i class="fas fa-users me-2"></i>Team Members</h4>
+                {% if equipe.equipeemployes|length > 0 %}
+                    {% for equipeEmploye in equipe.equipeemployes %}
+                        {% set member = equipeEmploye.utilisateur %}
+                        <div class="member-card">
+                            <div class="member-info">
+                                <div class="member-name-role">
+                                    <span class="member-name">{{ member.nom }} {{ member.prenom }}</span>
+                                    <span class="member-role">{{ member.poste }}</span>
+                                </div>
+                                <div class="member-contact">
+                                    <span class="member-email"><i class="fas fa-envelope me-2"></i>{{ member.email }}</span>
+                                    {% if member.competence %}
+                                        <span class="member-skills"><i class="fas fa-code me-2"></i>{{ member.competence }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle me-2"></i> This team doesn't have any members yet.
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="progress-container">
+                <h4><i class="fas fa-chart-line me-2"></i>Project Progress</h4>
+                <div class="progress-circle">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="progress-circle-bg" cx="50" cy="50" r="40"></circle>
+                        <circle class="progress-circle-fill" cx="50" cy="50" r="40" style="--progress: {{ per }}"></circle>
+                    </svg>
+                    <div class="progress-percent">{{ per|round }}%</div>
+                </div>
+                <div class="progress-text">Project completion</div>
+                <button class="btn btn-tasks btn-sm" onclick="window.location='{{ path('app_tache_front_by_project', {'id': projet.id}) }}'">
+                    <i class="fas fa-tasks me-2"></i> View Tasks
+                </button>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="{{ path('app_projet_front_index') }}" class="btn btn-back btn-sm">
+                <i class="fas fa-arrow-left me-2"></i> Back to list
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

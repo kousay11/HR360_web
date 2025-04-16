@@ -13,23 +13,24 @@ use App\Repository\EquipeemployeRepository;
 class Equipeemploye
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $idequipe = null;
+    #[ORM\ManyToOne(targetEntity: Equipe::class, inversedBy: 'equipeemployes')]
+    #[ORM\JoinColumn(name: 'id_equipe', referencedColumnName: 'id')]
+    private ?Equipe $equipe = null;
 
-    public function getIdequipe(): ?int
+    public function getEquipe(): ?Equipe
     {
-        return $this->idequipe;
+        return $this->equipe;
     }
 
-    public function setIdequipe(int $idequipe): self
+    public function setEquipe(?Equipe $equipe): self
     {
-        $this->idequipe = $idequipe;
+        $this->equipe = $equipe;
         return $this;
     }
 
+    #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'equipeemployes')]
-    #[ORM\JoinColumn(name: 'idemploye', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'id_employe', referencedColumnName: 'id')]
     private ?Utilisateur $utilisateur = null;
 
     public function getUtilisateur(): ?Utilisateur
