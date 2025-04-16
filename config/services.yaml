@@ -6,7 +6,12 @@
 parameters:
     cvs_directory: '%kernel.project_dir%/public/uploads/cvs'
     lettres_directory: '%kernel.project_dir%/public/uploads/lettres'
+    images_directory: '%kernel.project_dir%/public/uploads/images'
+
+
 services:
+    App\Twig\AppExtension:
+        tags: ['twig.extension']
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.

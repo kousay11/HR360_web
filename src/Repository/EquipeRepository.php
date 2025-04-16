@@ -13,5 +13,12 @@ class EquipeRepository extends ServiceEntityRepository
         parent::__construct($registry, Equipe::class);
     }
 
-    // Add custom methods as needed
+    public function search(string $query): array
+{
+    return $this->createQueryBuilder('p')
+        ->where('p.nom LIKE :query')
+        ->setParameter('query', '%'.$query.'%')
+        ->getQuery()
+        ->getResult();
+}
 }

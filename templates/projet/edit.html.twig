@@ -1,13 +1,41 @@
-<!DOCTYPE html>
+{% extends 'baseRH.html.twig' %}
 
-<title>Edit Projet</title>
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('front/css/styleProjet.css') }}">
+<style>
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875em;
+            margin-top: 0.25rem;
+        }
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+    </style>
+<title>Edit Project</title>
+{% endblock %}
+
+{% block heading %}
+Edit Project
+{% endblock %}
+
+{% block title %}
+Edit Project
+{% endblock %}
 
 {% block body %}
-    <h1>Edit Projet</h1>
+<div class="container project-form-container">
+    <div class="project-form-header">
+        <p class="text-muted">Update the project details below</p>
+    </div>
 
-    {{ include('projet/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ include('projet/_form.html.twig', {'button_label': 'Update', 'form_title': 'Edit Project'}) }}
 
-    <a href="{{ path('app_projet_index') }}">back to list</a>
-
-    {{ include('projet/_delete_form.html.twig') }}
+    <div class="form-actions mt-4">
+        <a href="{{ path('app_projet_index') }}" class="btn btn-back">
+            <i class="fas fa-arrow-left me-2"></i> Back to list
+        </a>
+    </div>
+</div>
 {% endblock %}

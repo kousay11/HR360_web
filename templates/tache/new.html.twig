@@ -1,11 +1,37 @@
-<!DOCTYPE html>
+{% extends 'baseRH.html.twig' %}
 
-<title>New Tache</title>
+{% block title %}New Task{% endblock %}
+{% block heading %}New Task{% endblock %}
+
+
+{% block css %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('front/css/styleTache.css') }}">
+    <style>
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875em;
+            margin-top: 0.25rem;
+        }
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-    <h1>Create new Tache</h1>
+<div class="task-container">
+    <div class="task-header">
+        <p class="text-muted">Fill in the task details below</p>
+    </div>
 
-    {{ include('tache/_form.html.twig') }}
+    {{ include('tache/_form.html.twig', {'button_label': 'Create'}) }}
 
-    <a href="{{ path('app_tache_index') }}">back to list</a>
+    <div class="form-actions mt-4">
+        <a href="{{ path(projetId ? 'app_tache_by_project' : 'app_tache_index', {'id': projetId}) }}" 
+           class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Back to list
+        </a>
+    </div>
+</div>
 {% endblock %}

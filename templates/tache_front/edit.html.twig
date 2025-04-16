@@ -1,0 +1,60 @@
+{% extends 'baseEMP.html.twig' %}
+
+{% block title %}Update Task Status{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('front/css/project-card.css') }}">
+    <style>
+        .status-form-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875em;
+            margin-top: 0.25rem;
+        }
+        
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+    </style>
+{% endblock %}
+
+{% block index %}
+</br>
+<div class="container">
+    <div class="card entity-card status-form-container">
+        <div class="card-header entity-header">
+            <i class="fas fa-edit entity-icon"></i>
+            <h5 class="entity-title text-white">Update Task Status</h5>
+        </div>
+        <div class="card-body entity-body">
+            <h6 class="mb-4">Current task: {{ tache.nom }}</h6>
+            {{ include('tache_front/_form.html.twig', {'button_label': 'Update'}) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block form %}{% endblock %}
+
+{% block js %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.task-form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const submitButton = this.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
