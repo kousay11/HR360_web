@@ -3,9 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-
+use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\ReservationRepository;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
@@ -43,7 +41,10 @@ class Reservation
         return $this;
     }
 
-    #[ORM\Column(name:'date_debut',type: 'date', nullable: false)]
+    #[ORM\Column(name:'date_debut', type: 'date', nullable: false)]
+    #[Assert\NotNull(message: 'La date de début ne peut pas être vide')]
+    #[Assert\Type("\DateTimeInterface", message: 'La date de début doit être une date valide')]
+    #[Assert\GreaterThan("today", message: "La date de début doit être supérieure à la date d'aujourd'hui")]
     private ?\DateTimeInterface $datedebut = null;
 
     public function getDatedebut(): ?\DateTimeInterface
@@ -57,7 +58,11 @@ class Reservation
         return $this;
     }
 
-    #[ORM\Column(name:'date_fin',type: 'date', nullable: false)]
+    #[ORM\Column(name:'date_fin', type: 'date', nullable: false)]
+    #[Assert\NotNull(message: 'La date de fin ne peut pas être vide')]
+    #[Assert\Type("\DateTimeInterface", message: 'La date de fin doit être une date valide')]
+    #[Assert\GreaterThan("today", message: "La date de fin doit être supérieure à la date d'aujourd'hui")]
+    #[Assert\GreaterThanOrEqual(propertyPath: 'datedebut', message: 'La date de fin doit être postérieure à la date de début')]
     private ?\DateTimeInterface $datefin = null;
 
     public function getDatefin(): ?\DateTimeInterface
@@ -85,5 +90,4 @@ class Reservation
         $this->utilisateur = $utilisateur;
         return $this;
     }
-
 }
