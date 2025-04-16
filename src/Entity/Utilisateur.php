@@ -8,6 +8,8 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use App\Repository\UtilisateurRepository;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\File;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[ORM\Table(name: 'utilisateur')]
@@ -46,9 +48,15 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank(message: "Le nom est obligatoire")]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: "Le nom doit contenir au moins {{ limit }} caractères",
+        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères"
+    )]
     private ?string $nom = null;
-
     public function getNom(): ?string
     {
         return $this->nom;
@@ -60,7 +68,15 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
+
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank(message: "Le prénom est obligatoire")]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: "Le prénom doit contenir au moins {{ limit }} caractères",
+        maxMessage: "Le prénom ne peut pas dépasser {{ limit }} caractères"
+    )]
     private ?string $prenom = null;
 
     public function getPrenom(): ?string
@@ -74,9 +90,10 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Assert\NotBlank(message: "L'email est obligatoire")]
+    #[Assert\Email(message: "L'email {{ value }} n'est pas valide")]
     private ?string $email = null;
-
     public function getEmail(): ?string
     {
         return $this->email;
@@ -88,8 +105,17 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
+
+
+    #[ORM\Column(type: 'string')]
+    #[Assert\NotBlank(message: "Le mot de passe est obligatoire")]
+    #[Assert\Length(
+        min: 8,
+        minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractères",
+        max: 4096
+    )]
     private ?string $password = null;
+
 
     public function getPassword(): ?string
     {
@@ -130,7 +156,12 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    
+
     #[ORM\Column(type: 'float', nullable: true)]
+    #[Assert\NotBlank(message: "Le salaire est obligatoire")]
+    #[Assert\Type(type: 'numeric', message: "Le salaire doit être un nombre")]
+    #[Assert\PositiveOrZero(message: "Le salaire ne peut pas être négatif")]
     private ?float $salaire = null;
 
     public function getSalaire(): ?float
@@ -145,6 +176,15 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     #[ORM\Column(type: 'string', nullable: true)]
+    #[Assert\NotBlank(message: "La poste est obligatoire")]
+    #[Assert\Length(
+        max: 100,
+        maxMessage: "Le poste ne peut pas dépasser {{ limit }} caractères"
+    )]
+    #[Assert\Regex(
+        pattern: "/^[a-zA-Z0-9éèêëàâäôöûüç' -]+$/",
+        message: "Le poste contient des caractères non autorisés"
+    )]
     private ?string $poste = null;
 
     public function getPoste(): ?string
@@ -158,7 +198,16 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+
     #[ORM\Column(type: 'string', nullable: true)]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "Les compétences ne peuvent pas dépasser {{ limit }} caractères"
+    )]
+    #[Assert\Regex(
+        pattern: "/^[a-zA-Z0-9éèêëàâäôöûüç,;. -]+$/",
+        message: "Les compétences contiennent des caractères non autorisés"
+    )]
     private ?string $competence = null;
 
     public function getCompetence(): ?string
@@ -171,6 +220,10 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         $this->competence = $competence;
         return $this;
     }
+
+
+
+
 
     #[ORM\OneToMany(targetEntity: Equipeemploye::class, mappedBy: 'utilisateur')]
     private Collection $equipeemployes;

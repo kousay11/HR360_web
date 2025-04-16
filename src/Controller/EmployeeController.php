@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Utilisateur;
 use App\Form\UtilisateurType;
+use App\Form\UtilisateurEditType;
 use App\Form\RegistrationFormType;
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -73,6 +74,12 @@ final class EmployeeController extends AbstractController
 
             $imageFile = $form->get('image')->getData();
             if ($imageFile) {
+                dump([
+                    'name' => $imageFile->getClientOriginalName(),
+                    'mime' => $imageFile->getMimeType(),
+                    'size' => $imageFile->getSize(),
+                    'extension' => $imageFile->guessExtension()
+                ]);
                 $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
@@ -120,7 +127,7 @@ final class EmployeeController extends AbstractController
     ): Response {
 
 
-        $form = $this->createForm(UtilisateurType::class, $utilisateur);
+        $form = $this->createForm(UtilisateurEditType::class, $utilisateur);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -193,6 +200,4 @@ final class EmployeeController extends AbstractController
 
         return $this->redirectToRoute('app_utilisateur_index');
     }
-
-
 }

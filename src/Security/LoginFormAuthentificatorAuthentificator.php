@@ -52,11 +52,11 @@ class LoginFormAuthentificatorAuthentificator extends AbstractLoginFormAuthentic
         }
 
         if (in_array('Employe', $user->getRoles())) {
-            return new RedirectResponse($this->urlGenerator->generate('app_formation_front_index')); // ou une autre route
+            return new RedirectResponse($this->urlGenerator->generate('app_employe_profil')); // ou une autre route
         }
 
         if (in_array('Candidat', $user->getRoles())) {
-            return new RedirectResponse($this->urlGenerator->generate('app_formation_front_index')); // ou une autre route
+            return new RedirectResponse($this->urlGenerator->generate('app_candidat_profil')); // ou une autre route
         }
 
         return new RedirectResponse($this->urlGenerator->generate('app_auth'));
