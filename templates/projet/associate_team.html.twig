@@ -1,0 +1,28 @@
+{# associate_team.html.twig #}
+{% extends 'baseRH.html.twig' %}
+
+{% block title %}Associate Team - {{ projet.nom }}{% endblock %}
+{% block heading %}Associate Team - {{ projet.nom }}{% endblock %}
+{% block css %}
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('front/css/styleProjet.css') }}">
+{% endblock %}
+{% block body %}
+    <div class="container">
+        <h1>Associate Team to {{ projet.nom }}</h1>
+        
+        <form method="post">
+            <div class="form-group">
+                <label for="equipe">Select Team:</label>
+                <select name="equipe" id="equipe" class="form-control" required>
+                    {% for equipe in equipes %}
+                        <option value="{{ equipe.id }}">{{ equipe.nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Associate</button>
+            <a href="{{ path('app_projet_show', {'id': projet.id}) }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+{% endblock %}
