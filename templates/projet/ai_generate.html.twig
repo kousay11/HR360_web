@@ -1,0 +1,80 @@
+{% extends 'baseRH.html.twig' %}
+
+{% block title %}AI Project Generator{% endblock %}
+{% block heading %}AI Project Generator{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('front/css/styleProjet.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="project-form-container">
+    <div class="project-form-header">
+        <h1>Generate Project with AI</h1>
+        <p class="text-muted">Fill in the details below and let AI generate a complete project with tasks</p>
+    </div>
+
+    <form method="post" class="project-form">
+        {{ form_start(form) }}
+            <div class="form-group">
+                {{ form_label(form.name, 'Project Name') }}
+                {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+                <div class="error-message">{{ form_errors(form.name) }}</div>
+            </div>
+
+            <div class="form-dates">
+                <div class="form-group">
+                    {{ form_label(form.start_date, 'Start Date') }}
+                    {{ form_widget(form.start_date, {'attr': {'class': 'form-control datepicker'}}) }}
+                    <div class="error-message">{{ form_errors(form.start_date) }}</div>
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.end_date, 'End Date') }}
+                    {{ form_widget(form.end_date, {'attr': {'class': 'form-control datepicker'}}) }}
+                    <div class="error-message">{{ form_errors(form.end_date) }}</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.task_count, 'Number of Tasks') }}
+                {{ form_widget(form.task_count, {'attr': {'class': 'form-control'}}) }}
+                <div class="error-message">{{ form_errors(form.task_count) }}</div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-robot me-2"></i> Generate Project
+                </button>
+                <a href="{{ path('app_projet_index') }}" class="btn btn-back">
+                    <i class="fas fa-arrow-left me-2"></i> Cancel
+                </a>
+            </div>
+        {{ form_end(form) }}
+    </form>
+</div>
+{% endblock %}
+
+{% block js %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set minimum dates for date pickers
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelector('input[name="start_date"]').min = today;
+    document.querySelector('input[name="end_date"]').min = today;
+    
+    // Validate that end date is after start date
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const startDate = new Date(document.querySelector('input[name="start_date"]').value);
+        const endDate = new Date(document.querySelector('input[name="end_date"]').value);
+        
+        if (endDate < startDate) {
+            e.preventDefault();
+            alert('End date must be after start date');
+        }
+    });
+});
+</script>
+{% endblock %}
