@@ -285,6 +285,13 @@
                                                     data-candidature-id="{{ candidature.idCandidature }}">
                                                 <i class="fas fa-search"></i>
                                             </button>
+                                             {# Nouveau bouton Entretien#}
+        
+            <a href="{{ path('app_entretien_index', {'idCandidature': candidature.idCandidature}) }}" 
+               class="btn btn-sm btn-outline-success action-btn" title="Planifier un entretien">
+                <i class="fas fa-calendar-check"></i>
+            </a>
+    </div>
                                         </div>
                                     </td>
                                 </tr>

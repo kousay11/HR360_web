@@ -223,23 +223,29 @@ private function getResultMessage(int $score): string
 
 private function formatAnalysisDetails(array $apiResponse): string
 {
-    if (isset($apiResponse['analysis_details']['content'])) {
-        return $apiResponse['analysis_details']['content'];
-    }
-    
+    // Si l'API retourne des détails spécifiques
     if (isset($apiResponse['analysis_details'])) {
         $details = '';
         foreach ($apiResponse['analysis_details'] as $key => $value) {
-            $details .= '<strong>'.ucfirst($key).':</strong> '.$value.'<br>';
+            $details .= '<strong>' . ucfirst($key) . ':</strong> ' . $value . '<br>';
         }
         return $details;
     }
     
-    if (isset($apiResponse['raw_text'])) {
-        return $this->formatTextToHtml($apiResponse['raw_text']);
+    // Si l'API retourne un message d'erreur
+    if (isset($apiResponse['error'])) {
+        return '<div class="alert alert-warning">' . $apiResponse['error'] . '</div>';
     }
-
-    return 'Les détails complets ne sont pas disponibles.';
+    
+    // Si l'API retourne d'autres données
+    $details = '';
+    foreach ($apiResponse as $key => $value) {
+        if (!in_array($key, ['score', 'success'])) {
+            $details .= '<strong>' . ucfirst($key) . ':</strong> ' . json_encode($value) . '<br>';
+        }
+    }
+    
+    return $details ?: 'Les détails de l\'analyse ne sont pas disponibles dans le format attendu.';
 }
 
 
@@ -255,7 +261,7 @@ private function callAnalysisApi(string $cvPath, string $jobOfferPath, LoggerInt
             'headers' => [
                 'X-RapidAPI-Host' => 'cv-resume-to-job-match-analysis-api.p.rapidapi.com',
                 'X-RapidAPI-Key' => '58781479a8msh50ee0c2c7fb876ap1b2da2jsnaf8f922475b2',
-                'Accept' => 'application/json', // Force le retour JSON
+                'Content-Type' => 'multipart/form-data',
             ],
             'body' => [
                 'cv_file' => fopen($cvPath, 'r'),
@@ -265,19 +271,19 @@ private function callAnalysisApi(string $cvPath, string $jobOfferPath, LoggerInt
 
         $content = $response->getContent(false);
         
-        // Tentative de décodage JSON
+        // First try to decode as JSON
         $decoded = json_decode($content, true);
-        
-        // Si le décodage échoue mais que le contenu semble être une analyse
-        if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
-            if (str_contains($content, 'Skills Analysis')) {
-                return $this->parseTextAnalysis($content);
-            }
-            throw new \Exception('Réponse API non-JSON non reconnue');
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return $decoded;
         }
-
-        return $decoded ?? [];
-
+        
+        // If not JSON, handle as text response
+        return [
+            'analysis' => $content,
+            'score' => $this->extractScoreFromText($content),
+            'raw_response' => $content
+        ];
+        
     } catch (\Exception $e) {
         $logger->error("API Error: ".$e->getMessage());
         return [
@@ -286,41 +292,26 @@ private function callAnalysisApi(string $cvPath, string $jobOfferPath, LoggerInt
         ];
     }
 }
-private function parseTextAnalysis(string $textResponse): array
+
+private function extractScoreFromText(string $text): int
 {
-    // Extraction du score
-    $score = 0;
-    if (preg_match('/APPLICATION (LITTLE|SOME|STRONGLY) CORRESPONDING/', $textResponse, $matches)) {
-        $score = match($matches[1]) {
-            'STRONGLY' => 80,
-            'SOME' => 60,
-            default => 40,
-        };
+    // Look for the "Fit Score" section in the text
+    if (preg_match('/Fit Score.*?(\d+)/', $text, $matches)) {
+        return (int)$matches[1];
     }
-
-    // Formatage des détails
-    $details = [
-        'analysis' => 'Analyse textuelle convertie',
-        'content' => $this->formatTextToHtml($textResponse)
-    ];
-
-    return [
-        'score' => $score,
-        'analysis_details' => $details,
-        'raw_text' => $textResponse
-    ];
-}
-
-private function formatTextToHtml(string $text): string
-{
-    // Conversion basique des sauts de ligne
-    $html = nl2br(htmlspecialchars($text));
     
-    // Amélioration des sections
-    $html = preg_replace('/\• (.*?)\n/', '<strong>• $1</strong><br>', $html);
-    $html = preg_replace('/→ (.*?)\n/', '<div class="section">$1</div>', $html);
+    // Try to estimate score based on keywords
+    $score = 50; // default neutral score
     
-    return '<div class="text-analysis">'.$html.'</div>';
+    if (strpos($text, 'APPLICATION LITTLE CORRESPONDING') !== false) {
+        $score = 30;
+    } elseif (strpos($text, 'APPLICATION CORRESPONDING') !== false) {
+        $score = 70;
+    } elseif (strpos($text, 'APPLICATION WELL CORRESPONDING') !== false) {
+        $score = 90;
+    }
+    
+    return $score;
 }
 
 private function extractScoreFromApiResponse(array $apiResponse): int
