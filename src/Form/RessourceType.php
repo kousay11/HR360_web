@@ -23,9 +23,10 @@ class RessourceType extends AbstractType
             ])
             ->add('type', ChoiceType::class, [
                 'choices' => [
-                    'Type 1' => 'type1',
-                    'Type 2' => 'type2',
-                    'Type 3' => 'type3',
+                    'Bureaux' => 'Bureaux',
+                    'Véhicules' => 'Véhicules',
+                    'Mobilier' => 'Mobilier',
+                    'Matériel informatique'  => 'Matériel informatique',
                 ],
                 'required' => false,
             ])
