@@ -1,0 +1,60 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0">{{ form_title|default('Formulaire Offre') }}</h3>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                        <div class="form-group mb-4">
+                            {{ form_label(form.titre, 'Titre de l\'offre', {'label_attr': {'class': 'form-label text-dark'}}) }}
+                            {{ form_widget(form.titre, {'attr': {'class': 'form-control' ~ (form.titre.vars.valid ? '' : ' is-invalid')}}) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.titre) }}
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label text-dark'}}) }}
+                            {{ form_widget(form.description, {'attr': {'class': 'form-control' ~ (form.description.vars.valid ? '' : ' is-invalid')}}) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.description) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-4">
+                                    {{ form_label(form.datePublication, 'Date de publication', {'label_attr': {'class': 'form-label text-dark'}}) }}
+                                    {{ form_widget(form.datePublication, {'attr': {'class': 'form-control' ~ (form.datePublication.vars.valid ? '' : ' is-invalid')}}) }}
+                                    <div class="invalid-feedback">
+                                        {{ form_errors(form.datePublication) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-4">
+                                    {{ form_label(form.dateExpiration, 'Date d\'expiration', {'label_attr': {'class': 'form-label text-dark'}}) }}
+                                    {{ form_widget(form.dateExpiration, {'attr': {'class': 'form-control' ~ (form.dateExpiration.vars.valid ? '' : ' is-invalid')}}) }}
+                                    <div class="invalid-feedback">
+                                        {{ form_errors(form.dateExpiration) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ path('app_offre_index') }}" class="btn btn-outline-dark">
+                                <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-save me-2"></i>{{ button_label|default('Enregistrer') }}
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

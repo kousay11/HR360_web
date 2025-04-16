@@ -1,13 +1,102 @@
-<!DOCTYPE html>
+{% extends 'baseRH.html.twig' %}
 
-<title>Edit Offre</title>
-
+{% block title %}Modifier l'offre - {{ offre.titre }}{% endblock %}
+{% block heading %}Modifier l'offre -{% endblock %}
 {% block body %}
-    <h1>Edit Offre</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="text-center mb-0 text-primary">
+                    <i class="fas fa-edit me-2"></i>Modifier l'offre
+                </h1>
+                <a href="{{ path('app_offre_index') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                </a>
+            </div>
 
-    {{ include('offre/_form.html.twig', {'button_label': 'Update'}) }}
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    {{ include('offre/_form.html.twig', {
+                        'button_label': 'Mettre à jour',
+                        'form_title': 'Faire modification'
+                    }) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block css %}
+    {{ parent() }}
+<style>
+    .card {
+        border-radius: 10px;
+        border-width: 2px;
+        border-color: #0d6efd; /* Bleu Bootstrap */
+    }
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .btn-outline-primary {
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+    .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        color: white;
+    }
+    .btn-primary {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+    }
+</style>
+{% endblock %}
+{% block js %}
+    {{ parent() }}
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const datePublication = document.querySelector('#{{ form.datePublication.vars.id }}');
+    const dateExpiration = document.querySelector('#{{ form.dateExpiration.vars.id }}');
 
-    <a href="{{ path('app_offre_index') }}">back to list</a>
+    function validateDates() {
+        const pubDate = new Date(datePublication.value);
+        const expDate = new Date(dateExpiration.value);
 
-    {{ include('offre/_delete_form.html.twig') }}
+        if (expDate < pubDate) {
+            alert('Erreur : La date d\'expiration doit être postérieure à la date de publication');
+            return false;
+        }
+        return true;
+    }
+
+    form.addEventListener('submit', function(e) {
+        if (!validateDates()) {
+            e.preventDefault();
+            datePublication.classList.add('is-invalid');
+            dateExpiration.classList.add('is-invalid');
+        }
+    });
+
+    [datePublication, dateExpiration].forEach(input => {
+        input.addEventListener('change', function() {
+            if (datePublication.value && dateExpiration.value) {
+                if (!validateDates()) {
+                    datePublication.classList.add('is-invalid');
+                    dateExpiration.classList.add('is-invalid');
+                } else {
+                    datePublication.classList.remove('is-invalid');
+                    dateExpiration.classList.remove('is-invalid');
+                }
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .logo {
+            width: 100px;
+            height: auto;
+            margin-right: 20px;
+        }
+        .company-info {
+            flex-grow: 1;
+        }
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+            text-align: center;
+        }
+        .report-title {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0 20px 0;
+        }
+        .candidature-block {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .candidature-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #4e73df;
+        }
+        .info-row {
+            margin-bottom: 5px;
+            display: flex;
+        }
+        .info-label {
+            font-weight: bold;
+            min-width: 180px;
+        }
+        .status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .status-accepted {
+            background-color: #28a745;
+            color: white;
+        }
+        .status-rejected {
+            background-color: #dc3545;
+            color: white;
+        }
+        .status-pending {
+            background-color: #ffc107;
+            color: black;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            text-align: center;
+            color: #666;
+        }
+        .page-break {
+            page-break-after: always;
+        }
+        .description-content {
+        white-space: pre-line; /* Respecte les sauts de ligne */
+        word-wrap: break-word; /* Force la césure des mots longs */
+        max-width: 100%; /* S'adapte à la largeur disponible */
+        display: inline-block; /* Pour appliquer correctement les styles */
+        vertical-align: top; /* Alignement correct avec le label */
+    }
+    </style>
+</head>
+<body>
+   <div class="header">
+    {% if logo_exists and logo_path %}
+        <img src="{{ logo_path }}" class="logo" alt="Logo RH360">
+    {% endif %}
+    <div class="company-info">
+        <h1 class="company-name">RH Entreprise 360</h1>
+    </div>
+</div>
+
+    <h2 class="report-title">Liste des Candidatures</h2>
+    <p>Date d'export : {{ "now"|date("d/m/Y H:i") }}</p>
+
+    {% for candidature in candidatures %}
+        <div class="candidature-block">
+            
+            <div class="info-row">
+                <span class="info-label">Titre de l'offre :</span>
+                <span>{{ candidature.offre.titre ?? 'Offre non spécifiée' }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Date de candidature :</span>
+                <span>{{ candidature.dateCandidature|date('d/m/Y H:i') }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Statut :</span>
+                <span class="status status-{{ candidature.statut == 'Accepté' ? 'accepted' : (candidature.statut == 'Refusé' ? 'rejected' : 'pending') }}">
+                    {{ candidature.statut }}
+                </span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">CV :</span>
+                <span>{{ candidature.cv }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Lettre de motivation :</span>
+                <span>{{ candidature.lettreMotivation }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Description :</span>
+                <span class="description-content">{{ candidature.description|default('Aucune description')|nl2br }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Date modification :</span>
+                <span>
+                    {% if candidature.dateModification %}
+                        {{ candidature.dateModification|date('d/m/Y H:i') }}
+                    {% else %}
+                        Non modifié
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="footer">
+        Page <span class="pageNumber"></span> sur <span class="totalPages"></span>
+    </div>
+</body>
+</html>
