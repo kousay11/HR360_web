@@ -87,8 +87,8 @@
           <li><a href="#portfolio">Profil</a></li>
           <li><a href="{{ path('app_offreFront_index') }}">Offres</a></li>
           <li><a href="{{ path('app_candidature_index') }}">Mes candidatures</a></li>
-          <li><a href="{{ path('app_entretien_index') }}">Entretiens</a></li>
-          <li><a href="{{ path('app_evaluation_index') }}">Evaluations</a></li>
+          <li><a href="{{ path('app_entretien_front', {'idCandidature': 89}) }}">Entretiens</a></li>
+          <li><a href="{{ path('app_evaluation_front') }}">Evaluations</a></li>
         </ul>
         {% endblock %}
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>

@@ -1,4 +1,129 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
+
+<div class="form-group row">
+    <div class="col-md-12 mb-3">
+        <label for="inputText" class="col-sm-4 col-form-label">Titre de l'évaluation</label>
+        {{ form_widget(form.titreEva, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.titreEva) }}
+    </div>
+</div>
+
+<div class="form-group row">
+    <div class="col-md-6 mb-3">
+        <label for="inputText" class="col-sm-4 col-form-label">Date et heure</label>
+        <div class="input-group">
+            {{ form_widget(form.dateEvaluation, {
+                'attr': {
+                    'class': 'form-control datetimepicker',
+                    'data-timezone': 'Africa/Tunis'
+                }
+            }) }}
+            <div class="input-group-append">
+                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+            </div>
+        </div>
+        <small class="form-text text-muted">Fuseau horaire: Tunis (UTC+1)</small>
+        {{ form_errors(form.dateEvaluation) }}
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="inputText" class="col-sm-4 col-form-label">Score Quiz (/10)</label>
+        {{ form_widget(form.scorequiz, {
+            'attr': {
+                'class': 'form-control',
+                'min': 0,
+                'max': 10,
+                'onchange': 'updateCommentaire(this.value)'
+            }
+        }) }}
+        {{ form_errors(form.scorequiz) }}
+    </div>
+</div>
+
+<div class="form-group row">
+    <div class="col-md-6 mb-3">
+        <label for="inputText" class="col-sm-4 col-form-label">Note Technique (/20)</label>
+        {{ form_widget(form.noteTechnique, {'attr': {'class': 'form-control', 'min': 0, 'max': 20}}) }}
+        {{ form_errors(form.noteTechnique) }}
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="inputText" class="col-sm-4 col-form-label">Note Soft Skills (/20)</label>
+        {{ form_widget(form.noteSoftSkills, {'attr': {'class': 'form-control', 'min': 0, 'max': 20}}) }}
+        {{ form_errors(form.noteSoftSkills) }}
+    </div>
+</div>
+
+<div class="form-group row">
+    <div class="col-md-4">
+    <label for="inputText" class="col-sm-4 col-form-label">Décision</label>
+        {{ form_widget(form.commentaire, {
+            'attr': {
+                'class': 'form-control',
+                'rows': 1,
+                'readonly': 'readonly'
+            }
+        }) }}
+        {{ form_errors(form.commentaire) }}
+    </div>
+</div>
+
+{# Champ caché pour la redirection #}
+{% if evaluation.entretien is defined and evaluation.entretien is not null %}
+    <input type="hidden" name="redirect_to_entretien" value="1">
+{% endif %}
+
+<div class="form-group text-right mt-4">
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save mr-2"></i>{{ button_label|default('Enregistrer') }}
+    </button>
+    {% if evaluation.entretien is defined and evaluation.entretien is not null %}
+        <a href="{{ path('app_evaluation_index_for_entretien', {'idEntretien': evaluation.entretien.idEntretien}) }}" class="btn btn-secondary ml-2">
+            <i class="fas fa-times mr-2"></i>Annuler
+        </a>
+    {% else %}
+        <a href="{{ path('app_evaluation_index') }}" class="btn btn-secondary ml-2">
+            <i class="fas fa-times mr-2"></i>Annuler
+        </a>
+    {% endif %}
+</div>
+
 {{ form_end(form) }}
+
+<script>
+function updateCommentaire(score) {
+    const commentaireField = document.getElementById('{{ form.commentaire.vars.id }}');
+    if (score > 7) {
+        commentaireField.value = 'ACCEPTÉ';
+    } else {
+        commentaireField.value = 'REFUSÉ';
+    }
+}
+
+// Initialiser le commentaire au chargement
+document.addEventListener('DOMContentLoaded', function() {
+    const initialScore = document.getElementById('{{ form.scorequiz.vars.id }}').value;
+    if (initialScore) {
+        updateCommentaire(initialScore);
+    }
+});
+
+// Initialisation du datetimepicker
+$(function () {
+    $('.datetimepicker').datetimepicker({
+        format: 'DD/MM/YYYY HH:mm',
+        sideBySide: true,
+        locale: 'fr',
+        timeZone: 'Africa/Tunis',
+        icons: {
+            time: 'fas fa-clock',
+            date: 'fas fa-calendar',
+            up: 'fas fa-arrow-up',
+            down: 'fas fa-arrow-down',
+            previous: 'fas fa-chevron-left',
+            next: 'fas fa-chevron-right',
+            today: 'fas fa-calendar-check',
+            clear: 'fas fa-trash',
+            close: 'fas fa-times'
+        }
+    });
+});
+</script>

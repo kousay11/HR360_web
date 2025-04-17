@@ -5,7 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-
+use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\EvaluationRepository;
 
 #[ORM\Entity(repositoryClass: EvaluationRepository::class)]
@@ -14,8 +14,69 @@ class Evaluation
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name:'idEvaluation',type: 'integer')]
+    #[ORM\Column(name:'idEvaluation', type: 'integer')]
     private ?int $idEvaluation = null;
+
+    #[ORM\Column(name:'titreEva', type: 'string', length: 100, nullable: false)]
+    #[Assert\NotBlank(message: "Le titre de l'évaluation est obligatoire")]
+    private ?string $titreEva = null;
+
+    #[ORM\Column(name: 'noteTechnique', type: 'float')]
+    #[Assert\NotBlank(message: "La note technique est obligatoire")]
+    #[Assert\Range(
+        min: 0,
+        max: 20,
+        notInRangeMessage: "La note Technique doit être entre {{ min }} et {{ max }}",
+    )]
+    private ?float $noteTechnique = null;
+
+    #[ORM\Column(name:'noteSoftSkills', type: 'float')]
+    #[Assert\NotBlank(message: "La note soft skills est obligatoire")]
+    #[Assert\Range(
+        min: 0,
+        max: 20,
+        notInRangeMessage: "La note soft skills doit être entre {{ min }} et {{ max }}"
+    )]
+    private ?float $noteSoftSkills = null;
+
+    #[ORM\Column(type: 'string', length: 50, nullable: false)]
+    #[Assert\NotBlank(message: "Le commentaire est obligatoire")]
+    #[Assert\Length(
+        max: 50,
+        maxMessage: "Le commentaire ne peut pas dépasser {{ limit }} caractères"
+    )]
+    private ?string $commentaire = null;
+
+    #[ORM\Column(name:'dateEvaluation', type: 'datetime', nullable: false)]
+    #[Assert\NotBlank(message: "La date d'évaluation est obligatoire")]
+    #[Assert\Type("\DateTimeInterface", message: "La date doit être une valeur valide")]
+    #[Assert\LessThanOrEqual(
+        value: "now",
+        message: "La date d'évaluation ne peut pas être dans le futur"
+    )]
+    private ?\DateTimeInterface $dateEvaluation = null;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Assert\NotBlank(message: "Le score d'évaluation est obligatoire")]
+    #[Assert\Range(
+        min: 0,
+        max: 10,
+        notInRangeMessage: "Le score quiz doit être entre {{ min }} et {{ max }}"
+    )]
+    private ?int $scorequiz = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $questions = null;
+
+    #[ORM\ManyToOne(targetEntity: Entretien::class, inversedBy: 'evaluations')]
+    #[ORM\JoinColumn(name: 'idEntretien', referencedColumnName: 'idEntretien')]
+    #[Assert\NotNull(message: "L'entretien associé est obligatoire")]
+    private ?Entretien $entretien = null;
+
+    public function __construct()
+    {
+        $this->dateEvaluation = new \DateTime('now', new \DateTimeZone('Africa/Tunis'));
+    }
 
     public function getIdEvaluation(): ?int
     {
@@ -28,9 +89,6 @@ class Evaluation
         return $this;
     }
 
-    #[ORM\Column(name:'titreEva',type: 'string', nullable: false)]
-    private ?string $titreEva = null;
-
     public function getTitreEva(): ?string
     {
         return $this->titreEva;
@@ -41,9 +99,6 @@ class Evaluation
         $this->titreEva = $titreEva;
         return $this;
     }
-
-    #[ORM\Column(name:'noteTechnique',type: 'float', nullable: false)]
-    private ?float $noteTechnique = null;
 
     public function getNoteTechnique(): ?float
     {
@@ -56,9 +111,6 @@ class Evaluation
         return $this;
     }
 
-    #[ORM\Column(name:'noteSoftSkills',type: 'float', nullable: false)]
-    private ?float $noteSoftSkills = null;
-
     public function getNoteSoftSkills(): ?float
     {
         return $this->noteSoftSkills;
@@ -69,9 +121,6 @@ class Evaluation
         $this->noteSoftSkills = $noteSoftSkills;
         return $this;
     }
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $commentaire = null;
 
     public function getCommentaire(): ?string
     {
@@ -84,9 +133,6 @@ class Evaluation
         return $this;
     }
 
-    #[ORM\Column(name:'dateEvaluation',type: 'datetime', nullable: false)]
-    private ?\DateTimeInterface $dateEvaluation = null;
-
     public function getDateEvaluation(): ?\DateTimeInterface
     {
         return $this->dateEvaluation;
@@ -94,12 +140,12 @@ class Evaluation
 
     public function setDateEvaluation(\DateTimeInterface $dateEvaluation): self
     {
+        if ($dateEvaluation instanceof \DateTimeImmutable) {
+            $dateEvaluation = \DateTime::createFromImmutable($dateEvaluation);
+        }
         $this->dateEvaluation = $dateEvaluation;
         return $this;
     }
-
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $scorequiz = null;
 
     public function getScorequiz(): ?int
     {
@@ -109,11 +155,11 @@ class Evaluation
     public function setScorequiz(?int $scorequiz): self
     {
         $this->scorequiz = $scorequiz;
+        if ($scorequiz !== null) {
+            $this->commentaire = $scorequiz > 7 ? 'ACCEPTÉ' : 'REFUSÉ';
+        }
         return $this;
     }
-
-    #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $questions = null;
 
     public function getQuestions(): ?string
     {
@@ -125,10 +171,6 @@ class Evaluation
         $this->questions = $questions;
         return $this;
     }
-
-    #[ORM\ManyToOne(targetEntity: Entretien::class, inversedBy: 'evaluations')]
-    #[ORM\JoinColumn(name: 'idEntretien', referencedColumnName: 'idEntretien')]
-    private ?Entretien $entretien = null;
 
     public function getEntretien(): ?Entretien
     {

@@ -1,46 +1,122 @@
-<!DOCTYPE html>
+{% extends 'baseRH.html.twig' %}
 
-<title>Entretien</title>
+{% block title %}Détails de l'entretien #{{ entretien.idEntretien }}{% endblock %}
+{% block heading %}Détails de l'entretien{% endblock %}
+
 
 {% block body %}
-    <h1>Entretien</h1>
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>IdEntretien</th>
-                <td>{{ entretien.idEntretien }}</td>
-            </tr>
-            <tr>
-                <th>Date</th>
-                <td>{{ entretien.date ? entretien.date|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Heure</th>
-                <td>{{ entretien.heure }}</td>
-            </tr>
-            <tr>
-                <th>Type</th>
-                <td>{{ entretien.type }}</td>
-            </tr>
-            <tr>
-                <th>Statut</th>
-                <td>{{ entretien.statut }}</td>
-            </tr>
-            <tr>
-                <th>Lienmeet</th>
-                <td>{{ entretien.lienmeet }}</td>
-            </tr>
-            <tr>
-                <th>Localisation</th>
-                <td>{{ entretien.localisation }}</td>
-            </tr>
-        </tbody>
-    </table>
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <div class="btn-group">
+                <a href="{{ path('app_entretien_index', {'idCandidature': idCandidature}) }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+                    <i class="fas fa-arrow-left fa-sm text-white-50 mr-2"></i>Retour à la liste
+                </a>
+                <a href="{{ path('app_entretien_edit', {'idEntretien': entretien.idEntretien}) }}" 
+                   class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm ml-2">
+                    <i class="fas fa-edit fa-sm text-white-50 mr-2"></i>Modifier
+                </a>
+            </div>
+        </div>
 
-    <a href="{{ path('app_entretien_index') }}">back to list</a>
+        <!-- Content Row -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Informations principales</h6>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th class="bg-light">ID</th>
+                                    <td>{{ entretien.idEntretien }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">Date</th>
+                                    <td>{{ entretien.date ? entretien.date|date('d/m/Y') : 'Non définie' }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">Heure</th>
+                                    <td>{{ entretien.heure ? entretien.heure|date('H:i') : 'Non définie' }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">Type</th>
+                                    <td>{{ entretien.type.value }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">Statut</th>
+                                    <td>
+                                        <span class="badge 
+                                            {% if entretien.statut.value == 'Planifié' %}badge-primary
+                                            {% elseif entretien.statut.value == 'Terminé' %}badge-success
+                                            {% elseif entretien.statut.value == 'Annulé' %}badge-danger
+                                            {% else %}badge-secondary
+                                            {% endif %}">
+                                            {{ entretien.statut.value }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+    <th class="bg-light">Lien Meet</th>
+    <td>
+        {% if entretien.type.value == 'En_ligne' %}
+            {% if entretien.lienmeet %}
+                <a href="{{ entretien.lienmeet }}" target="_blank" class="btn btn-sm btn-info">
+                    <i class="fas fa-video mr-2"></i>Rejoindre la réunion
+                </a>
+            {% else %}
+                <span class="text-muted">Non spécifié</span>
+            {% endif %}
+        {% else %}
+            <span class="text-muted">Non applicable (entretien en présentiel)</span>
+        {% endif %}
+    </td>
+</tr>
+<tr>
+    <th class="bg-light">Localisation</th>
+    <td>
+        {% if entretien.type.value == 'En_ligne' %}
+            <span class="text-muted">Non applicable (entretien en ligne)</span>
+        {% else %}
+            {{ entretien.localisation ? entretien.localisation : 'Non spécifiée' }}
+        {% endif %}
+    </td>
+</tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-    <a href="{{ path('app_entretien_edit', {'idEntretien': entretien.idEntretien}) }}">edit</a>
+            <div class="col-lg-4">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Actions</h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <a href="{{ path('app_entretien_edit', {'idEntretien': entretien.idEntretien}) }}" 
+                               class="btn btn-primary btn-block">
+                                <i class="fas fa-edit mr-2"></i>Modifier l'entretien
+                            </a>
+                        </div>
+                        <div class="mb-3">
+                            <button class="btn btn-outline-secondary btn-block" onclick="window.print()">
+                                <i class="fas fa-print mr-2"></i>Imprimer les détails
+                            </button>
+                        </div>
+                        <div>
+                            {{ include('entretien/_delete_form.html.twig') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    {{ include('entretien/_delete_form.html.twig') }}
+    </div>
+    <!-- /.container-fluid -->
 {% endblock %}
