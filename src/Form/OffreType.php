@@ -58,11 +58,11 @@ class OffreType extends AbstractType
                 'label' => 'Date de publication',
                 'required' => false,
                 'html5' => false,
-                'format' => 'yyyy-MM-dd',
+                'format' => 'yyyy-MM-dd HH:mm',
                 'empty_data' => null,
                 'attr' => [
                     'class' => 'form-control datepicker',
-                    'placeholder' => 'YYYY-MM-DD HH:MM'
+                    'placeholder' => 'YYYY-MM-DD HH:mm'
                 ],
                 'invalid_message' => 'Veuillez entrer une date valide pour la publication'
             ])
@@ -81,13 +81,13 @@ class OffreType extends AbstractType
                         'message' => 'La date d\'expiration doit être après la date de publication'
                     ])
                 ],
-                'format' => 'yyyy-MM-dd',
+                'format' => 'yyyy-MM-dd HH:mm',
                 'empty_data' => null,
                 'required' => false,
                 'html5' => false,
                 'attr' => [
                     'class' => 'form-control datepicker',
-                    'placeholder' => 'YYYY-MM-DD HH:MM'
+                    'placeholder' => 'YYYY-MM-DD HH:mm'
                 ],
                 'label' => 'Date d\'expiration',
                 'invalid_message' => 'Veuillez entrer une date valide pour l\'expiration'
