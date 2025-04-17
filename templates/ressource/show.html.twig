@@ -41,7 +41,7 @@
                         <tr>
                             <th>Date début</th>
                             <th>Date fin</th>
-                            <th>Actions</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -49,9 +49,7 @@
                             <tr>
                                 <td>{{ reservation.datedebut|date('Y-m-d') }}</td>
                                 <td>{{ reservation.datefin|date('Y-m-d') }}</td>
-                                <td>
-                                    <a href="{{ path('app_reservation_show', {'id': reservation.id}) }}">Voir</a>
-                                </td>
+                            
                             </tr>
                         {% endfor %}
                     </tbody>

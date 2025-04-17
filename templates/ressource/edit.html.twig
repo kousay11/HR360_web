@@ -27,9 +27,7 @@
                     'class': 'form-control' ~ (form.nom.vars.valid ? '' : ' is-invalid'),
                     'required': 'required'
                 }}) }}
-                <div class="invalid-feedback">
-                    {{ form_errors(form.nom) }}
-                </div>
+                
             </div>
 
             <!-- Champ Type -->
@@ -39,9 +37,7 @@
                     'class': 'form-control' ~ (form.type.vars.valid ? '' : ' is-invalid'),
                     'required': 'required'
                 }}) }}
-                <div class="invalid-feedback">
-                    {{ form_errors(form.type) }}
-                </div>
+                
             </div>
 
             <!-- Champ Etat -->
@@ -51,9 +47,7 @@
                     'class': 'form-control' ~ (form.etat.vars.valid ? '' : ' is-invalid'),
                     'required': 'required'
                 }}) }}
-                <div class="invalid-feedback">
-                    {{ form_errors(form.etat) }}
-                </div>
+                
             </div>
 
             <!-- Champ Prix -->
@@ -65,9 +59,7 @@
                     'min': '0.01',
                     'step': '0.01'
                 }}) }}
-                <div class="invalid-feedback">
-                    {{ form_errors(form.prix) }}
-                </div>
+                
             </div>
 
             <!-- Champ Image -->
@@ -82,9 +74,7 @@
                     </tr>
                 {% endif %}
                 {{ form_widget(form.image, {'attr': {'class': 'form-control' ~ (form.image.vars.valid ? '' : ' is-invalid')}}) }}
-                <div class="invalid-feedback">
-                    {{ form_errors(form.image) }}
-                </div>
+                
             </div>
 
             <!-- Bouton de soumission -->

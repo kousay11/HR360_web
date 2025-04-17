@@ -13,12 +13,8 @@
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/migrations": "^3.9",
         "doctrine/orm": "^3.3",
-        "google/apiclient": "^2.18",
-        "dompdf/dompdf": "^3.1",
         "phpdocumentor/reflection-docblock": "^5.6",
-        "phpoffice/phpspreadsheet": "^4.1",
         "phpstan/phpdoc-parser": "^2.1",
-        "sensio/framework-extra-bundle": "*",
         "symfony/asset": "6.4.*",
         "symfony/asset-mapper": "6.4.*",
         "symfony/console": "6.4.*",
@@ -28,7 +24,6 @@
         "symfony/flex": "^2",
         "symfony/form": "6.4.*",
         "symfony/framework-bundle": "6.4.*",
-        "symfony/google-mailer": "6.4.*",
         "symfony/http-client": "6.4.*",
         "symfony/intl": "6.4.*",
         "symfony/mailer": "6.4.*",
@@ -50,8 +45,7 @@
         "symfony/web-link": "6.4.*",
         "symfony/yaml": "6.4.*",
         "twig/extra-bundle": "^2.12|^3.0",
-        "twig/twig": "^2.12|^3.0",
-        "twilio/sdk": "^8.5"
+        "twig/twig": "^2.12|^3.0"
     },
     "config": {
         "allow-plugins": {

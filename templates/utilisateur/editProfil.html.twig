@@ -88,7 +88,7 @@
                     <h2 class="text-center mb-4" style="color: #ff4a17;">Modifier mon profil</h2>
                     
                     <div class="profile-preview">
-                        <img src="{{ user.image ? asset('uploads/images/' ~ user.image) : asset('uploads/images/') }}" 
+                        <img src="{{ user.image ? asset('uploads/images/' ~ user.image) : asset('uploads/images/default-avatar.png') }}" 
                              class="profile-preview-img" 
                              id="imagePreview"
                              alt="Photo de profil actuelle">
