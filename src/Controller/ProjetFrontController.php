@@ -25,7 +25,7 @@ final class ProjetFrontController extends AbstractController
     public function search(Request $request, ProjetRepository $projetRepository): Response
     {
         $query = $request->query->get('q', '');
-        $projets = $projetRepository->searchFront($query,1);
+        $projets = $projetRepository->searchFront($query,$this->getUser());
 
         if ($request->isXmlHttpRequest()) {
             return $this->render('projet_front/_project_grid.html.twig', [
@@ -40,7 +40,7 @@ final class ProjetFrontController extends AbstractController
     #[Route('/prioritize', name: 'app_projet_front_prioritize', methods: ['GET'])]
     public function prioritize(Request $request, ProjetRepository $projetRepository): Response
     {
-        $projets = $projetRepository->prioritizeFront(1);
+        $projets = $projetRepository->prioritizeFront($this->getUser());
 
         if ($request->isXmlHttpRequest()) {
             return $this->render('projet_front/_project_grid.html.twig', [

@@ -41,7 +41,7 @@
                         <tr>
                             <th>Date début</th>
                             <th>Date fin</th>
-                            
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -49,7 +49,9 @@
                             <tr>
                                 <td>{{ reservation.datedebut|date('Y-m-d') }}</td>
                                 <td>{{ reservation.datefin|date('Y-m-d') }}</td>
-                            
+                                <td>
+                                    {{ reservation.utilisateur.nom }} {{ reservation.utilisateur.prenom }}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
