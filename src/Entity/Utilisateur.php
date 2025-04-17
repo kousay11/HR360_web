@@ -48,15 +48,15 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
     #[Assert\NotBlank(message: "Le nom est obligatoire")]
     #[Assert\Length(
         min: 2,
-        max: 50,
-        minMessage: "Le nom doit contenir au moins {{ limit }} caractères",
+        max: 255,
+        minMessage: "Le nom doit faire au moins {{ limit }} caractères",
         maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères"
     )]
-    private ?string $nom = null;
+    private string $nom;
     public function getNom(): ?string
     {
         return $this->nom;
@@ -69,16 +69,15 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
     #[Assert\NotBlank(message: "Le prénom est obligatoire")]
     #[Assert\Length(
         min: 2,
-        max: 50,
-        minMessage: "Le prénom doit contenir au moins {{ limit }} caractères",
+        max: 255,
+        minMessage: "Le prénom doit faire au moins {{ limit }} caractères",
         maxMessage: "Le prénom ne peut pas dépasser {{ limit }} caractères"
     )]
-    private ?string $prenom = null;
-
+    private string $prenom;
     public function getPrenom(): ?string
     {
         return $this->prenom;
@@ -108,7 +107,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
 
     #[ORM\Column(type: 'string')]
-    #[Assert\NotBlank(message: "Le mot de passe est obligatoire")]
     #[Assert\Length(
         min: 8,
         minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractères",
@@ -156,10 +154,9 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    
+
 
     #[ORM\Column(type: 'float', nullable: true)]
-    #[Assert\NotBlank(message: "Le salaire est obligatoire")]
     #[Assert\Type(type: 'numeric', message: "Le salaire doit être un nombre")]
     #[Assert\PositiveOrZero(message: "Le salaire ne peut pas être négatif")]
     private ?float $salaire = null;
@@ -176,7 +173,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     #[ORM\Column(type: 'string', nullable: true)]
-    #[Assert\NotBlank(message: "La poste est obligatoire")]
     #[Assert\Length(
         max: 100,
         maxMessage: "Le poste ne peut pas dépasser {{ limit }} caractères"

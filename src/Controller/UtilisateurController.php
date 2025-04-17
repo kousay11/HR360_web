@@ -17,6 +17,8 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use App\Form\ProfilType;
+use Symfony\Component\Form\FormFactoryInterface;
+use App\Form\LoginType;
 
 #[Route('/utilisateur')]
 final class UtilisateurController extends AbstractController
@@ -24,6 +26,7 @@ final class UtilisateurController extends AbstractController
 
     // ------------------- Authentification -------------------
 
+    
     #[Route('/auth', name: 'app_auth')]
     public function showAuthPage(AuthenticationUtils $authenticationUtils, Request $request): Response
     {
@@ -40,7 +43,8 @@ final class UtilisateurController extends AbstractController
         ]);
     }
 
-    #[Route('/register', name: 'app_register', methods: ['POST'])]
+
+    #[Route('/register', name: 'app_register', methods: ['GET', 'POST'])]
     public function register(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
@@ -52,33 +56,40 @@ final class UtilisateurController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $imageFile = $form->get('image')->getData();
+                try {
+                    // Gestion de l'image
+                    $imageFile = $form->get('image')->getData();
+                    if ($imageFile) {
+                        $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+                        $imageFile->move(
+                            $params->get('images_directory'),
+                            $newFilename
+                        );
+                        $user->setImage($newFilename);
+                    }
 
-            if ($imageFile) {
-                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
-                $imageFile->move($params->get('images_directory'), $newFilename);
-                $user->setImage($newFilename);
-            } else {
-                $user->setImage('default.jpg');
-            }
+                    // Hash du mot de passe
+                    $user->setPassword(
+                        $passwordHasher->hashPassword(
+                            $user,
+                            $form->get('plainPassword')->getData()
+                        )
+                    );
 
-            $user->setPassword(
-                $passwordHasher->hashPassword(
-                    $user,
-                    $form->get('plainPassword')->getData()
-                )
-            );
-            $user->setRole('Candidat');
-            $entityManager->persist($user);
-            $entityManager->flush();
+                    $user->setRole('Candidat');
+                    $entityManager->persist($user);
+                    $entityManager->flush();
 
-            return $this->redirectToRoute('app_auth');
+                    $this->addFlash('success', 'Inscription réussie ! Vous pouvez maintenant vous connecter.');
+                    return $this->redirectToRoute('app_auth');
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Une erreur est survenue : ' . $e->getMessage());
+                }
+
         }
 
-        return $this->render('login.html.twig', [
+        return $this->render('register.html.twig', [
             'registrationForm' => $form->createView(),
-            'last_username' => '',
-            'error' => null
         ]);
     }
 
@@ -100,13 +111,9 @@ final class UtilisateurController extends AbstractController
         ]);
     }
 
-
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
-
-
-
 }

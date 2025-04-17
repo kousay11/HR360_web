@@ -1,57 +1,253 @@
 {% extends 'baseRH.html.twig' %}
 
-{% block title %}Modifier Employé{% endblock %}
+{% block title %}Modifier Employé
+{% endblock %}
+
+{% block css %}
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('back/css/forms.css') }}">
+	<style>
+		.is-invalid {
+			border-color: #dc3545;
+		}
+		.invalid-feedback {
+			color: #dc3545;
+			font-size: 0.875em;
+		}
+		.custom-file-label::after {
+			content: "Parcourir";
+		}
+		.img-preview {
+			max-width: 200px;
+			max-height: 200px;
+			margin-top: 10px;
+		}
+	</style>
+{% endblock %}
 
 {% block body %}
-<div class="container-fluid">
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Modifier l'employé</h6>
-        </div>
-        <div class="card-body">
-            {{ form_start(form) }}
-                <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.nom) }}
-                        {{ form_row(form.prenom) }}
-                        {{ form_row(form.email) }}
+	<div class="container-fluid">
+		<div class="card shadow mb-4">
+			<div class="card-header py-3">
+				<h6 class="m-0 font-weight-bold text-primary">Modifier l'employé</h6>
+			</div>
+			<div class="card-body">
+				{{ form_start(form, {'attr': {'class': 'form', 'novalidate': 'novalidate'}}) }}
+				<div class="row">
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form_label(form.nom) }}
+							{{ form_widget(form.nom, {
+								'attr': {
+									'class': 'form-control' ~ (form.nom.vars.errors|length ? ' is-invalid' : '')
+								}
+							}) }}
+							<div class="invalid-feedback">
+								{{ form_errors(form.nom) }}
+							</div>
+						</div>
 
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.salaire) }}
-                        {{ form_row(form.poste) }}
+						<div class="form-group">
+							{{ form_label(form.prenom) }}
+							{{ form_widget(form.prenom, {
+								'attr': {
+									'class': 'form-control' ~ (form.prenom.vars.errors|length ? ' is-invalid' : '')
+								}
+							}) }}
+							<div class="invalid-feedback">
+								{{ form_errors(form.prenom) }}
+							</div>
+						</div>
+
+						<div class="form-group">
+							{{ form_label(form.email) }}
+							{{ form_widget(form.email, {
+                            'attr': {
+                                'class': 'form-control' ~ (form.email.vars.errors|length ? ' is-invalid' : '')
+                            }
+                        }) }}
+							<div class="invalid-feedback">
+								{{ form_errors(form.email) }}
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form_label(form.salaire) }}
+							{{ form_widget(form.salaire, {
+                            'attr': {
+                                'class': 'form-control' ~ (form.salaire.vars.errors|length ? ' is-invalid' : '')
+                            }
+                        }) }}
+							<div class="invalid-feedback">
+								{{ form_errors(form.salaire) }}
+							</div>
+						</div>
+
+						<div class="form-group">
+							{{ form_label(form.poste) }}
+							{{ form_widget(form.poste, {
+                            'attr': {
+                                'class': 'form-control' ~ (form.poste.vars.errors|length ? ' is-invalid' : '')
+                            }
+                        }) }}
+							<div class="invalid-feedback">
+								{{ form_errors(form.poste) }}
+							</div>
+						</div>
+
+						<div class="form-group">
+							{{ form_label(form.image) }}
+							{{ form_widget(form.image, {
+                                'attr': {
+                                    'class': 'form-control-file' ~ (form.image.vars.errors|length ? ' is-invalid' : ''),
+                                    'data-upload-url': path('app_utilisateur_upload_image', {'id': utilisateur.id}),
+                                    'onchange': 'uploadImage(this)'
+                                }
+                            }) }}
+							<div class="invalid-feedback">
+								{{ form_errors(form.image) }}
+							</div>
+
+							<div id="imagePreviewContainer" class="mt-3">
+								{% if utilisateur.image %}
+									<img src="{{ asset('uploads/images/' ~ utilisateur.image) }}" alt="Photo actuelle" class="img-thumbnail img-preview">
+								{% endif %}
+							</div>
+						</div>
+
+						<script>
+							function uploadImage(input) {
+const file = input.files[0];
+if (! file) 
+return;
+
+
+
+const formData = new FormData();
+formData.append('image', file);
+
+const uploadUrl = input.getAttribute('data-upload-url');
+const previewContainer = document.getElementById('imagePreviewContainer');
+
+// Afficher un indicateur de chargement
+previewContainer.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="sr-only">Chargement...</span></div></div>';
+
+fetch(uploadUrl, {
+method: 'POST',
+body: formData,
+headers: {
+'X-Requested-With': 'XMLHttpRequest'
+}
+}).then(response => response.json()).then(data => {
+if (data.error) {
+previewContainer.innerHTML = `<div class="alert alert-danger">${
+data.error
+}</div>`;
+return;
+}
+
+// Mettre à jour l'aperçu
+previewContainer.innerHTML = `<img src="/uploads/images/${
+data.imageUrl.split('/').pop()
+}" alt="Nouvelle image" class="img-thumbnail img-preview">`;
+
+// Optionnel: afficher un message de succès
+const alert = document.createElement('div');
+alert.className = 'alert alert-success mt-2';
+alert.textContent = 'Image téléchargée avec succès';
+alert.style.transition = 'opacity 3s';
+previewContainer.appendChild(alert);
+
+// Faire disparaître le message après 3 secondes
+setTimeout(() => {
+alert.style.opacity = '0';
+setTimeout(() => alert.remove(), 1000);
+}, 3000);
+}).catch(error => {
+previewContainer.innerHTML = `<div class="alert alert-danger">Erreur lors du téléchargement: ${
+error.message
+}</div>`;
+});
+}
+						</script>
+
+
+						<div id="passwordField" style="display: none;">
+							{{ form_label(form.password) }}
+							{{ form_widget(form.password, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.password.vars.errors|length ? ' is-invalid' : '')
+                                }
+                            }) }}
+							<div class="invalid-feedback">
+								{{ form_errors(form.password) }}
+							</div>
+						</div>
                         
-                        <div class="form-group">
-                            {{ form_label(form.image) }}
-                            <div class="custom-file">
-                                {{ form_widget(form.image, {'attr': {'class': 'custom-file-input'}}) }}
-                                <label class="custom-file-label" for="utilisateur_image">
-                                    {% if utilisateur.image %}
-                                        {{ utilisateur.image }}
-                                    {% else %}
-                                        Choisir une image
-                                    {% endif %}
-                                </label>
-                            </div>
-                            {{ form_help(form.image) }}
-                            {{ form_errors(form.image) }}
-                            
-                            {% if utilisateur.image %}
-                                <div class="mt-3">
-                                    <img src="{{ asset('uploads/images/' ~ utilisateur.image) }}" 
-                                         alt="Photo actuelle" 
-                                         class="img-thumbnail" 
-                                         style="max-width: 200px;">
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                
-                <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
-                <a href="{{ path('app_utilisateur_index') }}" class="btn btn-secondary">Annuler</a>
-            {{ form_end(form) }}
-        </div>
-    </div>
-</div>
+					</div>
+				</div>
+
+				<div class="form-group mt-4">
+					<button type="submit" class="btn btn-primary">
+						<i class="fas fa-save mr-2"></i>
+						{{ button_label|default('Enregistrer') }}
+					</button>
+					<a href="{{ path('app_utilisateur_index') }}" class="btn btn-secondary">
+						<i class="fas fa-times mr-2"></i>
+						Annuler
+					</a>
+				</div>
+				{{ form_end(form) }}
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+
+{% block javascripts %}
+	<script>
+		document.querySelector('.form-control-file').addEventListener('change', function (e) {
+
+
+const nom = document.querySelector('# {{ form.nom.vars.id }}').value.trim();
+const prenom = document.querySelector('# {{ form.prenom.vars.id }}').value.trim();
+
+if (! nom || ! prenom) {
+e.preventDefault();
+if (! nom) {
+document.querySelector('# {{ form.nom.vars.id }}').classList.add('is-invalid');
+}
+if (! prenom) {
+document.querySelector('# {{ form.prenom.vars.id }}').classList.add('is-invalid');
+}
+}
+const file = e.target.files[0];
+const previewContainer = document.getElementById('imagePreviewContainer');
+
+// Vider le conteneur précédent
+previewContainer.innerHTML = '';
+
+if (file) {
+const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+if (! allowedTypes.includes(file.type)) {
+previewContainer.innerHTML = '<p class="text-danger">Format non supporté. Veuillez choisir une image JPG, PNG ou WEBP.</p>';
+return;
+}
+
+const reader = new FileReader();
+reader.onload = function (event) {
+const img = document.createElement('img');
+img.src = event.target.result;
+img.className = 'img-thumbnail img-preview';
+img.alt = 'Prévisualisation';
+previewContainer.appendChild(img);
+}
+reader.readAsDataURL(file);
+} else {
+previewContainer.innerHTML = '<p class="text-muted">Aucune image sélectionnée.</p>';
+}
+});
+	</script>
 {% endblock %}

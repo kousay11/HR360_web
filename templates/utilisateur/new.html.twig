@@ -39,10 +39,10 @@
 						<div class="form-group">
 							{{ form_label(form.nom) }}
 							{{ form_widget(form.nom, {
-                            'attr': {
-                                'class': 'form-control' ~ (form.nom.vars.errors|length ? ' is-invalid' : '')
-                            }
-                        }) }}
+								'attr': {
+									'class': 'form-control' ~ (form.nom.vars.errors|length ? ' is-invalid' : '')
+								}
+							}) }}
 							<div class="invalid-feedback">
 								{{ form_errors(form.nom) }}
 							</div>
@@ -51,10 +51,10 @@
 						<div class="form-group">
 							{{ form_label(form.prenom) }}
 							{{ form_widget(form.prenom, {
-                            'attr': {
-                                'class': 'form-control' ~ (form.prenom.vars.errors|length ? ' is-invalid' : '')
-                            }
-                        }) }}
+								'attr': {
+									'class': 'form-control' ~ (form.prenom.vars.errors|length ? ' is-invalid' : '')
+								}
+							}) }}
 							<div class="invalid-feedback">
 								{{ form_errors(form.prenom) }}
 							</div>

@@ -14,13 +14,15 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use App\Form\DataTransformer\StringToDateTimeTransformer;
+use App\Form\DataTransformer\DateToStringTransformer;
 
 class FormationType extends AbstractType
 {
 
-    private StringToDateTimeTransformer $transformer;
+    private DateToStringTransformer $transformer;
 
-    public function __construct(StringToDateTimeTransformer $transformer)
+
+    public function __construct(DateToStringTransformer $transformer)
     {
         $this->transformer = $transformer;
     }
@@ -34,17 +36,22 @@ class FormationType extends AbstractType
             ->add('duree', IntegerType::class, [
                 'label' => 'Durée (en jours)'
             ])
-            ->add('dateFormation', DateType::class, [
-                'widget' => 'single_text',
-                'html5' => true
+
+            ->add('dateFormation', TextType::class, [
+                'label' => 'Date de formation',
+                'attr' => [
+                    'placeholder' => 'JJ-MM-AAAA',
+                    'class' => 'form-control'
+                ]
             ])
+
 
             ->add('isFavorite', CheckboxType::class, [
                 'label' => 'Formation favorite',
                 'required' => false
             ]);
-            $builder->get('dateFormation')->addModelTransformer($this->transformer);
-
+            $builder->get('dateFormation')
+        ->addModelTransformer(new DateToStringTransformer());
     }
 
     public function configureOptions(OptionsResolver $resolver): void

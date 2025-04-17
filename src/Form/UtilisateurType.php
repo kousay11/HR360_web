@@ -56,8 +56,40 @@ class UtilisateurType extends AbstractType
             ])
 
 
-            ->add('salaire', NumberType::class, ['required' => false])
-            ->add('poste', TextType::class, ['required' => false]);
+            ->add('salaire', NumberType::class, [
+                'required' => false,
+                'constraints' => [
+                    new Assert\Type([
+                        'type' => 'numeric',
+                        'message' => 'Le salaire doit être un nombre valide'
+                    ]),
+                    new Assert\Range([
+                        'min' => 0,
+                        'max' => 1000000,
+                        'notInRangeMessage' => 'Le salaire doit être compris entre {{ min }} et {{ max }}',
+                        'invalidMessage' => 'Le salaire doit être un nombre valide'
+                    ]),
+                    new Assert\PositiveOrZero([
+                        'message' => 'Le salaire ne peut pas être négatif'
+                    ])
+                ],
+                'attr' => [
+                    'min' => 0,
+                    'step' => 0.01
+                ]
+            ])
+            ->add('poste', TextType::class, [
+                'required' => false,
+                'constraints' => [
+                    new Assert\Length([
+                        'max' => 100,
+                        'maxMessage' => 'Le poste ne peut pas dépasser {{ limit }} caractères'
+                    ]),
+                    new Assert\Regex([
+                        'pattern' => '/^[a-zA-ZÀ-ÿ\s\-]+$/',
+                        'message' => 'Le poste ne peut contenir que des lettres, espaces et tirets'
+                    ])
+                ]]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -2,13 +2,141 @@
 
 {% block title %}Modifier Formation{% endblock %}
 
+{% block css %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('back/css/forms.css') }}">
+    <style>
+        .is-invalid {
+            border-color: #dc3545;
+        }
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
-<h2>Modifier la formation</h2>
+    <div class="container-fluid">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Modifier la formation</h6>
+            </div>
+            <div class="card-body">
+                {{ form_start(form, {'attr': {'class': 'form', 'novalidate': 'novalidate'}}) }}
 
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button type="submit">Enregistrer</button>
-{{ form_end(form) }}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ form_label(form.titre) }}
+                            {{ form_widget(form.titre, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.titre.vars.errors|length ? ' is-invalid' : ''),
+                                    'placeholder': 'Ex: Formation Symfony'
+                                }
+                            }) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.titre) }}
+                            </div>
+                        </div>
 
-<a href="{{ path('app_formation_index') }}">⬅ Retour</a>
+                        <div class="form-group">
+                            {{ form_label(form.description) }}
+                            {{ form_widget(form.description, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.description.vars.errors|length ? ' is-invalid' : ''),
+                                    'rows': 4,
+                                    'placeholder': 'Description détaillée de la formation'
+                                }
+                            }) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.description) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ form_label(form.duree) }}
+                            <div class="input-group">
+                                {{ form_widget(form.duree, {
+                                    'attr': {
+                                        'class': 'form-control' ~ (form.duree.vars.errors|length ? ' is-invalid' : ''),
+                                        'placeholder': 'Durée en heures'
+                                    }
+                                }) }}
+                                <div class="input-group-append">
+                                    <span class="input-group-text">heures</span>
+                                </div>
+                            </div>
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.duree) }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form_label(form.dateFormation) }}
+                            {{ form_widget(form.dateFormation, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.dateFormation.vars.errors|length ? ' is-invalid' : ''),
+                                    'placeholder': 'JJ-MM-AAAA'
+                                }
+                            }) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.dateFormation) }}
+                            </div>
+                        </div>
+
+                        <div style="display: none;">
+                            {{ form_label(form.isFavorite) }}
+                            {{ form_widget(form.isFavorite, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.isFavorite.vars.errors|length ? ' is-invalid' : '')
+                                }
+                            }) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.isFavorite) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-edit mr-2"></i>
+                        Enregistrer
+                    </button>
+                    <a href="{{ path('app_formation_index') }}" class="btn btn-secondary">
+                        <i class="fas fa-times mr-2"></i>
+                        Annuler
+                    </a>
+                </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Script pour formater automatiquement la date
+        document.getElementById('{{ form.dateFormation.vars.id }}').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 2 && value.length <= 4) {
+                value = value.substring(0, 2) + '-' + value.substring(2);
+            } else if (value.length > 4) {
+                value = value.substring(0, 2) + '-' + value.substring(2, 4) + '-' + value.substring(4, 8);
+            }
+            e.target.value = value;
+        });
+
+        // Validation JS avant soumission
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const dateInput = document.getElementById('{{ form.dateFormation.vars.id }}');
+            if (!/^\d{2}-\d{2}-\d{4}$/.test(dateInput.value)) {
+                dateInput.classList.add('is-invalid');
+                dateInput.nextElementSibling.textContent = 'Format de date invalide (JJ-MM-AAAA requis)';
+                e.preventDefault();
+            }
+        });
+    </script>
 {% endblock %}

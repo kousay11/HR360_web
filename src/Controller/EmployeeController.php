@@ -17,6 +17,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 #[Route('/employe')]
 final class EmployeeController extends AbstractController
@@ -131,15 +133,7 @@ final class EmployeeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Gestion du mot de passe
-            $plainPassword = $form->get('password')->getData();
-            if ($plainPassword) {
-                $utilisateur->setPassword(
-                    $passwordHasher->hashPassword($utilisateur, $plainPassword)
-                );
-            }
-
-            // Gestion de l'image
+            // Gestion de l'upload d'image
             $imageFile = $form->get('image')->getData();
             if ($imageFile) {
                 // Supprimer l'ancienne image si elle existe
@@ -162,6 +156,7 @@ final class EmployeeController extends AbstractController
                     $utilisateur->setImage($newFilename);
                 } catch (FileException $e) {
                     $this->addFlash('error', 'Erreur lors du téléchargement de l\'image');
+                    return $this->redirectToRoute('app_utilisateur_edit', ['id' => $utilisateur->getId()]);
                 }
             }
 
@@ -176,6 +171,70 @@ final class EmployeeController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+
+    #[Route('/{id}/upload-image', name: 'app_utilisateur_upload_image', methods: ['POST'])]
+    public function uploadImage(
+        Request $request,
+        Utilisateur $utilisateur,
+        EntityManagerInterface $entityManager,
+        ParameterBagInterface $params,
+        SluggerInterface $slugger
+    ): JsonResponse {
+        $imageFile = $request->files->get('image');
+
+        if (!$imageFile) {
+            return new JsonResponse(['error' => 'Aucun fichier envoyé'], 400);
+        }
+
+        // Vérification du type MIME
+        $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!in_array($imageFile->getMimeType(), $allowedMimeTypes)) {
+            return new JsonResponse(['error' => 'Format d\'image non valide'], 400);
+        }
+
+        // Supprimer l'ancienne image si elle existe
+        if ($utilisateur->getImage() && $utilisateur->getImage() !== 'default.jpg') {
+            $oldImagePath = $params->get('images_directory') . '/' . $utilisateur->getImage();
+            if (file_exists($oldImagePath)) {
+                unlink($oldImagePath);
+            }
+        }
+
+        $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeFilename = $slugger->slug($originalFilename);
+        $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+        try {
+            $imageFile->move(
+                $params->get('images_directory'),
+                $newFilename
+            );
+            $utilisateur->setImage($newFilename);
+            $entityManager->flush();
+
+            return new JsonResponse([
+                'success' => true,
+                'imageUrl' => $this->generateUrl('app_images', ['filename' => $newFilename])
+            ]);
+        } catch (FileException $e) {
+            return new JsonResponse(['error' => 'Erreur lors du téléchargement'], 500);
+        }
+    }
+
+
+    #[Route('/uploads/images/{filename}', name: 'app_images')]
+    public function displayImage($filename, ParameterBagInterface $params): Response
+    {
+        $path = $params->get('images_directory') . '/' . $filename;
+
+        if (!file_exists($path)) {
+            throw $this->createNotFoundException('Image non trouvée');
+        }
+
+        return new BinaryFileResponse($path);
+    }
+
 
     #[Route('/{id}', name: 'app_utilisateur_delete', methods: ['POST'])]
     public function delete(

@@ -18,7 +18,8 @@
 							<input id="tab-1" type="radio" name="tab" class="sign-in" checked>
 							<label for="tab-1" class="tab">Login</label>
 							<input id="tab-2" type="radio" name="tab" class="sign-up">
-							<label for="tab-2" class="tab">Sign Up</label>
+							<label for="tab-2" class="tab"></label>
+
 							<div
 								class="login-space" style="margin-top: 5px; padding: 5px 0 0 0;">
 
@@ -45,133 +46,17 @@
 										<div class="group">
 											<button type="submit" class="button">Sign in</button>
 										</div>
+										<div class="foot">
+											<a href="{{ path('app_register') }}" style="color: white; text-decoration: none;">Pas encore inscrit ? Créez un compte</a>
+
+										</div>
+
 									</div>
 								</form>
+
 								<div class="hr"></div>
 
 
-								<!-- Formulaire d'Inscription -->
-								<div class="sign-up-form" style="max-height: 100%; padding: 5px; box-sizing: border-box;">
-									{{ form_start(registrationForm, {
-											'action': path('app_register'),
-											'method': 'POST',
-											'attr': {
-												'class': 'register-form',
-												'enctype': 'multipart/form-data'
-											}
-										}) }}
+							</body>
 
-									<div class="group" style="margin-bottom: 10px;">
-										{{ form_label(registrationForm.nom) }}
-										{{ form_widget(registrationForm.nom, {'attr': {'class': 'input', 'placeholder': 'Votre nom'}}) }}
-										{{ form_errors(registrationForm.nom) }}
-									</div>
-
-									<div class="group" style="margin-bottom: 10px;">
-										{{ form_label(registrationForm.prenom) }}
-										{{ form_widget(registrationForm.prenom, {'attr': {'class': 'input', 'placeholder': 'Votre prénom'}}) }}
-										{{ form_errors(registrationForm.prenom) }}
-									</div>
-
-									<div class="group" style="margin-bottom: 10px;">
-										{{ form_label(registrationForm.email) }}
-										{{ form_widget(registrationForm.email, {'attr': {'class': 'input', 'placeholder': 'Votre email'}}) }}
-										{{ form_errors(registrationForm.email) }}
-									</div>
-
-									<div class="group" style="margin-bottom: 10px;">
-										{{ form_label(registrationForm.plainPassword.first) }}
-										{{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'input', 'placeholder': 'Mot de passe'}}) }}
-										{{ form_errors(registrationForm.plainPassword.first) }}
-									</div>
-
-									<div class="group" style="margin-bottom: 10px;">
-										{{ form_label(registrationForm.plainPassword.second) }}
-										{{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'input', 'placeholder': 'Confirmez le mot de passe'}}) }}
-									</div>
-
-									<div class="group" style="margin-bottom: 10px;">
-										{{ form_label(registrationForm.image) }}
-
-
-										{{ form_widget(registrationForm.image, {
-												'attr': {
-													'class': 'input-file',
-													'accept': 'image/*'
-												}
-											}) }}
-
-										<div class="image-preview-container" style="margin-top: 10px;">
-											<label for="{{ registrationForm.image.vars.id }}" class="custom-upload-button">
-												<i class="fas fa-upload"></i>
-												Choisir une image
-											</label>
-											{% if registrationForm.image.vars.data %}
-												<img id="image-preview" src="{{ asset('uploads/images/' ~ registrationForm.image.vars.data) }}" alt="Aperçu de l'image" style="max-width: 120px; max-height: 120px; object-fit: cover; border-radius: 8px; display: block;">
-											{% else %}
-												<img id="image-preview" src="#" alt="Aperçu de l'image" style="max-width: 120px; max-height: 120px; object-fit: cover; border-radius: 8px; display: none;">
-											{% endif %}
-											<span id="file-name" style="display: none;"></span>
-										</div>
-
-										<small class="form-help">Formats acceptés: JPG, PNG, GIF (max. 2MB)</small>
-										{{ form_errors(registrationForm.image) }}
-									</div>
-
-									<div class="group" style="margin-bottom: 10px;">
-										{{ form_label(registrationForm.competence) }}
-										{{ form_widget(registrationForm.competence, {'attr': {'class': 'input', 'placeholder': 'Décrivez vos compétences', 'rows': 3}}) }}
-										{{ form_errors(registrationForm.competence) }}
-									</div>
-
-									<div class="group">
-										<button type="submit" class="button">S'inscrire</button>
-									</div>
-
-									<div class="hr"></div>
-									<div class="foot">
-										<a href="#" onclick="document.getElementById('tab-1').click()">Déjà inscrit ? Connectez-vous</a>
-									</div>
-									{{ form_end(registrationForm) }}
-								</div>
-
-
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-	</body>
-
-
-	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-const fileInput = document.getElementById('{{ registrationForm.image.vars.id }}');
-const imagePreview = document.getElementById('image-preview');
-const fileNameSpan = document.getElementById('file-name');
-
-if (fileInput) {
-fileInput.addEventListener('change', function (event) {
-const file = event.target.files[0];
-if (file) {
-const reader = new FileReader();
-reader.onload = function (e) {
-imagePreview.src = e.target.result;
-imagePreview.style.display = 'block';
-};
-reader.readAsDataURL(file);
-
-fileNameSpan.textContent = file.name;
-fileNameSpan.style.display = 'inline-block';
-} else {
-imagePreview.style.display = 'none';
-fileNameSpan.style.display = 'none';
-}
-});
-}
-});
-	</script>
-
-</html>
+						</html>

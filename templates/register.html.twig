@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Connexion/Inscription</title>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+	<link rel="stylesheet" href="{{ asset('front/css/auth.css') }}">
+
+	<!-- Ton style pour le rouge ici -->
+	<style>
+		.input.is-invalid,
+		.input-file.is-invalid {
+			border: 2px solid red;
+			background-color: #ffe6e6;
+			color: #a70000;
+		}
+
+		.invalid-feedback {
+			color: red;
+			font-size: 0.9em;
+			margin-top: 5px;
+		}
+
+		.input.is-invalid:focus,
+		.input-file.is-invalid:focus {
+			outline: none;
+			box-shadow: 0 0 5px red;
+		}
+	</style>
+</head>
+
+
+
+	<body>
+
+		<div class="row">
+			<div class="col-md-6 mx-auto p-0">
+				<div class="card">
+					<div class="login-box">
+						<div class="login-snip">
+							<input id="tab-1" type="radio" name="tab" class="sign-in" checked>
+							<label for="tab-1" class="tab">SignUp</label>
+							<input id="tab-2" type="radio" name="tab" class="sign-up">
+							<label for="tab-2" class="tab"></label>
+							<div
+								class="login-space" style="margin-top: 5px; padding: 5px 0 0 0;">
+
+
+								<!-- Formulaire d'Inscription -->
+								{{ form_start(registrationForm, {
+												'action': path('app_register'),
+												'method': 'POST',
+												'attr': {
+													'class': 'register-form',
+													'enctype': 'multipart/form-data',
+													'novalidate': 'novalidate'
+												}
+											}) }}
+
+								<div class="group" style="margin-bottom: 15px;">
+									{{ form_label(registrationForm.nom, null, {'label_attr': {'class': 'label'}}) }}
+									{{ form_widget(registrationForm.nom, {
+												'attr': {
+													'class': 'input' ~ (registrationForm.nom.vars.errors|length ? ' is-invalid' : ''),
+													'placeholder': 'Votre nom'
+												}
+											}) }}
+									<div class="invalid-feedback text-white">
+										{{ form_errors(registrationForm.nom) }}
+									</div>
+								</div>
+
+								<div class="group" style="margin-bottom: 15px;">
+									{{ form_label(registrationForm.prenom, null, {'label_attr': {'class': 'label'}}) }}
+									{{ form_widget(registrationForm.prenom, {
+												'attr': {
+													'class': 'input' ~ (registrationForm.prenom.vars.errors|length ? ' is-invalid' : ''),
+													'placeholder': 'Votre prénom'
+												}
+											}) }}
+									<div class="invalid-feedback">
+										{{ form_errors(registrationForm.prenom) }}
+									</div>
+								</div>
+
+								<div class="group" style="margin-bottom: 15px;">
+									{{ form_label(registrationForm.email, null, {'label_attr': {'class': 'label'}}) }}
+									{{ form_widget(registrationForm.email, {
+												'attr': {
+													'class': 'input' ~ (registrationForm.email.vars.errors|length ? ' is-invalid' : ''),
+													'placeholder': 'Votre email'
+												}
+											}) }}
+									<div class="invalid-feedback">
+										{{ form_errors(registrationForm.email) }}
+									</div>
+								</div>
+
+
+								{% for flashError in app.flashes('error') %}
+									<div class="alert alert-danger">{{ flashError }}</div>
+								{% endfor %}
+
+
+								<div class="group" style="margin-bottom: 15px;">
+									{{ form_label(registrationForm.plainPassword.first, null, {'label_attr': {'class': 'label'}}) }}
+									{{ form_widget(registrationForm.plainPassword.first, {
+												'attr': {
+													'class': 'input' ~ (registrationForm.plainPassword.first.vars.errors|length ? ' is-invalid' : ''),
+													'placeholder': 'Mot de passe',
+                                                    
+												}
+											}) }}
+									<div class="invalid-feedback">
+										{{ form_errors(registrationForm.plainPassword.first) }}
+									</div>
+								</div>
+
+								<div class="group" style="margin-bottom: 15px;">
+									{{ form_label(registrationForm.plainPassword.second, null, {'label_attr': {'class': 'label'}}) }}
+									{{ form_widget(registrationForm.plainPassword.second, {
+												'attr': {
+													'class': 'input' ~ (registrationForm.plainPassword.second.vars.errors|length ? ' is-invalid' : ''),
+													'placeholder': 'Confirmez le mot de passe'
+												}
+											}) }}
+									<div class="invalid-feedback">
+										{{ form_errors(registrationForm.plainPassword.second) }}
+									</div>
+								</div>
+
+								<div class="group" style="margin-bottom: 15px;">
+									{{ form_label(registrationForm.image, null, {'label_attr': {'class': 'label'}}) }}
+									{{ form_widget(registrationForm.image, {
+												'attr': {
+													'class': 'input-file' ~ (registrationForm.image.vars.errors|length ? ' is-invalid' : ''),
+													'accept': 'image/*'
+												}
+											}) }}
+
+									<div class="image-preview-container" style="margin-top: 10px;">
+										<label for="{{ registrationForm.image.vars.id }}" class="custom-upload-button">
+											<i class="fas fa-upload"></i>
+											Choisir une image
+										</label>
+										{% if registrationForm.image.vars.data %}
+											<img id="image-preview" src="{{ asset('uploads/images/' ~ registrationForm.image.vars.data) }}" alt="Aperçu de l'image" class="img-preview">
+										{% else %}
+											<img id="image-preview" src="#" alt="Aperçu de l'image" class="img-preview" style="display: none;">
+										{% endif %}
+										<span id="file-name" style="display: none;"></span>
+									</div>
+
+									<small class="form-help">Formats acceptés: JPG, PNG, GIF (max. 2MB)</small>
+									<div class="invalid-feedback">
+										{{ form_errors(registrationForm.image) }}
+									</div>
+								</div>
+
+								<div class="group" style="margin-bottom: 15px;">
+									{{ form_label(registrationForm.competence, null, {'label_attr': {'class': 'label'}}) }}
+									{{ form_widget(registrationForm.competence, {
+												'attr': {
+													'class': 'input' ~ (registrationForm.competence.vars.errors|length ? ' is-invalid' : ''),
+													'placeholder': 'Décrivez vos compétences',
+													'rows': 3
+												}
+											}) }}
+									<div class="invalid-feedback">
+										{{ form_errors(registrationForm.competence) }}
+									</div>
+								</div>
+
+								<div class="group">
+									<button type="submit" class="button">S'inscrire</button>
+								</div>
+
+								<div class="hr"></div>
+								<div class="foot">
+									<a href="{{ path('app_auth') }}" style="color: white; text-decoration: none;">Déjà inscrit ? Connectez-vous</a>
+								</div>
+								{{ form_end(registrationForm) }}
+
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</body>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+const fileInput = document.getElementById('{{ registrationForm.image.vars.id }}');
+const imagePreview = document.getElementById('image-preview');
+const fileNameSpan = document.getElementById('file-name');
+
+if (fileInput) {
+fileInput.addEventListener('change', function (event) {
+const file = event.target.files[0];
+if (file) {
+const reader = new FileReader();
+reader.onload = function (e) {
+imagePreview.src = e.target.result;
+imagePreview.style.display = 'block';
+};
+reader.readAsDataURL(file);
+
+fileNameSpan.textContent = file.name;
+fileNameSpan.style.display = 'inline-block';
+} else {
+imagePreview.style.display = 'none';
+fileNameSpan.style.display = 'none';
+}
+});
+}
+});
+	</script>
+
+
+</html>

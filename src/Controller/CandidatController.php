@@ -67,6 +67,7 @@ class CandidatController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            
             // Gestion de l'upload d'image
             $imageFile = $form->get('image')->getData();
 
