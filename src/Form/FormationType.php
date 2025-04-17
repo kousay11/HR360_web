@@ -15,6 +15,8 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use App\Form\DataTransformer\StringToDateTimeTransformer;
 use App\Form\DataTransformer\DateToStringTransformer;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 class FormationType extends AbstractType
 {
@@ -34,9 +36,16 @@ class FormationType extends AbstractType
             ])
             ->add('description', TextareaType::class)
             ->add('duree', IntegerType::class, [
-                'label' => 'Durée (en jours)'
+                'label' => 'Durée (en jours)',
+                'required' => true,
+                'empty_data' => '0',
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'La durée est obligatoire'
+                    ])
+                ]
             ])
-
+            
             ->add('dateFormation', TextType::class, [
                 'label' => 'Date de formation',
                 'attr' => [
