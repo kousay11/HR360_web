@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -92,7 +91,12 @@
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
 
-      <a class="cta-btn" href="index.html#about">Log out</a>
+      <form id="logout-form" action="{{ path('app_logout') }}" method="POST" class="d-inline">
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+					<button type="button" class="cta-btn" onclick="if(confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) { this.form.submit(); }">
+						Déconnexion
+					</button>
+				</form>
 
     </div>
   </header>
@@ -447,3 +451,4 @@
 </body>
 
 </html>
+

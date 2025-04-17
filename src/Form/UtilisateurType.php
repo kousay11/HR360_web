@@ -2,28 +2,94 @@
 
 namespace App\Form;
 
-use App\Entity\Formation;
 use App\Entity\Utilisateur;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class UtilisateurType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+
+
         $builder
-            ->add('nom')
-            ->add('prenom')
-            ->add('email')
-            ->add('password')
-            ->add('role')
-            ->add('image')
-            ->add('salaire')
-            ->add('poste')
-            ->add('competence')
-        ;
+            ->add('nom', TextType::class)
+            ->add('prenom', TextType::class)
+            ->add('email', EmailType::class)
+
+            ->add('password', RepeatedType::class, [
+                'type' => PasswordType::class,
+                'invalid_message' => 'Les mots de passe doivent correspondre',
+                'options' => ['attr' => ['class' => 'form-control password-field']],
+                'required' => true,
+                'first_options'  => ['label' => 'Mot de passe'],
+                'second_options' => ['label' => 'Confirmation du mot de passe'],
+            ])
+
+            ->add('image', FileType::class, [
+                'label' => 'Photo de profil',
+                'required' => true,
+                'mapped' => false,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez sélectionner une image'
+                    ]),
+                    new Assert\File([
+                        'maxSize' => '2M',
+                        'mimeTypes' => [
+                            'image/*'
+                        ],
+                        'mimeTypesMessage' => 'Veuillez uploader une image valide (JPG, JPEG, PNG ou WEBP)',
+                        'maxSizeMessage' => 'La taille maximale autorisée est de 2Mo'
+                    ])
+                ],
+                'attr' => ['class' => 'form-control-file']
+            ])
+
+
+            ->add('salaire', NumberType::class, [
+                'required' => false,
+                'constraints' => [
+                    new Assert\Type([
+                        'type' => 'numeric',
+                        'message' => 'Le salaire doit être un nombre valide'
+                    ]),
+                    new Assert\Range([
+                        'min' => 0,
+                        'max' => 1000000,
+                        'notInRangeMessage' => 'Le salaire doit être compris entre {{ min }} et {{ max }}',
+                        'invalidMessage' => 'Le salaire doit être un nombre valide'
+                    ]),
+                    new Assert\PositiveOrZero([
+                        'message' => 'Le salaire ne peut pas être négatif'
+                    ])
+                ],
+                'attr' => [
+                    'min' => 0,
+                    'step' => 0.01
+                ]
+            ])
+            ->add('poste', TextType::class, [
+                'required' => false,
+                'constraints' => [
+                    new Assert\Length([
+                        'max' => 100,
+                        'maxMessage' => 'Le poste ne peut pas dépasser {{ limit }} caractères'
+                    ]),
+                    new Assert\Regex([
+                        'pattern' => '/^[a-zA-ZÀ-ÿ\s\-]+$/',
+                        'message' => 'Le poste ne peut contenir que des lettres, espaces et tirets'
+                    ])
+                ]]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -4,78 +4,116 @@ namespace App\Controller;
 
 use App\Entity\Utilisateur;
 use App\Form\UtilisateurType;
+use App\Form\RegistrationFormType;
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use App\Form\ProfilType;
+use Symfony\Component\Form\FormFactoryInterface;
+use App\Form\LoginType;
 
 #[Route('/utilisateur')]
 final class UtilisateurController extends AbstractController
 {
-    #[Route(name: 'app_utilisateur_index', methods: ['GET'])]
-    public function index(UtilisateurRepository $utilisateurRepository): Response
+
+    // ------------------- Authentification -------------------
+
+    
+    #[Route('/auth', name: 'app_auth')]
+    public function showAuthPage(AuthenticationUtils $authenticationUtils, Request $request): Response
     {
-        return $this->render('utilisateur/index.html.twig', [
-            'utilisateurs' => $utilisateurRepository->findAll(),
+        $error = $authenticationUtils->getLastAuthenticationError();
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        $user = new Utilisateur();
+        $registrationForm = $this->createForm(RegistrationFormType::class, $user);
+
+        return $this->render('login.html.twig', [
+            'last_username' => $lastUsername,
+            'error' => $error,
+            'registrationForm' => $registrationForm->createView(),
         ]);
     }
 
-    #[Route('/new', name: 'app_utilisateur_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $utilisateur = new Utilisateur();
-        $form = $this->createForm(UtilisateurType::class, $utilisateur);
+
+    #[Route('/register', name: 'app_register', methods: ['GET', 'POST'])]
+    public function register(
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $entityManager,
+        ParameterBagInterface $params
+    ): Response {
+        $user = new Utilisateur();
+        $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($utilisateur);
-            $entityManager->flush();
+                try {
+                    // Gestion de l'image
+                    $imageFile = $form->get('image')->getData();
+                    if ($imageFile) {
+                        $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+                        $imageFile->move(
+                            $params->get('images_directory'),
+                            $newFilename
+                        );
+                        $user->setImage($newFilename);
+                    }
 
-            return $this->redirectToRoute('app_utilisateur_index', [], Response::HTTP_SEE_OTHER);
+                    // Hash du mot de passe
+                    $user->setPassword(
+                        $passwordHasher->hashPassword(
+                            $user,
+                            $form->get('plainPassword')->getData()
+                        )
+                    );
+
+                    $user->setRole('Candidat');
+                    $entityManager->persist($user);
+                    $entityManager->flush();
+
+                    $this->addFlash('success', 'Inscription réussie ! Vous pouvez maintenant vous connecter.');
+                    return $this->redirectToRoute('app_auth');
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Une erreur est survenue : ' . $e->getMessage());
+                }
+
         }
 
-        return $this->render('utilisateur/new.html.twig', [
-            'utilisateur' => $utilisateur,
-            'form' => $form,
+        return $this->render('register.html.twig', [
+            'registrationForm' => $form->createView(),
         ]);
     }
 
-    #[Route('/{id}', name: 'app_utilisateur_show', methods: ['GET'])]
-    public function show(Utilisateur $utilisateur): Response
+
+
+    #[Route('/login', name: 'app_login', methods: ['GET', 'POST'])]
+    public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        return $this->render('utilisateur/show.html.twig', [
-            'utilisateur' => $utilisateur,
+        // Get the login error if there is one
+        $error = $authenticationUtils->getLastAuthenticationError();
+
+        // Last username entered by the user
+        $lastUsername = $authenticationUtils->getLastUsername();
+        
+        
+        return $this->render('login.html.twig', [
+            'last_username' => $lastUsername,
+            'error' => $error
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_utilisateur_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Utilisateur $utilisateur, EntityManagerInterface $entityManager): Response
+    #[Route(path: '/logout', name: 'app_logout')]
+    public function logout(): void
     {
-        $form = $this->createForm(UtilisateurType::class, $utilisateur);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_utilisateur_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('utilisateur/edit.html.twig', [
-            'utilisateur' => $utilisateur,
-            'form' => $form,
-        ]);
-    }
-
-    #[Route('/{id}', name: 'app_utilisateur_delete', methods: ['POST'])]
-    public function delete(Request $request, Utilisateur $utilisateur, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$utilisateur->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($utilisateur);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_utilisateur_index', [], Response::HTTP_SEE_OTHER);
+        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 }

@@ -329,10 +329,13 @@
                                     Activity Log
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#ogoutModal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-                                </a>
+                                <form id="logout-form" action="{{ path('app_logout') }}" method="POST" class="d-inline">
+											            <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+											            <button type="button" class="dropdown-item" onclick="if(confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) { this.form.submit(); }">
+												            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+												            Déconnexion
+											            </button>
+									            	</form>
                             </div>
                         </li>
 
