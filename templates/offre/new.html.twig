@@ -1,11 +1,103 @@
-<!DOCTYPE html>
+{% extends 'baseRH.html.twig' %}
 
-<title>New Offre</title>
+{% block title %}New Offre{% endblock %}
+{% block heading %}New Offre{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+{% endblock %}
 
 {% block body %}
-    <h1>Create new Offre</h1>
+    <div class="container py-5">
+        <h1 class="text-center mb-5 text-dark">Créer une nouvelle offre</h1>
+        {{ include('offre/_form.html.twig', {'form_title': 'Nouvelle Offre'}) }}
+    </div>
+{% endblock %}
 
-    {{ include('offre/_form.html.twig') }}
-
-    <a href="{{ path('app_offre_index') }}">back to list</a>
+{% block js %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+       document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form[name="offre"]');
+    
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const description = document.getElementById('offre_description').value;
+        
+        try {
+            // Afficher un indicateur de chargement
+            const swalLoading = Swal.fire({
+                title: 'Vérification en cours',
+                text: 'Nous vérifions votre texte...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            const response = await fetch('{{ path('app_offre_validate_grammar') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ text: description })
+            });
+            
+            await swalLoading.close();
+            
+            if (!response.ok) {
+                throw new Error(`Erreur lors de la vérification grammaticale (${response.status})`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.error) {
+                await Swal.fire({
+                    title: 'Erreur grammaticale détectée',
+                    html: `<div class="text-left">
+                             <p class="mb-2"><strong>Erreur:</strong> ${data.error}</p>
+                             ${data.correction ? `<p class="mb-2"><strong>Correction suggérée:</strong></p>
+                             <div class="bg-light p-2 mb-3">${data.correction}</div>` : ''}
+                           </div>`,
+                    icon: 'warning',
+                    showCancelButton: !!data.correction,
+                    confirmButtonText: data.correction ? 'Appliquer la correction' : 'Soumettre quand même',
+                    cancelButtonText: 'Ignorer',
+                    focusConfirm: false,
+                    customClass: {
+                        htmlContainer: 'text-left'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed && data.correction) {
+                        document.getElementById('offre_description').value = data.correction;
+                    }
+                    form.submit();
+                });
+            } else {
+                form.submit();
+            }
+            
+        } catch (error) {
+            console.error('Erreur:', error);
+            await Swal.fire({
+                title: 'Erreur',
+                text: 'Impossible de vérifier la grammaire. Voulez-vous soumettre quand même?',
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonText: 'Oui, soumettre',
+                cancelButtonText: 'Non, modifier'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+    });
+});
+    </script>
 {% endblock %}

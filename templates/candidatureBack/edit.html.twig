@@ -1,0 +1,40 @@
+{# templates/candidatureBack/statut.html.twig #}
+{% extends 'baseRH.html.twig' %}
+
+{% block title %}Modifier le statut{% endblock %}
+{% block heading %} Modifier le statut{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="text-center mb-0 text-dark">
+                    <i class="fas fa-edit me-2"></i>Modifier le statut
+                </h1>
+                <a href="{{ path('app_candidatureBack_index', {'idCandidature': candidature.idCandidature}) }}" class="btn btn-outline-dark">
+                    <i class="fas fa-arrow-left me-2"></i>Retour
+                </a>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    {{ form_start(form) }}
+                    
+                    <div class="mb-4">
+                        {{ form_row(form.statut) }}
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-primary me-md-2">
+                            <i class="fas fa-save me-2"></i>Enregistrer
+                        </button>
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

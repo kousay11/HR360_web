@@ -125,5 +125,15 @@ class Offre
         $this->getCandidatures()->removeElement($candidature);
         return $this;
     }
+    public function updateStatut(): void
+{
+    $now = new \DateTime();
+    
+    if ($this->dateExpiration < $now) {
+        $this->statut = 'Expirée';
+    } else {
+        $this->statut = 'Publiée';
+    }
+}
 
 }

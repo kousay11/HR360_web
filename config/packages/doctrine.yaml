@@ -14,6 +14,7 @@ doctrine:
             type: App\Doctrine\TypeType
             statut: App\Doctrine\StatutType
             commentaire: App\Doctrine\CommentaireType
+            statustache: App\Doctrine\StatusTacheType
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
