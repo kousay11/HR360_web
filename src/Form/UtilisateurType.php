@@ -14,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class UtilisateurType extends AbstractType
 {
@@ -41,6 +42,9 @@ class UtilisateurType extends AbstractType
                 'mapped' => false,
                 'constraints' => [
                     new Assert\NotBlank([
+                        'message' => 'Veuillez sélectionner une image'
+                    ]),
+                    new NotBlank([
                         'message' => 'Veuillez sélectionner une image'
                     ]),
                     new Assert\File([
