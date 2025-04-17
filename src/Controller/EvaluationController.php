@@ -158,10 +158,11 @@ public function delete(Request $request, Evaluation $evaluation, EntityManagerIn
 public function indexForEntretien(Entretien $entretien, EvaluationRepository $evaluationRepository): Response
 {
     $evaluations = $evaluationRepository->findBy(['entretien' => $entretien], ['dateEvaluation' => 'DESC']);
-    
+    $Candidature=$entretien->getCandidature();
     return $this->render('evaluation/index.html.twig', [
         'evaluations' => $evaluations,
         'entretien' => $entretien,
+        'candidature' => $Candidature
     ]);
 }
 

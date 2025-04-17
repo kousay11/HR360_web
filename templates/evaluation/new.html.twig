@@ -1,6 +1,7 @@
 {% extends 'baseRH.html.twig' %}
 
 {% block title %}Nouvelle Évaluation{% endblock %}
+{% block heading %}Créer une nouvelle évaluation{% endblock %}
 
 {% block body %}
     <!-- Begin Page Content -->
@@ -8,7 +9,6 @@
 
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Créer une nouvelle évaluation</h1>
             {% if evaluation.entretien %}
                 <a href="{{ path('app_evaluation_index_for_entretien', {'idEntretien': evaluation.entretien.idEntretien}) }}" 
                    class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">

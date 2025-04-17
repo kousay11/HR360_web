@@ -79,7 +79,7 @@
             </div>
             <div>
                 {% if entretien is defined %}
-                    <a href="{{ path('app_entretien_index') }}" class="btn btn-secondary btn-sm mr-2">
+                    <a href="{{ path('app_entretien_index', {'idCandidature': candidature.idCandidature}) }}" class="btn btn-secondary btn-sm mr-2">
                         <i class="fas fa-arrow-left"></i> Retour
                     </a>
                 {% endif %}

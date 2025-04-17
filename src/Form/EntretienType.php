@@ -45,6 +45,10 @@ class EntretienType extends AbstractType
                 'choice_label' => fn(TypeEnt $type) => $type->getLabel(),
                 'label' => 'Type',
                 'placeholder' => 'Sélectionnez un type',
+                'attr' => [
+                    'class' => 'form-control entretien-type-selector',
+                    'onchange' => "toggleFields(this.value)"
+                ]
             ])
             ->add('statut', EnumType::class, [
                 'class' => Statut::class,
@@ -52,11 +56,7 @@ class EntretienType extends AbstractType
                 'label' => 'Statut',
                 'placeholder' => 'Sélectionnez une statut',
             ])
-            ->add('lienmeet' ,null, [
-                'attr' => ['class' => 'form-control'],
-                'label' => 'lien meet',
-                'empty_data' => '' 
-            ])
+            
             ->add('localisation', null, [
                 'attr' => ['class' => 'form-control'],
                 'label' => 'localisation',

@@ -43,13 +43,7 @@
     </div>
 </div>
 
-<div class="form-group lienmeet-field">
-   
-    <label for="inputText" class="col-sm-4 col-form-label">Lien Meet</label>
-    {{ form_widget(form.lienmeet, {'attr': {'class': 'form-control', 'placeholder': 'https://meet.google.com/...'}}) }}
-    {{ form_errors(form.lienmeet, {'attr': {'class': 'text-danger'}}) }}
-    <small class="form-text text-muted">Laissez vide si l'entretien est en présentiel</small>
-</div>
+
 
 <div class="form-group localisation-field">
     <label for="inputText" class="col-sm-4 col-form-label">Localisation</label>
@@ -64,7 +58,7 @@
     <button type="submit" class="btn btn-primary">
         <i class="fas fa-save mr-2"></i>{{ button_label|default('Enregistrer') }}
     </button>
-    <a href="{{ path('app_entretien_index') }}" class="btn btn-secondary ml-2">
+    <a href="{{ path('app_entretien_index', {'idCandidature': idCandidature}) }}" class="btn btn-secondary ml-2">
         <i class="fas fa-times mr-2"></i>Annuler
     </a>
 </div>

@@ -2,6 +2,7 @@
 
 {% block title %}Détails de l'entretien #{{ entretien.idEntretien }}{% endblock %}
 
+
 {% block index %}
     <!-- Begin Page Content -->
     <div class="container-fluid mt-4"> <!-- Ajout de mt-4 pour descendre le contenu -->
@@ -10,7 +11,7 @@
         <div class="d-sm-flex align-items-center justify-content-between mb-5"> <!-- mb-5 au lieu de mb-4 -->
             <h1 class="h3 mb-0 text-gray-800">Détails de l'entretien</h1>
             <div class="btn-group">
-                <a href="{{ path('app_entretien_front') }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+                <a href="{{ path('app_entretien_front', {'idCandidature': idCandidature}) }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
                     <i class="fas fa-arrow-left fa-sm text-white-50 mr-2"></i>Retour à la liste
                 </a>
             </div>
@@ -26,10 +27,6 @@
                     <div class="card-body">
                         <table class="table table-striped table-hover mx-auto"> <!-- Ajout de mx-auto -->
                             <tbody>
-                                <tr>
-                                    <th><i class="fas fa-id-badge mr-2 text-secondary"></i>ID</th>
-                                    <td>{{ entretien.idEntretien }}</td>
-                                </tr>
                                 <tr>
                                     <th><i class="fas fa-calendar-alt mr-2 text-secondary"></i>Date</th>
                                     <td>{{ entretien.date ? entretien.date|date('d/m/Y') : 'Non définie' }}</td>

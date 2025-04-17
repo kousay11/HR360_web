@@ -1,6 +1,8 @@
 {% extends 'baseRH.html.twig' %}
 
 {% block title %}Évaluation #{{ evaluation.idEvaluation }}{% endblock %}
+{% block heading %}Détails Evaluation{% endblock %}
+
 
 {% block body %}
     <!-- Begin Page Content -->
@@ -8,7 +10,6 @@
 
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Détails de l'évaluation</h1>
             <div>
                 {% if evaluation.entretien %}
                 <a href="{{ path('app_evaluation_index_for_entretien', {'idEntretien': evaluation.entretien.idEntretien}) }}" 

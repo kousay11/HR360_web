@@ -36,7 +36,8 @@
 
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <a href="{{ path('app_entretien_new') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <a href="{{ path('app_entretien_new_for_candidature', {'idCandidature': candidature.idCandidature}) }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+
                 <i class="fas fa-plus fa-sm text-white-50 mr-2"></i>Créer un nouvel entretien
             </a>
         </div>
@@ -46,8 +47,8 @@
             {% for entretien in entretiens %}
                 <div class="col-md-4 mb-4">
                 <div class="project-card">
-                    <div class="project-card clickable-card" onclick="window.location='{{ path('app_entretien_show', {'idEntretien': entretien.idEntretien}) }}'">
-                        <div class="project-card-header">
+                    <div class="project-card clickable-card" >
+                        <div class="project-card-header" onclick="window.location='{{ path('app_entretien_show', {'idEntretien': entretien.idEntretien}) }}'">
                             <div class="project-icon">
                                 <i class="fas fa-handshake"></i>
                             </div>
@@ -72,18 +73,21 @@
                                     {{ entretien.statut.value }}
                                 </span>
                             </div>
-                            <div class="project-meta">
-                                <i class="fas fa-video"></i>
-                                {% if entretien.lienmeet %}
-                                    <a href="{{ entretien.lienmeet }}" target="_blank">Lien Meet</a>
-                                {% else %}
-                                    <span>N/A</span>
-                                {% endif %}
-                            </div>
-                            <div class="project-meta">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>{{ entretien.localisation ? entretien.localisation : 'Non spécifié' }}</span>
-                            </div>
+                            {% if entretien.type.value == 'En_ligne' %}
+        <div class="project-meta">
+            <i class="fas fa-video"></i>
+            {% if entretien.lienmeet %}
+                <a href="{{ entretien.lienmeet }}" target="_blank">Lien Meet</a>
+            {% else %}
+                <span>N/A</span>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="project-meta">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>{{ entretien.localisation ?? 'Non spécifié' }}</span>
+        </div>
+    {% endif %}
                         </div>
                         <div class="project-card-footer">
                             <div class="action-buttons">

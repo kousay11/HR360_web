@@ -1,6 +1,8 @@
 {% extends 'baseRH.html.twig' %}
 
 {% block title %}Détails de l'entretien #{{ entretien.idEntretien }}{% endblock %}
+{% block heading %}Détails de l'entretien{% endblock %}
+
 
 {% block body %}
     <!-- Begin Page Content -->
@@ -8,9 +10,8 @@
 
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Détails de l'entretien</h1>
             <div class="btn-group">
-                <a href="{{ path('app_entretien_index') }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+                <a href="{{ path('app_entretien_index', {'idCandidature': idCandidature}) }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
                     <i class="fas fa-arrow-left fa-sm text-white-50 mr-2"></i>Retour à la liste
                 </a>
                 <a href="{{ path('app_entretien_edit', {'idEntretien': entretien.idEntretien}) }}" 
@@ -60,21 +61,31 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="bg-light">Lien Meet</th>
-                                    <td>
-                                        {% if entretien.lienmeet %}
-                                            <a href="{{ entretien.lienmeet }}" target="_blank" class="btn btn-sm btn-info">
-                                                <i class="fas fa-video mr-2"></i>Rejoindre la réunion
-                                            </a>
-                                        {% else %}
-                                            Non spécifié
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th class="bg-light">Localisation</th>
-                                    <td>{{ entretien.localisation ? entretien.localisation : 'Non spécifiée' }}</td>
-                                </tr>
+    <th class="bg-light">Lien Meet</th>
+    <td>
+        {% if entretien.type.value == 'En_ligne' %}
+            {% if entretien.lienmeet %}
+                <a href="{{ entretien.lienmeet }}" target="_blank" class="btn btn-sm btn-info">
+                    <i class="fas fa-video mr-2"></i>Rejoindre la réunion
+                </a>
+            {% else %}
+                <span class="text-muted">Non spécifié</span>
+            {% endif %}
+        {% else %}
+            <span class="text-muted">Non applicable (entretien en présentiel)</span>
+        {% endif %}
+    </td>
+</tr>
+<tr>
+    <th class="bg-light">Localisation</th>
+    <td>
+        {% if entretien.type.value == 'En_ligne' %}
+            <span class="text-muted">Non applicable (entretien en ligne)</span>
+        {% else %}
+            {{ entretien.localisation ? entretien.localisation : 'Non spécifiée' }}
+        {% endif %}
+    </td>
+</tr>
                             </tbody>
                         </table>
                     </div>

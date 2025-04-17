@@ -1,6 +1,7 @@
 {% extends 'baseRH.html.twig' %}
 
 {% block title %}Modifier Entretien #{{ entretien.idEntretien }}{% endblock %}
+{% block heading %}Modifier l'entretien{% endblock %}
 
 {% block body %}
     <!-- Begin Page Content -->
@@ -9,7 +10,7 @@
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-0 text-gray-800">Modifier l'entretien</h1>
-            <a href="{{ path('app_entretien_index') }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <a href="{{ path('app_entretien_index', {'idCandidature': idCandidature}) }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
                 <i class="fas fa-arrow-left fa-sm text-white-50 mr-2"></i>Retour à la liste
             </a>
         </div>

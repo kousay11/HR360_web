@@ -134,7 +134,7 @@
             <div class="project-card clickable-card">
               <div class="entity-header">
                 <i class="fas fa-handshake entity-icon"></i>
-                <h5 class="entity-title clickable-title" onclick="window.location='{{ path('app_entretien_show_front', {'idEntretien': entretien.idEntretien}) }}'">
+                <h5 class="entity-title clickable-title text-white" onclick="window.location='{{ path('app_entretien_show_front', {'idEntretien': entretien.idEntretien , 'idCandidature': candidature.idCandidature}) }}'">
                   Entretien {{ entretien.type.value }}
                 </h5>
                 <span class="badge 
@@ -209,7 +209,7 @@
           <ul class="pagination">
             {% if page > 1 %}
               <li class="page-item">
-                <a class="page-link" href="{{ path('app_entretien_front', {'page': page - 1}) }}" aria-label="Previous">
+                <a class="page-link" href="{{ path('app_entretien_front', {'idCandidature': candidature.idCandidature,  'page': page - 1}) }}" aria-label="Previous">
                   <span aria-hidden="true">&laquo;</span>
                 </a>
               </li>
@@ -217,13 +217,13 @@
             
             {% for i in 1..totalPages %}
               <li class="page-item {% if i == page %}active{% endif %}">
-                <a class="page-link" href="{{ path('app_entretien_front', {'page': i}) }}">{{ i }}</a>
+                <a class="page-link" href="{{ path('app_entretien_front' , {'idCandidature': candidature.idCandidature, 'page': i}) }}">{{ i }}</a>
               </li>
             {% endfor %}
             
             {% if page < totalPages %}
               <li class="page-item">
-                <a class="page-link" href="{{ path('app_entretien_front', {'page': page + 1}) }}" aria-label="Next">
+                <a class="page-link" href="{{ path('app_entretien_front', {'idCandidature': candidature.idCandidature, 'page': page + 1}) }}" aria-label="Next">
                   <span aria-hidden="true">&raquo;</span>
                 </a>
               </li>

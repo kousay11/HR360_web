@@ -49,20 +49,22 @@ class Entretien
     #[Assert\NotBlank(message: "Le statut de l'entretien est obligatoire")]
     private ?Statut $statut = null;
 
-    #[ORM\Column(name: 'lien_meet', type: 'string', length: 255, nullable: false)]
-    #[Assert\NotBlank(message: "Le lien Meet est obligatoire")]
-    #[Assert\Url(message: "Le lien Meet doit être une URL valide")]
-    #[Assert\Regex(
+    #[ORM\Column(name: 'lien_meet', type: 'string', length: 255, nullable: true)]
+    //#[Assert\NotBlank(message: "Le lien Meet est obligatoire")]
+    //#[Assert\Url(message: "Le lien Meet doit être une URL valide")]
+    /*#[Assert\Regex(
         pattern: "/meet\.google\.com|teams\.microsoft\.com|zoom\.us/",
         message: "Le lien doit être un lien Meet, Teams ou Zoom valide"
-    )]
+    )]*/
     private ?string $lienmeet = null;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    #[Assert\NotBlank(message: "La localisation est obligatoire")]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Assert\NotBlank(message: "La localisation est obligatoire pour un entretien en présentiel", groups: ['Presentiel'])]
     #[Assert\Length(
         max: 255,
-        maxMessage: "La localisation ne peut pas dépasser {{ limit }} caractères"
+        maxMessage: "La localisation ne peut pas dépasser {{ limit }} caractères",
+        groups: ['Presentiel']
+
     )]
     private ?string $localisation = null;
 
