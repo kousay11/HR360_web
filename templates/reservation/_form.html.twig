@@ -1,4 +1,176 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
-{{ form_end(form) }}
+{% extends 'baseEMP.html.twig' %}
+
+{% block title %}Nouvelle Réservation{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('front/css/project-card.css') }}">
+
+    <style>
+        .reservation-form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .entity-card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            background-color: #fff;
+        }
+
+        .entity-header {
+            background-color:rgb(0, 0, 0);
+            padding: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .entity-icon {
+            font-size: 1.5rem;
+        }
+
+        .entity-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .entity-body {
+            padding: 30px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.15);
+            outline: none;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn-submit {
+            background-color: #28a745;
+            color: white;
+            border-radius: 6px;
+            padding: 10px 20px;
+            border: none;
+            font-weight: 500;
+        }
+
+        .btn-submit:hover {
+            background-color: #218838;
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+
+        .btn-cancel:hover {
+            background-color: #5a6268;
+        }
+
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+    </style>
+{% endblock %}
+
+{% block index %}
+    <div class="container">
+        <div class="card entity-card reservation-form-container">
+            <div class="card-header entity-header">
+                <i class="fas fa-calendar-plus entity-icon"></i>
+                <h5 class="entity-title text-white">{{ button_label|default('Nouvelle Réservation') }}</h5>
+            </div>
+            <div class="card-body entity-body">
+                <p class="mb-4">Réservez une ressource pour votre équipe</p>
+
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                    <div class="form-group mb-3">
+                        {{ form_label(form.datedebut, 'Date de début', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.datedebut, {
+                            'attr': {
+                                'class': 'form-control' ~ (form.datedebut.vars.valid ? '' : ' is-invalid'),
+                                'placeholder': 'Sélectionnez une date de début'
+                            }
+                        }) }}
+                        {{ form_errors(form.datedebut) }}
+                    </div>
+
+                    <div class="form-group mb-3">
+                        {{ form_label(form.datefin, 'Date de fin', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.datefin, {
+                            'attr': {
+                                'class': 'form-control' ~ (form.datefin.vars.valid ? '' : ' is-invalid'),
+                                'placeholder': 'Sélectionnez une date de fin'
+                            }
+                        }) }}
+                        {{ form_errors(form.datefin) }}
+                    </div>
+
+                    {% if form.ressource is defined %}
+                    <div class="form-group mb-3">
+                        {{ form_label(form.ressource, 'Ressource', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.ressource, {
+                            'attr': {
+                                'class': 'form-control' ~ (form.ressource.vars.valid ? '' : ' is-invalid')
+                            }
+                        }) }}
+                        {{ form_errors(form.ressource) }}
+                    </div>
+                    {% endif %}
+
+                    <div class="form-actions">
+                        <a href="{{ path('app_reservation_index') }}" class="btn-cancel">
+                            <i class="fas fa-times-circle"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-check-circle"></i> {{ button_label|default('Créer') }}
+                        </button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.reservation-form-container form');
+            if (form) {
+                form.addEventListener('submit', function() {
+                    const submitButton = this.querySelector('button[type="submit"]');
+                    if (submitButton) {
+                        submitButton.disabled = true;
+                        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> En cours de création...';
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

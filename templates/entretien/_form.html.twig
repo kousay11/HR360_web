@@ -1,4 +1,76 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_start(form, {'attr': {'class': 'form-horizontal'}, 'attr': {'novalidate': 'novalidate'}}) }}
+
+<div class="form-group row">
+    <div class="col-md-6 mb-3">
+    <label for="inputText" class="col-sm-4 col-form-label">Date</label>
+        {{ form_widget(form.date, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.date, {'attr': {'class': 'text-danger'}}) }}
+    </div>
+    <div class="col-md-6 mb-3">
+    <label for="inputText" class="col-sm-4 col-form-label">Heure</label>
+    <div class="input-group">
+        {{ form_widget(form.heure, {
+            'attr': {
+                'class': 'form-control',
+                'id': 'timepicker-input',
+                'autocomplete': 'off'
+            }
+        }) }}
+        <div class="input-group-append">
+            <span class="input-group-text" id="timepicker-icon" style="cursor: pointer;">
+                <i class="far fa-clock"></i>
+            </span>
+        </div>
+    </div>
+    {{ form_errors(form.heure, {'attr': {'class': 'text-danger'}}) }}
+</div>
+</div>
+
+<div class="form-group row">
+    <div class="col-md-6 mb-3">
+    <label for="inputText" class="col-sm-4 col-form-label">Type d'entretien</label>
+        {{ form_widget(form.type, {
+            'attr': {
+                'class': 'form-control entretien-type-selector'
+            }
+        }) }}
+        {{ form_errors(form.type, {'attr': {'class': 'text-danger'}}) }}
+    </div>
+    <div class="col-md-6 mb-3">
+    <label for="inputText" class="col-sm-4 col-form-label">Statut</label>
+        {{ form_widget(form.statut, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.statut, {'attr': {'class': 'text-danger'}}) }}
+    </div>
+</div>
+
+
+
+<div class="form-group localisation-field">
+    <label for="inputText" class="col-sm-4 col-form-label">Localisation</label>
+    {{ form_widget(form.localisation, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.localisation, {'attr': {'class': 'text-danger'}}) }}
+    <small class="form-text text-muted">Adresse physique si entretien en présentiel</small>
+</div>
+
+
+
+<div class="form-group text-right mt-4">
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save mr-2"></i>{{ button_label|default('Enregistrer') }}
+    </button>
+    <a href="{{ path('app_entretien_index', {'idCandidature': idCandidature}) }}" class="btn btn-secondary ml-2">
+        <i class="fas fa-times mr-2"></i>Annuler
+    </a>
+</div>
+
 {{ form_end(form) }}
+
+<style>
+    .is-invalid {
+        border-color: #dc3545;
+    }
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875em;
+    }
+</style>
