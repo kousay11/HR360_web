@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Reservation;
+use App\Entity\Ressource;
+use App\Entity\Utilisateur;
 use App\Form\ReservationType;
 use App\Repository\ReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,20 +16,55 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/reservation')]
 final class ReservationController extends AbstractController
 {
+    private $entityManager;
+
+    // Injection de l'EntityManagerInterface
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     #[Route(name: 'app_reservation_index', methods: ['GET'])]
     public function index(ReservationRepository $reservationRepository): Response
     {
+        $utilisateur = $this->getUser();
+        
+        // Filtrer les réservations par utilisateur
+        $reservations = $reservationRepository->findBy(['utilisateur' => $utilisateur]);
+
         return $this->render('reservation/index.html.twig', [
-            'reservations' => $reservationRepository->findAll(),
+            'reservations' => $reservations,
         ]);
     }
 
-    #[Route('/new', name: 'app_reservation_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+
+    #[Route('/new/{ressourceId}', name: 'app_reservation_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager , ?int $ressourceId = null): Response
     {
+
+
+
+
+
         $reservation = new Reservation();
-        $form = $this->createForm(ReservationType::class, $reservation);
+
+
+        $ressource = $entityManager->getRepository(Ressource::class)->find($ressourceId);
+        if($ressource){
+            $reservation->setRessource($ressource);
+        }
+        $utilisateur = $this->getUser();
+        if($utilisateur){
+            $reservation->setUtilisateur($utilisateur);
+        }
+
+        $form = $this->createForm(ReservationType::class, $reservation, [
+            
+        ]);
         $form->handleRequest($request);
+    
+
+        
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($reservation);
@@ -39,6 +76,7 @@ final class ReservationController extends AbstractController
         return $this->render('reservation/new.html.twig', [
             'reservation' => $reservation,
             'form' => $form,
+            'ressourceID' => $ressourceId
         ]);
     }
 

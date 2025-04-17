@@ -1,41 +1,90 @@
-<!DOCTYPE html>
+{% extends 'baseRH.html.twig' %}
 
-<title>Ressource index</title>
+{% block title %}Liste des Ressources{% endblock %}
+
+{% block heading %}Gestion des Ressources{% endblock %}
 
 {% block body %}
-    <h1>Ressource index</h1>
+<div class="container">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>Type</th>
-                <th>Etat</th>
-                <th>Prix</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
+    </br></br>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{{ path('app_ressource_new') }}" class="btn-ajouter-ressource">
+            <i class="fas fa-plus-circle me-2"></i>Ajouter une Ressource
+        </a>
+    </div>
+
+    <div class="row">
         {% for ressource in ressources %}
-            <tr>
-                <td>{{ ressource.id }}</td>
-                <td>{{ ressource.nom }}</td>
-                <td>{{ ressource.type }}</td>
-                <td>{{ ressource.etat }}</td>
-                <td>{{ ressource.prix }}</td>
-                <td>
-                    <a href="{{ path('app_ressource_show', {'id': ressource.id}) }}">show</a>
-                    <a href="{{ path('app_ressource_edit', {'id': ressource.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <div class="col-md-4 mb-4">
+            <div class="entity-card">
+                <div class="entity-header">
+                    <div class="entity-icon">
+                        <i class="fas fa-{{ get_icon_for_type(ressource.type) }}"></i>
+                    </div>
+                    <h5 class="entity-title">{{ ressource.nom }}</h5>
+                </div>
+                
+                <div class="entity-body">
+                    <div class="project-meta">
+                        <i class="fas fa-tag"></i>
+                        <span>Type: {{ ressource.type }}</span>
+                    </div>
+                    <div class="project-meta">
+                        <i class="fas fa-circle text-{{ ressource.etat == 'Disponible' ? 'success' : 'danger' }}"></i>
+                        <span class="status-badge status-{{ ressource.etat == 'Disponible' ? 'active' : 'expired' }}">
+                            {{ ressource.etat }}
+                        </span>
+                    </div>
+                    <div class="project-meta">
+                        <i class="fas fa-euro-sign"></i>
+                        <span>Prix: {{ ressource.prix|number_format(2, ',', ' ') }} €</span>
+                    </div>
+                </div>
 
-    <a href="{{ path('app_ressource_new') }}">Create new</a>
+                <div class="entity-footer">
+                    <div class="action-buttons">
+                        <a href="{{ path('app_ressource_show', {'id': ressource.id}) }}" 
+                           class="btn btn-modify">
+                            <i class="fas fa-eye me-1"></i>Voir
+                        </a>
+                        <a href="{{ path('app_ressource_edit', {'id': ressource.id}) }}" 
+                           class="btn btn-delete">
+                            <i class="fas fa-edit me-1"></i>Modifier
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-inbox me-2"></i>
+                Aucune ressource trouvée
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block css %}
+{{ parent() }}
+<link href="{{ asset('back/css/project-card.css')}}" rel="stylesheet" >
+<style>
+    .btn-ajouter-ressource {
+        background-color: #4361ee;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-ajouter-ressource:hover {
+        background-color: #3f37c9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+    }
+</style>
 {% endblock %}

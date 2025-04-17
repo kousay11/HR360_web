@@ -1,0 +1,46 @@
+{% extends 'baseRH.html.twig' %}
+
+{% block title %}Liste des Réservations{% endblock %}
+
+{% block heading %}Liste des Réservations des Employés{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Liste des Réservations des Employés</h6>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date Début</th>
+                        <th>Date Fin</th>
+                        <th>Employé</th>
+                        <th>Ressource</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in reservations %}
+    <tr>
+        <td>{{ reservation.id }}</td>
+        <td>{{ reservation.datedebut ? reservation.datedebut|date('Y-m-d') : '' }}</td>
+        <td>{{ reservation.datefin ? reservation.datefin|date('Y-m-d') : '' }}</td>
+        <td>{{ reservation.utilisateur.nom }}</td> <!-- Assurez-vous que 'utilisateur' existe dans votre entité -->
+        <td>{{ reservation.ressource.nom }}</td>
+    </tr>
+{% else %}
+    <tr>
+        <td colspan="5">Aucune réservation trouvée.</td>
+    </tr>
+{% endfor %}
+
+                </tbody>
+            </table>
+
+            <div class="mt-3">
+                <a href="{{ path('app_ressource_index') }}" class="btn btn-secondary">Retour à la liste des ressources</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

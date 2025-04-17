@@ -1,50 +1,131 @@
-<!DOCTYPE html>
+{% extends 'baseCAN.html.twig' %}
 
-<title>Candidature</title>
+{% block title %}Détails de la candidature{% endblock %}
+{% block form %}
+{% endblock %}
+{% block index %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <a href="{{ path('app_candidature_index') }}" class="btn btn-outline-dark">
+                    <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                </a>
+            </div>
 
-{% block body %}
-    <h1>Candidature</h1>
-
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>IdCandidature</th>
-                <td>{{ candidature.idCandidature }}</td>
-            </tr>
-            <tr>
-                <th>DateCandidature</th>
-                <td>{{ candidature.dateCandidature ? candidature.dateCandidature|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Statut</th>
-                <td>{{ candidature.statut }}</td>
-            </tr>
-            <tr>
-                <th>Cv</th>
-                <td>{{ candidature.cv }}</td>
-            </tr>
-            <tr>
-                <th>LettreMotivation</th>
-                <td>{{ candidature.lettreMotivation }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ candidature.description }}</td>
-            </tr>
-            <tr>
-                <th>DateModification</th>
-                <td>{{ candidature.dateModification ? candidature.dateModification|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Iduser</th>
-                <td>{{ candidature.iduser }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_candidature_index') }}">back to list</a>
-
-    <a href="{{ path('app_candidature_edit', {'idCandidature': candidature.idCandidature}) }}">edit</a>
-
-    {{ include('candidature/_delete_form.html.twig') }}
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="mb-0">
+                        </h2>
+                        <span class="badge rounded-pill bg-{{ candidature.statut == 'Accepté' ? 'success' : (candidature.statut == 'Refusé' ? 'danger' : 'warning') }}">
+                            {{ candidature.statut }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h4 class="text-dark mb-3">
+                            <i class="fas fa-briefcase text-danger me-2"></i>Offre concernée
+                        </h4>
+                        <p class="lead">
+                            <a href="{{ path('app_offre_show', {'idoffre': candidature.offre.idoffre}) }}">
+                                {{ candidature.offre.titre }}
+                            </a>
+                        </p>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <h5 class="text-dark">
+                                    <i class="fas fa-calendar-plus text-danger me-2"></i>Date de candidature
+                                </h5>
+                                <p>{{ candidature.dateCandidature|date('d/m/Y à H:i') }}</p>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h5 class="text-dark">
+                                    <i class="fas fa-file-pdf text-danger me-2"></i>CV
+                                </h5>
+                                <p>
+                                    <a href="{{ asset('uploads/cvs/' ~ candidature.cv) }}" target="_blank" class="text-primary">
+                                        <i class="fas fa-download me-1"></i>{{ candidature.cv|split('/')|last }}
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <h5 class="text-dark">
+                                    <i class="fas fa-clock text-danger me-2"></i>Dernière modification
+                                </h5>
+                                <p>{{ candidature.dateModification ? candidature.dateModification|date('d/m/Y à H:i') : 'Aucune modification' }}</p>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h5 class="text-dark">
+                                    <i class="fas fa-file-contract text-danger me-2"></i>Lettre de motivation
+                                </h5>
+                                <p>
+                                    <a href="{{ asset('uploads/lettres/' ~ candidature.lettreMotivation) }}" target="_blank" class="text-primary">
+                                        <i class="fas fa-download me-1"></i>{{ candidature.lettreMotivation|split('/')|last }}
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="text-dark mb-3">
+                            <i class="fas fa-align-left text-danger me-2"></i>Description complémentaire
+                        </h4>
+                        <div class="bg-light p-3 rounded">
+                            {{ candidature.description ?? 'Aucune description supplémentaire' }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-white border-0 d-flex justify-content-between">
+                    <div>
+                        <a href="{{ path('app_candidature_edit', {'idCandidature': candidature.idCandidature}) }}" 
+                           class="btn btn-outline-secondary">
+                            <i class="fas fa-edit me-2"></i>Modifier
+                        </a>
+                    </div>
+                    <div>
+                        {{ include('candidature/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block css %}
+    {{ parent() }}
+<style>
+    .card {
+        border-radius: 10px;
+        border-width: 2px;
+        border-color: #dc3545;
+    }
+    .card-header {
+        border-bottom: 2px solid #dc3545;
+    }
+    .badge {
+        font-size: 1rem;
+        padding: 0.5em 1em;
+    }
+    hr {
+        opacity: 0.1;
+    }
+    .btn-outline-secondary {
+        border-color: #6c757d;
+    }
+</style>
 {% endblock %}

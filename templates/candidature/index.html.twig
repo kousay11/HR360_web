@@ -1,47 +1,179 @@
-<!DOCTYPE html>
+{% extends 'baseCAN.html.twig' %}
 
-<title>Candidature index</title>
+{% block title %}Liste des Candidatures{% endblock %}
 
-{% block body %}
-    <h1>Candidature index</h1>
+{% block css %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .card {
+            transition: all 0.3s ease;
+            border-width: 2px;
+            border-radius: 10px;
+            height: 100%;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        .card-header {
+            border-bottom: 2px solid #dc3545;
+            padding: 1rem 1.25rem;
+            background-color: #212529;
+            color: white;
+            position: relative;
+            min-height: 60px;
+        }
+        .card-header .badge {
+            font-size: 0.75rem;
+            padding: 0.5em 0.8em;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .list-group-item {
+            padding: 0.75rem 0;
+            border: none;
+        }
+        hr {
+            opacity: 0.1;
+            margin: 1rem 0;
+        }
+        .card-title {
+            max-width: calc(100% - 100px);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .entity-icon-red {
+            color: #dc3545;
+            margin-right: 10px;
+        }
+        .text-muted i {
+            color: #dc3545;
+            margin-right: 8px;
+        }
+        .file-link {
+            color: #dc3545;
+            text-decoration: none;
+        }
+        .file-link:hover {
+            text-decoration: underline;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+        .empty-state i {
+            font-size: 50px;
+            color: #dddfeb;
+            margin-bottom: 20px;
+        }
+        .text-original {
+            color: #28a745;
+        }
+        .text-modified {
+            color: #6c757d;
+        }
+    </style>
+{% endblock %}
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>IdCandidature</th>
-                <th>DateCandidature</th>
-                <th>Statut</th>
-                <th>Cv</th>
-                <th>LettreMotivation</th>
-                <th>Description</th>
-                <th>DateModification</th>
-                <th>Iduser</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for candidature in candidatures %}
-            <tr>
-                <td>{{ candidature.idCandidature }}</td>
-                <td>{{ candidature.dateCandidature ? candidature.dateCandidature|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ candidature.statut }}</td>
-                <td>{{ candidature.cv }}</td>
-                <td>{{ candidature.lettreMotivation }}</td>
-                <td>{{ candidature.description }}</td>
-                <td>{{ candidature.dateModification ? candidature.dateModification|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ candidature.iduser }}</td>
-                <td>
-                    <a href="{{ path('app_candidature_show', {'idCandidature': candidature.idCandidature}) }}">show</a>
-                    <a href="{{ path('app_candidature_edit', {'idCandidature': candidature.idCandidature}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="9">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+{% block form %}
+{% endblock %}
 
-    <a href="{{ path('app_candidature_new') }}">Create new</a>
+{% block index %}
+<div class="container py-5">
+    <h1 class="text-center mb-5 text-dark">
+        <i class="fas fa-file-alt me-2"></i>Liste des Candidatures
+    </h1>
+
+    <div class="row mb-4 justify-content-end">
+        <div class="col-md-6 text-end">
+            <div class="d-inline-block bg-light p-2 rounded">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Statut : 
+                    <span class="badge bg-success">Accepté</span>
+                    <span class="badge bg-warning ms-1">En attente</span>
+                    <span class="badge bg-danger ms-1">Refusé</span>
+                </small>
+            </div>
+        </div>
+    </div>
+
+    {% if candidatures is empty %}
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle me-2"></i>Aucune candidature disponible pour le moment
+        </div>
+    {% else %}
+        <div class="row g-4">
+            {% for candidature in candidatures %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0 border-danger">
+                        <div class="card-header bg-dark text-white position-relative">
+                            <h5 class="card-title mb-0 pe-5">
+                                <i class="fas fa-file-alt entity-icon-red"></i>{{ candidature.offre.titre ?? 'Offre non spécifiée' }}
+                            </h5>
+                            <span class="position-absolute top-50 end-0 translate-middle-y badge rounded-pill bg-{{ candidature.statut == 'Accepté' ? 'success' : (candidature.statut == 'Refusé' ? 'danger' : 'warning') }} me-3">
+                                <i class="fas fa-{{ candidature.statut == 'Accepté' ? 'check-circle' : (candidature.statut == 'Refusé' ? 'times-circle' : 'clock') }} me-1"></i>
+                                {{ candidature.statut }}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item bg-transparent">
+                                    <i class="fas fa-calendar-alt text-danger me-2"></i>
+                                    <strong>Date :</strong> 
+                                    <span class="float-end">{{ candidature.dateCandidature|date('d/m/Y H:i') }}</span>
+                                </li>
+                                <li class="list-group-item bg-transparent">
+                                    <i class="fas fa-file-pdf text-danger me-2"></i>
+                                    <strong>Documents :</strong> 
+                                    <span class="float-end">
+                                        <a href="{{ asset('uploads/cvs/' ~ candidature.cv) }}" class="file-link me-2" target="_blank">CV</a>
+                                        <a href="{{ asset('uploads/lettres/' ~ candidature.lettreMotivation) }}" class="file-link" target="_blank">Lettre</a>
+                                    </span>
+                                </li>
+                                {% if candidature.description %}
+                                <li class="list-group-item bg-transparent">
+                                    <i class="fas fa-align-left text-danger me-2"></i>
+                                    <strong>Description :</strong> 
+                                    <div class="mt-2 text-truncate" title="{{ candidature.description }}">
+                                        {{ candidature.description }}
+                                    </div>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="card-footer bg-white border-0 d-flex justify-content-between pt-0">
+                            <small class="text-muted">
+                                {% if candidature.dateModification and candidature.dateModification != candidature.dateCandidature %}
+                                    <i class="fas fa-clock text-danger me-1"></i>Modifié le {{ candidature.dateModification|date('d/m/Y à H:i') }}
+                                {% else %}
+                                    <i class="fas fa-check-circle text-success me-1"></i>Candidature originale
+                                {% endif %}
+                            </small>
+                            <div>
+                                <a href="{{ path('app_candidature_show', {'idCandidature': candidature.idCandidature}) }}" 
+                                   class="btn btn-outline-dark btn-sm">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ path('app_candidature_edit', {'idCandidature': candidature.idCandidature}) }}" 
+                                   class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                       {# Nouveau bouton Entretien#}
+            <a href="{{ path('app_entretien_front', {'idCandidature': candidature.idCandidature}) }}" 
+               class="btn btn-sm btn-outline-success action-btn" title="Planifier un entretien">
+                <i class="fas fa-calendar-check"></i>
+            </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

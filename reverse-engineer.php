@@ -4,7 +4,7 @@ require_once 'vendor/autoload.php';
 
 // Database configuration - MODIFY THESE VALUES
 $dbHost = 'localhost';
-$dbName = 'esprit';
+$dbName = 'esprit2';
 $dbUser = 'root';
 $dbPass = '';
 $dbPort = 3306;

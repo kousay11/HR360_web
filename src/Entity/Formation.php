@@ -5,6 +5,8 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 use App\Repository\FormationRepository;
 
@@ -29,6 +31,13 @@ class Formation
     }
 
     #[ORM\Column(type: 'string', nullable: false)]
+    #[Assert\NotBlank(message: "Le titre est obligatoire")]
+    #[Assert\Length(
+        min: 5,
+        max: 100,
+        minMessage: "Le titre doit faire au moins {{ limit }} caractères",
+        maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères"
+    )]
     private ?string $titre = null;
 
     public function getTitre(): ?string
@@ -43,6 +52,13 @@ class Formation
     }
 
     #[ORM\Column(type: 'string', nullable: false)]
+    #[Assert\NotBlank(message: "La description est obligatoire")]
+    #[Assert\Length(
+        min: 10,
+        max: 1000,
+        minMessage: "La description doit faire au moins {{ limit }} caractères",
+        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères"
+    )]
     private ?string $description = null;
 
     public function getDescription(): ?string
@@ -57,6 +73,11 @@ class Formation
     }
 
     #[ORM\Column(type: 'integer', nullable: false)]
+    #[Assert\Range(
+        min: 1,
+        max: 1000,
+        notInRangeMessage: "La durée doit être entre {{ min }} et {{ max }} heures"
+    )]
     private ?int $duree = null;
 
     public function getDuree(): ?int
@@ -70,21 +91,28 @@ class Formation
         return $this;
     }
 
-    #[ORM\Column(name:'dateFormation',type: 'string', nullable: false)]
-    private ?string $dateFormation = null;
+        #[ORM\Column(name: 'dateFormation', type: 'string', nullable: false)]
+        #[Assert\NotBlank(message: "La date de formation est obligatoire")]
+        #[Assert\Regex(
+            pattern: "/^\d{2}-\d{2}-\d{4}$/",
+            message: "La date doit être au format JJ-MM-AAAA"
+        )]
+        private ?string $dateFormation = null;
+
 
     public function getDateFormation(): ?string
     {
         return $this->dateFormation;
     }
 
-    public function setDateFormation(string $dateFormation): self
+    public function setDateFormation(?string $dateFormation): void
     {
         $this->dateFormation = $dateFormation;
-        return $this;
     }
 
-    #[ORM\Column(name:'isFavorite',type: 'boolean', nullable: false)]
+
+
+    #[ORM\Column(name: 'isFavorite', type: 'boolean', nullable: false)]
     private ?bool $isFavorite = null;
 
     public function isIsFavorite(): ?bool
@@ -134,5 +162,4 @@ class Formation
         $this->getUtilisateurs()->removeElement($utilisateur);
         return $this;
     }
-
 }

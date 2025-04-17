@@ -1,11 +1,85 @@
-<!DOCTYPE html>
+{% extends 'baseRH.html.twig' %}
 
-<title>New Entretien</title>
+{% block title %}New Entretien{% endblock %}
+{% block heading %}Create new Entretien{% endblock %}
+
 
 {% block body %}
-    <h1>Create new Entretien</h1>
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+        
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        </div>
+        
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                {{ include('entretien/_form.html.twig') }}
+                
+                <a href="{{ path('app_entretien_index', {'idCandidature': idCandidature}) }}" class="btn btn-secondary mt-3">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to list
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- /.container-fluid -->
+{% endblock %}
+{% block css %}
+{{ parent() }}
+<style>
+    .lienmeet-field, .localisation-field {
+        transition: opacity 0.3s ease, height 0.3s ease;
+    }
+    
+    /* Style pour quand les champs sont cachés */
+    [style*="display: none"] {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+{% block javascripts %}
+{{ parent() }}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Fonction pour gérer la visibilité des champs
+    function toggleFields(type) {
+        if (type === 'En_ligne') {
+            $('.lienmeet-field').show();
+            $('.localisation-field').hide();
+        } else if (type === 'Presentiel') {
+            $('.lienmeet-field').hide();
+            $('.localisation-field').show();
+        } else {
+            $('.lienmeet-field').hide();
+            $('.localisation-field').hide();
+        }
+    }
 
-    {{ include('entretien/_form.html.twig') }}
+    // Initialisation au chargement
+    var initialType = $('.entretien-type-selector').val();
+    toggleFields(initialType);
 
-    <a href="{{ path('app_entretien_index') }}">back to list</a>
+    // Gestion du changement de type
+    $('.entretien-type-selector').change(function() {
+        toggleFields($(this).val());
+    });
+
+    // Initialisation du timepicker (si vous en avez besoin)
+    $('#timepicker-input').flatpickr({
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: true,
+        minuteIncrement: 15,
+        defaultHour: 9,
+        defaultMinute: 0,
+        locale: "fr"
+    });
+
+    $('#timepicker-icon').click(function() {
+        $('#timepicker-input').flatpickr().open();
+    });
+});
+</script>
 {% endblock %}
