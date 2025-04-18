@@ -113,23 +113,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const tasksContainer = document.getElementById('tasksContainer');
     let searchTimeout;
 
-    // Use event delegation for task item clicks
+    // Event delegation for task item clicks
     tasksContainer.addEventListener('click', function(event) {
-    const taskItem = event.target.closest('.task-item');
-    if (taskItem) {
-        const taskId = taskItem.dataset.tacheId;
-        const taskName = taskItem.querySelector('.task-name').textContent;
-        const taskDescription = taskItem.dataset.description || '';
-        const taskDateDebut = taskItem.dataset.dateDebut || 'null';
-        const taskDateFin = taskItem.dataset.dateFin || 'null';
-        const taskStatut = taskItem.querySelector('.task-status').textContent.replace(/\s+/g, ' ').trim();
-        const taskTrelloId = taskItem.dataset.trelloId || 'null';
-        const hasTeamAssociation = taskItem.dataset.hasTeam;
-        
-        selectTask(taskId, taskName, taskDescription, taskDateDebut, taskDateFin, taskStatut, taskTrelloId, hasTeamAssociation);
-    }
-});
-});
+        const taskItem = event.target.closest('.task-item');
+        if (taskItem) {
+            const taskId = taskItem.dataset.tacheId;
+            const taskName = taskItem.querySelector('.task-name').textContent;
+            const taskDescription = taskItem.dataset.description || '';
+            const taskDateDebut = taskItem.dataset.dateDebut || 'null';
+            const taskDateFin = taskItem.dataset.dateFin || 'null';
+            const taskStatut = taskItem.querySelector('.task-status').textContent.replace(/\s+/g, ' ').trim();
+            const taskTrelloId = taskItem.dataset.trelloId || 'null';
+            const hasTeamAssociation = taskItem.dataset.hasTeam;
+            
+            selectTask(taskId, taskName, taskDescription, taskDateDebut, taskDateFin, taskStatut, taskTrelloId, hasTeamAssociation);
+        }
+    });
 
     searchInput.addEventListener('input', function() {
         clearTimeout(searchTimeout);
@@ -231,6 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-}
+    }
+});
 </script>
 {% endblock %}
