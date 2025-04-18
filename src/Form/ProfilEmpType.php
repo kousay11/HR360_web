@@ -22,6 +22,7 @@ class ProfilEmpType extends AbstractType
         $builder
             ->add('prenom', TextType::class, [
                 'label' => 'Prénom',
+                'empty_data' => '',
                 'attr' => [
                     'class' => 'form-control',
                     'placeholder' => 'Votre prénom'
@@ -29,6 +30,7 @@ class ProfilEmpType extends AbstractType
             ])
             ->add('nom', TextType::class, [
                 'label' => 'Nom',
+                'empty_data' => '',
                 'attr' => [
                     'class' => 'form-control',
                     'placeholder' => 'Votre nom'
@@ -36,6 +38,7 @@ class ProfilEmpType extends AbstractType
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Email',
+                'empty_data' => '',
                 'attr' => [
                     'class' => 'form-control',
                     'placeholder' => 'Votre email'

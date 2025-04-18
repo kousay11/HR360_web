@@ -80,7 +80,7 @@
       <nav id="navmenu" class="navmenu">
       {% block navmenu %}
         <ul>
-          <li><a href="#portfolio">Profil</a></li>
+          <li><a href="{{ path('app_candidat_profil') }}">Profil</a></li>
           <li><a href="{{ path('app_offreFront_index') }}">Offres</a></li>
           <li><a href="{{ path('app_candidature_index') }}">Mes candidatures</a></li>
         </ul>
