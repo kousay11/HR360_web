@@ -119,58 +119,58 @@
 
 						<script>
 							function uploadImage(input) {
-const file = input.files[0];
-if (! file) 
-return;
+								const file = input.files[0];
+								if (! file) 
+								return;
 
 
 
-const formData = new FormData();
-formData.append('image', file);
+								const formData = new FormData();
+								formData.append('image', file);
 
-const uploadUrl = input.getAttribute('data-upload-url');
-const previewContainer = document.getElementById('imagePreviewContainer');
+								const uploadUrl = input.getAttribute('data-upload-url');
+								const previewContainer = document.getElementById('imagePreviewContainer');
 
-// Afficher un indicateur de chargement
-previewContainer.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="sr-only">Chargement...</span></div></div>';
+								// Afficher un indicateur de chargement
+								previewContainer.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="sr-only">Chargement...</span></div></div>';
 
-fetch(uploadUrl, {
-method: 'POST',
-body: formData,
-headers: {
-'X-Requested-With': 'XMLHttpRequest'
-}
-}).then(response => response.json()).then(data => {
-if (data.error) {
-previewContainer.innerHTML = `<div class="alert alert-danger">${
-data.error
-}</div>`;
-return;
-}
+								fetch(uploadUrl, {
+								method: 'POST',
+								body: formData,
+								headers: {
+								'X-Requested-With': 'XMLHttpRequest'
+								}
+								}).then(response => response.json()).then(data => {
+								if (data.error) {
+								previewContainer.innerHTML = `<div class="alert alert-danger">${
+								data.error
+								}</div>`;
+								return;
+								}
 
-// Mettre à jour l'aperçu
-previewContainer.innerHTML = `<img src="/uploads/images/${
-data.imageUrl.split('/').pop()
-}" alt="Nouvelle image" class="img-thumbnail img-preview">`;
+								// Mettre à jour l'aperçu
+								previewContainer.innerHTML = `<img src="/uploads/images/${
+								data.imageUrl.split('/').pop()
+								}" alt="Nouvelle image" class="img-thumbnail img-preview">`;
 
-// Optionnel: afficher un message de succès
-const alert = document.createElement('div');
-alert.className = 'alert alert-success mt-2';
-alert.textContent = 'Image téléchargée avec succès';
-alert.style.transition = 'opacity 3s';
-previewContainer.appendChild(alert);
+								// Optionnel: afficher un message de succès
+								const alert = document.createElement('div');
+								alert.className = 'alert alert-success mt-2';
+								alert.textContent = 'Image téléchargée avec succès';
+								alert.style.transition = 'opacity 3s';
+								previewContainer.appendChild(alert);
 
-// Faire disparaître le message après 3 secondes
-setTimeout(() => {
-alert.style.opacity = '0';
-setTimeout(() => alert.remove(), 1000);
-}, 3000);
-}).catch(error => {
-previewContainer.innerHTML = `<div class="alert alert-danger">Erreur lors du téléchargement: ${
-error.message
-}</div>`;
-});
-}
+								// Faire disparaître le message après 3 secondes
+								setTimeout(() => {
+								alert.style.opacity = '0';
+								setTimeout(() => alert.remove(), 1000);
+								}, 3000);
+								}).catch(error => {
+								previewContainer.innerHTML = `<div class="alert alert-danger">Erreur lors du téléchargement: ${
+								error.message
+								}</div>`;
+								});
+								}
 						</script>
 
 

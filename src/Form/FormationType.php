@@ -32,9 +32,13 @@ class FormationType extends AbstractType
     {
         $builder
             ->add('titre', TextType::class, [
-                'label' => 'Titre de la formation'
+                'label' => 'Titre de la formation',
+                'empty_data' => '',
             ])
-            ->add('description', TextareaType::class)
+            ->add('description', TextareaType::class,[
+                'label' => 'Description de la formation',
+                'empty_data' => '',
+            ])
             ->add('duree', IntegerType::class, [
                 'label' => 'Durée (en jours)',
                 'required' => true,

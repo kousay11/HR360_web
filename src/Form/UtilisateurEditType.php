@@ -45,6 +45,7 @@ class UtilisateurEditType extends AbstractType
             ->add('password', PasswordType::class, [
                 'label' => 'Nouveau mot de passe',
                 'required' => false,
+                'empty_data' => '',
                 'mapped' => false,
                 'attr' => [
                     'placeholder' => 'Laissez vide pour ne pas changer',
