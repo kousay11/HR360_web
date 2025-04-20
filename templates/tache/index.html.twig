@@ -3,7 +3,6 @@
 {% block title %}Tasks for {{ projet.nom }}{% endblock %}
 {% block heading %}Tasks for {{ projet.nom }}{% endblock %}
 
-
 {% block css %}
     {{ parent() }}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -48,48 +47,49 @@
         <div class="task-details-column">
             <div class="task-details-card" id="taskDetails">
                 {% if taches|length > 0 %}
+                    {% set firstTask = taches|first %}
                     <div class="task-details-header">
-    <h2>{{ taches|first.nom }}</h2>
-    {% if taches|first.projet.hasEquipe() %}
-        {% if taches|first.trelloboardid %}
-            <a href="https://trello.com/b/{{ taches|first.trelloboardid }}" 
-               class="btn trello-btn" 
-               target="_blank" 
-               rel="noopener noreferrer">
-                <i class="fab fa-trello"></i> View Trello
-            </a>
-        {% else %}
-            <a href="#" class="btn trello-btn">
-                <i class="fab fa-trello"></i> Enable Trello
-            </a>
-        {% endif %}
-    {% endif %}
-</div>
+                        <h2>{{ firstTask.nom }}</h2>
+                        {% if firstTask.projet.hasEquipe() %}
+                            {% if firstTask.trelloboardid %}
+                                <a href="https://trello.com/b/{{ firstTask.trelloboardid }}" 
+                                   class="btn trello-btn" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer">
+                                    <i class="fab fa-trello"></i> View Trello
+                                </a>
+                            {% else %}
+                                <a href="{{ path('create_TrelloBoard',{'id': firstTask.id}) }}" class="btn trello-btn">
+                                    <i class="fab fa-trello"></i> Enable Trello
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
                     
                     <div class="task-content">
-                        <p class="task-description">{{ taches|first.description }}</p>
+                        <p class="task-description">{{ firstTask.description }}</p>
                         
                         <div class="task-meta">
                             <div class="task-dates">
                                 <div class="task-date">
                                     <span class="task-date-label">Start Date</span>
                                     <span class="task-date-value">
-                                        {{ taches|first.dateDebut ? taches|first.dateDebut|date('M d, Y') : 'Not set' }}
+                                        {{ firstTask.dateDebut ? firstTask.dateDebut|date('M d, Y') : 'Not set' }}
                                     </span>
                                 </div>
                                 <div class="task-date">
                                     <span class="task-date-label">End Date</span>
                                     <span class="task-date-value">
-                                        {{ taches|first.dateFin ? taches|first.dateFin|date('M d, Y') : 'Not set' }}
+                                        {{ firstTask.dateFin ? firstTask.dateFin|date('M d, Y') : 'Not set' }}
                                     </span>
                                 </div>
                             </div>
                             
                             <div class="task-status-display">
                                 <span class="task-status-label">Status:</span>
-                                <span class="task-status-badge status-{{ taches|first.statut.value|lower|replace({' ': '-'}) }}">
-                                    <i class="fas fa-{{ taches|first.statut.value == 'A faire' ? 'clock' : (taches|first.statut.value == 'En cours' ? 'spinner' : 'check-circle') }}"></i>
-                                    {{ taches|first.statut.value }}
+                                <span class="task-status-badge status-{{ firstTask.statut.value|lower|replace({' ': '-'}) }}">
+                                    <i class="fas fa-{{ firstTask.statut.value == 'A faire' ? 'clock' : (firstTask.statut.value == 'En cours' ? 'spinner' : 'check-circle') }}"></i>
+                                    {{ firstTask.statut.value }}
                                 </span>
                             </div>
                         </div>
@@ -105,6 +105,7 @@
     </div>
 </div>
 {% endblock %}
+
 {% block js %}
 {{ parent() }}
 <script>
@@ -172,64 +173,64 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function selectTask(taskId, taskName, taskDescription, taskDateDebut, taskDateFin, taskStatut, taskTrelloId, hasTeamAssociation) {
-    // Remove selected class from all items
-    document.querySelectorAll('.task-item').forEach(item => {
-        item.classList.remove('selected');
-    });
-    
-    // Add selected class to clicked item
-    const clickedItem = document.querySelector(`.task-item[data-tache-id="${taskId}"]`);
-    if (clickedItem) {
-        clickedItem.classList.add('selected');
-    }
-    
-    // Update task details
-    const detailsContainer = document.getElementById('taskDetails');
-    if (taskName && detailsContainer) {
-        const titleElement = detailsContainer.querySelector('h2');
-        const descriptionElement = detailsContainer.querySelector('.task-description');
+        // Remove selected class from all items
+        document.querySelectorAll('.task-item').forEach(item => {
+            item.classList.remove('selected');
+        });
         
-        if (titleElement) titleElement.textContent = taskName;
-        if (descriptionElement) descriptionElement.textContent = taskDescription;
-        
-        const formatDate = (dateString) => {
-            if (!dateString || dateString === 'null') return 'Not set';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        };
-        
-        const dateElements = detailsContainer.querySelectorAll('.task-date-value');
-        if (dateElements[0]) dateElements[0].textContent = formatDate(taskDateDebut);
-        if (dateElements[1]) dateElements[1].textContent = formatDate(taskDateFin);
-        
-        const statusBadge = detailsContainer.querySelector('.task-status-badge');
-        if (statusBadge) {
-            statusBadge.className = `task-status-badge status-${taskStatut.toLowerCase().replace(' ', '-')}`;
-            statusBadge.innerHTML = `
-                <i class="fas fa-${taskStatut == 'A faire' ? 'clock' : (taskStatut == 'En cours' ? 'spinner' : 'check-circle')}"></i>
-                ${taskStatut}
-            `;
+        // Add selected class to clicked item
+        const clickedItem = document.querySelector(`.task-item[data-tache-id="${taskId}"]`);
+        if (clickedItem) {
+            clickedItem.classList.add('selected');
         }
         
-        const trelloBtn = detailsContainer.querySelector('.trello-btn');
-        if (trelloBtn) {
-            if (hasTeamAssociation === 'true') {
-                if (taskTrelloId && taskTrelloId !== 'null') {
-                    trelloBtn.style.display = 'inline-block';
-                    trelloBtn.href = `https://trello.com/b/${taskTrelloId}`;
-                    trelloBtn.target = '_blank';
-                    trelloBtn.rel = 'noopener noreferrer';
-                    trelloBtn.innerHTML = '<i class="fab fa-trello"></i> View Trello';
+        // Update task details
+        const detailsContainer = document.getElementById('taskDetails');
+        if (taskName && detailsContainer) {
+            const titleElement = detailsContainer.querySelector('h2');
+            const descriptionElement = detailsContainer.querySelector('.task-description');
+            
+            if (titleElement) titleElement.textContent = taskName;
+            if (descriptionElement) descriptionElement.textContent = taskDescription;
+            
+            const formatDate = (dateString) => {
+                if (!dateString || dateString === 'null') return 'Not set';
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            };
+            
+            const dateElements = detailsContainer.querySelectorAll('.task-date-value');
+            if (dateElements[0]) dateElements[0].textContent = formatDate(taskDateDebut);
+            if (dateElements[1]) dateElements[1].textContent = formatDate(taskDateFin);
+            
+            const statusBadge = detailsContainer.querySelector('.task-status-badge');
+            if (statusBadge) {
+                statusBadge.className = `task-status-badge status-${taskStatut.toLowerCase().replace(' ', '-')}`;
+                statusBadge.innerHTML = `
+                    <i class="fas fa-${taskStatut == 'A faire' ? 'clock' : (taskStatut == 'En cours' ? 'spinner' : 'check-circle')}"></i>
+                    ${taskStatut}
+                `;
+            }
+            
+            const trelloBtn = detailsContainer.querySelector('.trello-btn');
+            if (trelloBtn) {
+                if (hasTeamAssociation === 'true') {
+                    if (taskTrelloId && taskTrelloId !== 'null') {
+                        trelloBtn.style.display = 'inline-block';
+                        trelloBtn.href = `https://trello.com/b/${taskTrelloId}`;
+                        trelloBtn.target = '_blank';
+                        trelloBtn.rel = 'noopener noreferrer';
+                        trelloBtn.innerHTML = '<i class="fab fa-trello"></i> View Trello';
+                    } else {
+                        trelloBtn.style.display = 'inline-block';
+                        trelloBtn.href = '#';
+                        trelloBtn.innerHTML = '<i class="fab fa-trello"></i> Enable Trello';
+                    }
                 } else {
-                    trelloBtn.style.display = 'inline-block';
-                    trelloBtn.href = '#';
-                    trelloBtn.innerHTML = '<i class="fab fa-trello"></i> Enable Trello';
+                    trelloBtn.style.display = 'none';
                 }
-            } else {
-                trelloBtn.style.display = 'none';
             }
         }
-    }
     }
 });
 </script>
