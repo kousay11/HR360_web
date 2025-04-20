@@ -15,6 +15,9 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Regex;
+
 
 class UtilisateurType extends AbstractType
 {
@@ -30,10 +33,34 @@ class UtilisateurType extends AbstractType
             ->add('password', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'invalid_message' => 'Les mots de passe doivent correspondre',
-                'options' => ['attr' => ['class' => 'form-control password-field']],
+                'options' => [
+                    'attr' => [
+                        'class' => 'form-control password-field',
+                        'autocomplete' => 'new-password', // Amélioration UX
+                    ],
+                ],
                 'required' => true,
-                'first_options'  => ['label' => 'Mot de passe'],
-                'second_options' => ['label' => 'Confirmation du mot de passe'],
+                'first_options'  => [
+                    'label' => 'Mot de passe',
+                    'constraints' => [
+                        new NotBlank([
+                            'message' => 'Veuillez entrer un mot de passe.',
+                        ]),
+                        new Length([
+                            'min' => 8,
+                            'minMessage' => 'Le mot de passe doit contenir au moins {{ limit }} caractères.',
+                            'max' => 255,
+                        ]),
+                        new Regex([
+                            'pattern' => '/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
+                            'message' => 'Le mot de passe doit contenir au moins 1 majuscule, 1 chiffre et 1 caractère spécial (@$!%*?&).',
+                        ]),
+                    ],
+                ],
+                'second_options' => [
+                    'label' => 'Confirmation du mot de passe',
+                    'attr' => ['autocomplete' => 'new-password'],
+                ],
             ])
 
             ->add('image', FileType::class, [
@@ -63,6 +90,9 @@ class UtilisateurType extends AbstractType
             ->add('salaire', NumberType::class, [
                 'required' => false,
                 'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Le salaire est obligatoire'
+                    ]),
                     new Assert\Type([
                         'type' => 'numeric',
                         'message' => 'Le salaire doit être un nombre valide'
@@ -85,6 +115,9 @@ class UtilisateurType extends AbstractType
             ->add('poste', TextType::class, [
                 'required' => false,
                 'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'La poste est obligatoire'
+                    ]),
                     new Assert\Length([
                         'max' => 100,
                         'maxMessage' => 'Le poste ne peut pas dépasser {{ limit }} caractères'

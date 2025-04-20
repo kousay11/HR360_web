@@ -334,4 +334,31 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    #[ORM\OneToMany(targetEntity: Candidature::class, mappedBy: 'utilisateur')]
+private Collection $candidatures;
+
+/**
+ * @return Collection<int, Candidature>
+ */
+public function getCandidatures(): Collection
+{
+    if (!$this->candidatures instanceof Collection) {
+        $this->candidatures = new ArrayCollection();
+    }
+    return $this->candidatures;
+}
+
+public function addCandidature(Candidature $candidature): self
+{
+    if (!$this->getCandidatures()->contains($candidature)) {
+        $this->getCandidatures()->add($candidature);
+    }
+    return $this;
+}
+
+public function removeCandidature(Candidature $candidature): self
+{
+    $this->getCandidatures()->removeElement($candidature);
+    return $this;
+}
 }

@@ -50,7 +50,7 @@
                                 <td>{{ reservation.datedebut|date('Y-m-d') }}</td>
                                 <td>{{ reservation.datefin|date('Y-m-d') }}</td>
                                 <td>
-                                    <a href="{{ path('app_reservation_show', {'id': reservation.id}) }}">Voir</a>
+                                    {{ reservation.utilisateur.nom }} {{ reservation.utilisateur.prenom }}
                                 </td>
                             </tr>
                         {% endfor %}

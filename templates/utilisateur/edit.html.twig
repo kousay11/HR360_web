@@ -119,72 +119,59 @@
 
 						<script>
 							function uploadImage(input) {
-const file = input.files[0];
-if (! file) 
-return;
+								const file = input.files[0];
+								if (! file) 
+								return;
 
 
 
-const formData = new FormData();
-formData.append('image', file);
+								const formData = new FormData();
+								formData.append('image', file);
 
-const uploadUrl = input.getAttribute('data-upload-url');
-const previewContainer = document.getElementById('imagePreviewContainer');
+								const uploadUrl = input.getAttribute('data-upload-url');
+								const previewContainer = document.getElementById('imagePreviewContainer');
 
-// Afficher un indicateur de chargement
-previewContainer.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="sr-only">Chargement...</span></div></div>';
+								// Afficher un indicateur de chargement
+								previewContainer.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="sr-only">Chargement...</span></div></div>';
 
-fetch(uploadUrl, {
-method: 'POST',
-body: formData,
-headers: {
-'X-Requested-With': 'XMLHttpRequest'
-}
-}).then(response => response.json()).then(data => {
-if (data.error) {
-previewContainer.innerHTML = `<div class="alert alert-danger">${
-data.error
-}</div>`;
-return;
-}
+								fetch(uploadUrl, {
+								method: 'POST',
+								body: formData,
+								headers: {
+								'X-Requested-With': 'XMLHttpRequest'
+								}
+								}).then(response => response.json()).then(data => {
+								if (data.error) {
+								previewContainer.innerHTML = `<div class="alert alert-danger">${
+								data.error
+								}</div>`;
+								return;
+								}
 
-// Mettre à jour l'aperçu
-previewContainer.innerHTML = `<img src="/uploads/images/${
-data.imageUrl.split('/').pop()
-}" alt="Nouvelle image" class="img-thumbnail img-preview">`;
+								// Mettre à jour l'aperçu
+								previewContainer.innerHTML = `<img src="/uploads/images/${
+								data.imageUrl.split('/').pop()
+								}" alt="Nouvelle image" class="img-thumbnail img-preview">`;
 
-// Optionnel: afficher un message de succès
-const alert = document.createElement('div');
-alert.className = 'alert alert-success mt-2';
-alert.textContent = 'Image téléchargée avec succès';
-alert.style.transition = 'opacity 3s';
-previewContainer.appendChild(alert);
+								// Optionnel: afficher un message de succès
+								const alert = document.createElement('div');
+								alert.className = 'alert alert-success mt-2';
+								alert.textContent = 'Image téléchargée avec succès';
+								alert.style.transition = 'opacity 3s';
+								previewContainer.appendChild(alert);
 
-// Faire disparaître le message après 3 secondes
-setTimeout(() => {
-alert.style.opacity = '0';
-setTimeout(() => alert.remove(), 1000);
-}, 3000);
-}).catch(error => {
-previewContainer.innerHTML = `<div class="alert alert-danger">Erreur lors du téléchargement: ${
-error.message
-}</div>`;
-});
-}
+								// Faire disparaître le message après 3 secondes
+								setTimeout(() => {
+								alert.style.opacity = '0';
+								setTimeout(() => alert.remove(), 1000);
+								}, 3000);
+								}).catch(error => {
+								previewContainer.innerHTML = `<div class="alert alert-danger">Erreur lors du téléchargement: ${
+								error.message
+								}</div>`;
+								});
+								}
 						</script>
-
-
-						<div id="passwordField" style="display: none;">
-							{{ form_label(form.password) }}
-							{{ form_widget(form.password, {
-                                'attr': {
-                                    'class': 'form-control' ~ (form.password.vars.errors|length ? ' is-invalid' : '')
-                                }
-                            }) }}
-							<div class="invalid-feedback">
-								{{ form_errors(form.password) }}
-							</div>
-						</div>
                         
 					</div>
 				</div>
@@ -207,47 +194,58 @@ error.message
 
 
 {% block javascripts %}
-	<script>
-		document.querySelector('.form-control-file').addEventListener('change', function (e) {
+    {{ parent() }}
+    <script>
+        // Prévisualisation d'image seulement
+        document.querySelector('.form-control-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const previewContainer = document.getElementById('imagePreviewContainer');
 
+            previewContainer.innerHTML = '';
 
-const nom = document.querySelector('# {{ form.nom.vars.id }}').value.trim();
-const prenom = document.querySelector('# {{ form.prenom.vars.id }}').value.trim();
+            if (file) {
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+                if (!allowedTypes.includes(file.type)) {
+                    previewContainer.innerHTML = '<p class="text-danger">Format non supporté. Veuillez choisir une image JPG, PNG ou WEBP.</p>';
+                    return;
+                }
 
-if (! nom || ! prenom) {
-e.preventDefault();
-if (! nom) {
-document.querySelector('# {{ form.nom.vars.id }}').classList.add('is-invalid');
-}
-if (! prenom) {
-document.querySelector('# {{ form.prenom.vars.id }}').classList.add('is-invalid');
-}
-}
-const file = e.target.files[0];
-const previewContainer = document.getElementById('imagePreviewContainer');
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.className = 'img-thumbnail img-preview';
+                    img.alt = 'Prévisualisation';
+                    previewContainer.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
 
-// Vider le conteneur précédent
-previewContainer.innerHTML = '';
+        // Validation avant soumission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const nom = document.querySelector('#{{ form.nom.vars.id }}').value.trim();
+            const prenom = document.querySelector('#{{ form.prenom.vars.id }}').value.trim();
+            let isValid = true;
 
-if (file) {
-const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-if (! allowedTypes.includes(file.type)) {
-previewContainer.innerHTML = '<p class="text-danger">Format non supporté. Veuillez choisir une image JPG, PNG ou WEBP.</p>';
-return;
-}
+            if (!nom) {
+                document.querySelector('#{{ form.nom.vars.id }}').classList.add('is-invalid');
+                isValid = false;
+            }
 
-const reader = new FileReader();
-reader.onload = function (event) {
-const img = document.createElement('img');
-img.src = event.target.result;
-img.className = 'img-thumbnail img-preview';
-img.alt = 'Prévisualisation';
-previewContainer.appendChild(img);
-}
-reader.readAsDataURL(file);
-} else {
-previewContainer.innerHTML = '<p class="text-muted">Aucune image sélectionnée.</p>';
-}
-});
-	</script>
+            if (!prenom) {
+                document.querySelector('#{{ form.prenom.vars.id }}').classList.add('is-invalid');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                // Scroll vers le premier champ invalide
+                document.querySelector('.is-invalid').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        });
+    </script>
 {% endblock %}

@@ -126,15 +126,16 @@ class Candidature
         return $this;
     }
 
-    #[ORM\Column(name:'id_user',type: 'integer', nullable: false)]
-    private ?int $iduser = null;
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'utilisateurs')]
+    #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id')]
+    private ?Utilisateur $iduser = null;
 
-    public function getIduser(): ?int
+    public function getIduser(): ?Utilisateur
     {
         return $this->iduser;
     }
 
-    public function setIduser(int $iduser): self
+    public function setIduser(Utilisateur $iduser): self
     {
         $this->iduser = $iduser;
         return $this;

@@ -42,22 +42,6 @@ class UtilisateurEditType extends AbstractType
             ])
 
             ->add('email', EmailType::class)
-            ->add('password', PasswordType::class, [
-                'label' => 'Nouveau mot de passe',
-                'required' => false,
-                'mapped' => false,
-                'attr' => [
-                    'placeholder' => 'Laissez vide pour ne pas changer',
-                    'autocomplete' => 'new-password'
-                ],
-                'constraints' => [
-                    new Assert\Length([
-                        'min' => 6,
-                        'minMessage' => 'Le mot de passe doit contenir au moins {{ limit }} caractères',
-                        'max' => 4096,
-                    ]),
-                ],
-            ])
             ->add('image', FileType::class, [
                 'label' => 'Photo de profil',
                 'required' => false,
@@ -72,11 +56,14 @@ class UtilisateurEditType extends AbstractType
                 'attr' => ['class' => 'form-control-file']
             ])
             ->add('salaire', NumberType::class, [
-                'required' => false,
+                'required' => true,
                 'constraints' => [
                     new Assert\Type([
                         'type' => 'numeric',
                         'message' => 'Le salaire doit être un nombre valide'
+                    ]),
+                    new Assert\NotBlank([
+                        'message' => 'Le salaire est obligatoire'
                     ]),
                     new Assert\Range([
                         'min' => 0,
@@ -99,6 +86,9 @@ class UtilisateurEditType extends AbstractType
                     new Assert\Length([
                         'max' => 100,
                         'maxMessage' => 'Le poste ne peut pas dépasser {{ limit }} caractères'
+                    ]),
+                    new Assert\NotBlank([
+                        'message' => 'La poste est obligatoire'
                     ]),
                     new Assert\Regex([
                         'pattern' => '/^[a-zA-ZÀ-ÿ\s\-]+$/',

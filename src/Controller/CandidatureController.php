@@ -21,7 +21,7 @@ final class CandidatureController extends AbstractController
     public function index(CandidatureRepository $candidatureRepository): Response
     {
         return $this->render('candidature/index.html.twig', [
-            'candidatures' => $candidatureRepository->findAll(),
+            'candidatures' => $candidatureRepository->findBy(["iduser" => $this->getUser()]),
         ]);
     }
 
@@ -44,7 +44,7 @@ final class CandidatureController extends AbstractController
         $candidature->setDateCandidature(new \DateTime());
         $candidature->setDateModification(new \DateTime());
         $candidature->setStatut('En attente');
-        $candidature->setIduser(1); // À remplacer par l'utilisateur connecté
+        $candidature->setIduser($this->getUser()); // À remplacer par l'utilisateur connecté
     
         $form = $this->createForm(CandidatureType::class, $candidature);
         $form->handleRequest($request);
