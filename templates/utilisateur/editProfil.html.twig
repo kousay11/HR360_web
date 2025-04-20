@@ -1,0 +1,190 @@
+{% extends 'baseCAN.html.twig' %}
+
+{% block title %}Modifier mon profil - HR360{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    <style>
+        .edit-profile-section {
+            background-color: #f8f9fa;
+            padding: 3rem 0;
+        }
+        
+        .edit-profile-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 2.5rem;
+        }
+        
+        .profile-preview {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-preview-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ff4a17;
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #273d4e;
+        }
+        
+        .form-control {
+            border-radius: 5px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #ff4a17;
+            box-shadow: 0 0 0 0.25rem rgba(255, 74, 23, 0.25);
+        }
+        
+        .btn-save {
+            background-color: #ff4a17;
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-save:hover {
+            background-color: #e03e12;
+            transform: translateY(-2px);
+        }
+        
+        .btn-cancel {
+            color: #ff4a17;
+            border: 1px solid #ff4a17;
+            background: white;
+        }
+        
+        .btn-cancel:hover {
+            background-color: #ffe0d6;
+        }
+
+        .is-invalid {
+            border-color: #dc3545;
+        }
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+        
+        @media (max-width: 768px) {
+            .edit-profile-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block index %}
+<section class="edit-profile-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="edit-profile-card">
+                    <h2 class="text-center mb-4" style="color: #ff4a17;">Modifier mon profil</h2>
+                    
+                    <div class="profile-preview">
+                        <img src="{{ user.image ? asset('uploads/images/' ~ user.image) : asset('uploads/images/default-avatar.png') }}" 
+                             class="profile-preview-img" 
+                             id="imagePreview"
+                             alt="Photo de profil actuelle">
+                    </div>
+                    
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.prenom, {
+                                    'attr': {
+                                        'class': 'form-control' ~ (form.prenom.vars.errors|length ? ' is-invalid' : '')
+                                    }
+                                }) }}
+                                <div class="invalid-feedback">{{ form_errors(form.prenom) }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.nom, {
+                                    'attr': {
+                                        'class': 'form-control' ~ (form.nom.vars.errors|length ? ' is-invalid' : '')
+                                    }
+                                }) }}
+                                <div class="invalid-feedback">{{ form_errors(form.nom) }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form_label(form.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.email, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.email.vars.errors|length ? ' is-invalid' : '')
+                                }
+                            }) }}
+                            <div class="invalid-feedback">{{ form_errors(form.email) }}</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form_label(form.competence, 'Compétences', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.competence, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.competence.vars.errors|length ? ' is-invalid' : ''),
+                                    'rows': 4
+                                }
+                            }) }}
+                            <small class="text-muted">Listez vos compétences séparées par des virgules</small>
+                            <div class="invalid-feedback">{{ form_errors(form.competence) }}</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form_label(form.image, 'Changer la photo de profil', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.image, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.image.vars.errors|length ? ' is-invalid' : ''),
+                                    'onchange': 'previewImage(this)'
+                                }
+                            }) }}
+                            <div class="invalid-feedback">{{ form_errors(form.image) }}</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ path('app_candidat_profil') }}" class="btn btn-cancel">
+                                <i class="fas fa-times mr-2"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-save">
+                                <i class="fas fa-save mr-2"></i> Enregistrer
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function previewImage(input) {
+    const preview = document.getElementById('imagePreview');
+    const file = input.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        preview.src = e.target.result;
+    }
+    
+    if (file) {
+        reader.readAsDataURL(file);
+    }
+}
+</script>
+{% endblock %}

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -71,7 +70,7 @@
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
 
-      <a href="index.html" class="logo d-flex align-items-center me-auto">
+      <a href="#" class="logo d-flex align-items-center me-auto">
       {% block logo %}
         <img src="{{asset('logoRH360.png')}}" alt="">
         <h1 class="sitename">HR360</h1>
@@ -81,10 +80,7 @@
       <nav id="navmenu" class="navmenu">
       {% block navmenu %}
         <ul>
-          <li><a href="#hero" class="active">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#services">Contact</a></li>
-          <li><a href="#portfolio">Profil</a></li>
+          <li><a href="{{ path('app_candidat_profil') }}">Profil</a></li>
           <li><a href="{{ path('app_offreFront_index') }}">Offres</a></li>
           <li><a href="{{ path('app_candidature_index') }}">Mes candidatures</a></li>
         </ul>
@@ -92,7 +88,12 @@
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
 
-      <a class="cta-btn" href="index.html#about">Log out</a>
+      <form id="logout-form" action="{{ path('app_logout') }}" method="POST" class="d-inline">
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+					<button type="button" class="cta-btn" onclick="if(confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) { this.form.submit(); }">
+						Déconnexion
+					</button>
+				</form>
 
     </div>
   </header>
@@ -359,7 +360,7 @@
     <div class="container footer-top">
       <div class="row gy-4">
         <div class="col-lg-4 col-md-6 footer-about">
-          <a href="index.html" class="logo d-flex align-items-center">
+          <a href="#" class="logo d-flex align-items-center">
             <span class="sitename">Dewi</span>
           </a>
           <div class="footer-contact pt-3">
@@ -447,3 +448,4 @@
 </body>
 
 </html>
+

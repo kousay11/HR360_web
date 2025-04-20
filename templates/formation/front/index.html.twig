@@ -1,0 +1,160 @@
+{% extends 'baseEMP.html.twig' %}
+
+{% block title %}Liste des Formations - HR360
+{% endblock %}
+
+{% block css %}
+	{{ parent() }}
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="{{ asset('front/css/project-card.css') }}">
+{% endblock %}
+
+{% block index %}
+	<section id="formations" class="formations section">
+		<div class="container section-title" data-aos="fade-up">
+			<h2>Nos Formations</h2>
+			<p>Découvrez notre catalogue de formations</p>
+		</div>
+
+		{# Affichage des messages flash #}
+		<div class="container mb-3">
+			{% for label, messages in app.flashes %}
+				{% for message in messages %}
+					<div class="alert alert-{{ label == 'success' ? 'success' : (label == 'warning' ? 'warning' : (label == 'danger' ? 'danger' : 'info')) }} alert-dismissible fade show" role="alert">
+						<i class="fas fa-info-circle me-2"></i>
+						{{ message }}
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+				{% endfor %}
+			{% endfor %}
+		</div>
+
+
+		<div class="container">
+			<div class="row mb-4">
+				<div class="col-md-6">
+					<form method="get" class="search-form">
+						<div class="input-group search-container">
+							<input type="text" name="search" class="form-control search-box" placeholder="Rechercher..." value="{{ app.request.query.get('search') ?? '' }}">
+							<button class="btn btn-outline-danger" type="submit">
+								<i class="fas fa-search"></i>
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<div class="row">
+				{% for formation in formations %}
+					<div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+						<div class="card entity-card">
+							<div class="card-header entity-header">
+								<i class="fas fa-graduation-cap entity-icon"></i>
+								<h5 class="entity-title">{{ formation.titre }}</h5>
+								<span class="badge bg-success badge-position">
+									<i class="fas fa-check-circle me-1"></i>
+									{{ formation.isFavorite ? 'Favori' : 'Disponible' }}
+								</span>
+							</div>
+							<div class="card-body entity-body">
+								<p>
+									<i class="fas fa-align-left"></i>
+									{{ formation.description|u.truncate(100, '...') }}
+								</p>
+								<hr>
+								<div class="project-meta">
+									<i class="fas fa-clock"></i>
+									<span>Durée:
+										{{ formation.duree }}
+										jours</span>
+								</div>
+								<div class="project-meta">
+									<i class="fas fa-calendar-day"></i>
+									<span>Date:
+										{{ formation.dateFormation|date('d/m/Y') }}</span>
+								</div>
+							</div>
+
+							<div class="card-footer entity-footer">
+								<div
+									class="d-flex justify-content-between align-items-center">
+									{# Groupe gauche - Boutons principaux #}
+									<div class="btn-group btn-group-sm" role="group">
+										<a href="{{ path('app_participation_front_new', {'id': formation.id}) }}" class="btn btn-outline-success">
+											<i class="fas fa-user-check me-1"></i>
+											Participer
+										</a>
+									</div>
+
+									<div>
+										<button class="btn btn-outline-warning btn-sm">
+											<i class="fas fa-star"></i>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				{% else %}
+					<div class="col-12" data-aos="fade-up">
+						<div class="alert alert-info">
+							Aucune formation trouvée.
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+
+			{% if total > limit %}
+				<div class="row mt-4">
+					<div class="col-12">
+						<nav aria-label="Page navigation">
+							<ul class="pagination justify-content-center">
+								<li class="page-item {{ page == 1 ? 'disabled' : '' }}">
+									<a class="page-link" href="{{ path('app_formation_front_index', {'page': page - 1, 'search': search}) }}">
+										&laquo; Précédent
+									</a>
+								</li>
+
+								{% for i in 1..((total / limit)|round(0, 'ceil')) %}
+									<li class="page-item {{ page == i ? 'active' : '' }}">
+										<a class="page-link" href="{{ path('app_formation_front_index', {'page': i, 'search': search}) }}">
+											{{ i }}
+										</a>
+									</li>
+								{% endfor %}
+
+								<li class="page-item {{ page * limit >= total ? 'disabled' : '' }}">
+									<a class="page-link" href="{{ path('app_formation_front_index', {'page': page + 1, 'search': search}) }}">
+										Suivant &raquo;
+									</a>
+								</li>
+							</ul>
+						</nav>
+					</div>
+				</div>
+			{% endif %}
+		</div>
+	</section>
+{% endblock %}
+
+{% block js %}
+	{{ parent() }}
+	<script>
+		document.addEventListener('DOMContentLoaded', function () { // Animation des cartes
+const formationCards = document.querySelectorAll('.entity-card');
+formationCards.forEach((card, index) => {
+card.style.animationDelay = `${
+index * 0.1
+}s`;
+});
+
+// Gestion des favoris
+document.querySelectorAll('.btn-outline-warning').forEach(btn => {
+btn.addEventListener('click', function () {
+this.classList.toggle('active');
+});
+});
+});
+	</script>
+{% endblock %}

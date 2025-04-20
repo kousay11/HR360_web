@@ -11,14 +11,15 @@ class Participation
 {
 
     #[ORM\Id]
+    #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
     private int $id;
 
-        #[ORM\ManyToOne(targetEntity: Formation::class, inversedBy: "participations")]
+    #[ORM\ManyToOne(targetEntity: Formation::class, inversedBy: "participations")]
     #[ORM\JoinColumn(name: 'idFormation', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private Formation $idFormation;
 
-        #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: "participations")]
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: "participations")]
     #[ORM\JoinColumn(name: 'idUser', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private Utilisateur $idUser;
 

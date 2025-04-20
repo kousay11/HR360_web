@@ -80,7 +80,7 @@
                             'class': 'form-control' ~ (form.datedebut.vars.valid ? '' : ' is-invalid')
                         }
                     }) }}
-                    {{ form_errors(form.datedebut) }}
+                    
                 </div>
 
                 <div class="form-group mb-3">
@@ -90,7 +90,7 @@
                             'class': 'form-control' ~ (form.datefin.vars.valid ? '' : ' is-invalid')
                         }
                     }) }}
-                    {{ form_errors(form.datefin) }}
+                    
                 </div>
 
                 {% if form.ressource is defined %}
@@ -109,13 +109,15 @@
                     <button type="submit" class="btn btn-save">
                         <i class="fas fa-save"></i> Enregistrer
                     </button>
-
-                    {{ include('reservation/_delete_form.html.twig', {
-                        'button_label': '<i class="fas fa-trash"></i> Supprimer',
-                        'button_attr': {'class': 'btn btn-delete'}
-                    }) }}
                 </div>
             {{ form_end(form) }}
+
+            <div class="d-flex justify-content-between mt-4">
+                {{ include('reservation/_delete_form.html.twig', {
+                    'button_label': '<i class="fas fa-trash"></i> Supprimer',
+                    'button_attr': {'class': 'btn btn-delete'}
+                }) }}
+            </div>
         </div>
     </div>
 </div>

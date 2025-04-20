@@ -27,8 +27,7 @@ final class ReservationController extends AbstractController
     #[Route(name: 'app_reservation_index', methods: ['GET'])]
     public function index(ReservationRepository $reservationRepository): Response
     {
-        // Récupérer l'utilisateur ayant ID = 1 pour les tests
-        $utilisateur = $this->entityManager->getRepository(Utilisateur::class)->find(1);
+        $utilisateur = $this->getUser();
         
         // Filtrer les réservations par utilisateur
         $reservations = $reservationRepository->findBy(['utilisateur' => $utilisateur]);
@@ -54,7 +53,7 @@ final class ReservationController extends AbstractController
         if($ressource){
             $reservation->setRessource($ressource);
         }
-        $utilisateur = $entityManager->getRepository(Utilisateur::class)->find(1);
+        $utilisateur = $this->getUser();
         if($utilisateur){
             $reservation->setUtilisateur($utilisateur);
         }

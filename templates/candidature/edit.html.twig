@@ -19,16 +19,18 @@
                     {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
                     
                     <div class="mb-3">
-                        {{ form_label(form.description, 'Description complémentaire', {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                        {{ form_widget(form.description, {
-                            'attr': {
-                                'class': 'form-control' ~ (form.description.vars.valid ? '' : ' is-invalid'),
-                                'rows': 5
-                            }
-                        }) }}
-                        {{ form_errors(form.description) }}
-                        <div class="form-text">Minimum 50 caractères</div>
-                    </div>
+    {{ form_label(form.description, 'Description complémentaire', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+    {{ form_widget(form.description, {
+        'attr': {
+            'class': 'form-control' ~ (form.description.vars.valid ? '' : ' is-invalid'),
+            'rows': 5
+        }
+    }) }}
+    <div class="invalid-feedback">
+        {{ form_errors(form.description) }}
+    </div>
+    <div class="form-text">Minimum 50 caractères</div>
+</div>
                     
                   <div class="mb-3">
     {{ form_label(form.cv, 'CV (PDF)', {'label_attr': {'class': 'form-label fw-bold'}}) }}
@@ -131,6 +133,19 @@
         font-size: 0.85rem;
         padding: 0.35em 0.65em;
     }
+    <style>
+    .invalid-feedback {
+        color: #dc3545; /* Rouge Bootstrap */
+        font-size: 0.875rem;
+    }
+    .is-invalid {
+        border-color: #dc3545;
+    }
+    .is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+</style>
 </style>
 {% endblock %}
 {% block js %}

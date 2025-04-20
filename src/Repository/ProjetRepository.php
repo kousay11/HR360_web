@@ -28,28 +28,26 @@ public function prioritize(): array
         ->getQuery()
         ->getResult();
 }
-public function searchFront(string $query,int $userid): array
+public function searchFront(string $query,Utilisateur $userid): array
 {
     return $this->createQueryBuilder('p')
         ->innerJoin('p.projetequipes', 'pe')
         ->innerJoin('pe.equipe', 'e')
         ->innerJoin('e.equipeemployes', 'ee')
-        ->innerJoin('ee.utilisateur', 'u')
-        ->where('u.id = :userId')
+        ->where('ee.utilisateur = :userId')
         ->Andwhere('p.nom LIKE :query')
         ->setParameter('userId', $userid)
         ->setParameter('query', '%'.$query.'%')
         ->getQuery()
         ->getResult();
 }
-public function prioritizeFront(int $userid): array
+public function prioritizeFront(Utilisateur $userid): array
 {
     return $this->createQueryBuilder('t')
     ->innerJoin('t.projetequipes', 'pe')
         ->innerJoin('pe.equipe', 'e')
         ->innerJoin('e.equipeemployes', 'ee')
-        ->innerJoin('ee.utilisateur', 'u')
-        ->where('u.id = :userId')
+        ->where('ee.utilisateur = :userId')
         ->setParameter('userId', $userid)
         ->orderBy('t.dateFin', 'ASC')
         ->getQuery()
