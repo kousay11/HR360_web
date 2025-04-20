@@ -42,23 +42,6 @@ class UtilisateurEditType extends AbstractType
             ])
 
             ->add('email', EmailType::class)
-            ->add('password', PasswordType::class, [
-                'label' => 'Nouveau mot de passe',
-                'required' => false,
-                'empty_data' => '',
-                'mapped' => false,
-                'attr' => [
-                    'placeholder' => 'Laissez vide pour ne pas changer',
-                    'autocomplete' => 'new-password'
-                ],
-                'constraints' => [
-                    new Assert\Length([
-                        'min' => 6,
-                        'minMessage' => 'Le mot de passe doit contenir au moins {{ limit }} caractères',
-                        'max' => 4096,
-                    ]),
-                ],
-            ])
             ->add('image', FileType::class, [
                 'label' => 'Photo de profil',
                 'required' => false,
