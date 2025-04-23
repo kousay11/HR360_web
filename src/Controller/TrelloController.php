@@ -75,4 +75,48 @@ class TrelloController extends AbstractController
             ], 500);
         }
     }
+    #[Route('/disable-trello-board', name: 'disable_TrelloBoard', methods: ['POST'])]
+public function disableTrelloBoard(Request $request): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
+    $taskId = $data['task_id'] ?? null;
+    $boardId = $data['board_id'] ?? null;
+
+    if (!$taskId || !$boardId) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Missing task or board ID'
+        ], 400);
+    }
+
+    try {
+        $task = $this->entityManager
+            ->getRepository(Tache::class)
+            ->find($taskId);
+
+        if (!$task) {
+            throw new \Exception('Task not found');
+        }
+
+        // Delete the Trello board
+        $deleteSuccess = $this->trelloService->deleteBoard($boardId);
+        
+        if (!$deleteSuccess) {
+            throw new \Exception('Failed to delete Trello board');
+        }
+
+        // Clear board ID from task
+        $task->setTrelloboardid(null);
+        $this->entityManager->flush();
+
+        return $this->json([
+            'success' => true
+        ]);
+    } catch (\Exception $e) {
+        return $this->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
 }

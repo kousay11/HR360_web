@@ -52,12 +52,22 @@
                         <h2>{{ firstTask.nom }}</h2>
            {% if firstTask.projet.hasEquipe() %}
     {% if firstTask.trelloboardid %}
-        <a href="https://trello.com/b/{{ firstTask.trelloboardid }}" 
-           class="btn trello-btn view-trello" 
-           target="_blank" 
-           rel="noopener noreferrer">
-            <i class="fab fa-trello"></i> View Trello
-        </a>
+        <div class="trello-buttons">
+            <a href="https://trello.com/b/{{ firstTask.trelloboardid }}" 
+               class="btn trello-btn view-trello" 
+               target="_blank" 
+               rel="noopener noreferrer">
+                <i class="fab fa-trello"></i> View Trello
+            </a>
+            <button class="btn btn-danger disable-trello" 
+                    data-task-id="{{ firstTask.id }}"
+                    data-board-id="{{ firstTask.trelloboardid }}">
+                <i class="fas fa-trash-alt"></i> Disable Trello
+            </button>
+            <div class="trello-loading" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i> Deleting Trello board...
+            </div>
+        </div>
     {% else %}
         <button class="btn trello-btn enable-trello" 
                 data-task-id="{{ firstTask.id }}"
@@ -67,7 +77,6 @@
         <div class="trello-loading" style="display: none;">
             <i class="fas fa-spinner fa-spin"></i> Creating Trello board...
         </div>
-        <div class="trello-error alert alert-danger" style="display: none;"></div>
     {% endif %}
 {% endif %}
                     </div>
@@ -170,6 +179,14 @@ const TaskManager = {
                 window.open(link.href, '_blank');
                 return false;
             }
+            
+            // Handle Disable Trello button
+            if (event.target.closest('.disable-trello')) {
+                event.preventDefault();
+                const button = event.target.closest('.disable-trello');
+                this.disableTrelloForTask(button);
+                return false;
+            }
         });
     },
     
@@ -243,12 +260,22 @@ const TaskManager = {
                 if (taskTrelloId && taskTrelloId !== 'null') {
                     trelloContainer.innerHTML = `
                         <h2>${taskName}</h2>
-                        <a href="https://trello.com/b/${taskTrelloId}" 
-                           class="btn trello-btn view-trello" 
-                           target="_blank" 
-                           rel="noopener noreferrer">
-                            <i class="fab fa-trello"></i> View Trello
-                        </a>
+                        <div class="trello-buttons">
+                            <a href="https://trello.com/b/${taskTrelloId}" 
+                               class="btn trello-btn view-trello" 
+                               target="_blank" 
+                               rel="noopener noreferrer">
+                                <i class="fab fa-trello"></i> View Trello
+                            </a>
+                            <button class="btn btn-danger disable-trello" 
+                                    data-task-id="${taskId}"
+                                    data-board-id="${taskTrelloId}">
+                                <i class="fas fa-trash-alt"></i> Disable Trello
+                            </button>
+                            <div class="trello-loading" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i> Deleting Trello board...
+                            </div>
+                        </div>
                     `;
                 } else {
                     trelloContainer.innerHTML = `
@@ -355,6 +382,75 @@ const TaskManager = {
                 </button>
                 <div class="trello-error alert alert-danger">
                     ${error.message}
+                </div>
+            `;
+            container.innerHTML = errorHTML;
+        }
+    },
+    
+    async disableTrelloForTask(button) {
+        const taskId = button.dataset.taskId;
+        const boardId = button.dataset.boardId;
+        const container = button.closest('.task-details-header');
+        
+        // Show loading state
+        const loadingHTML = `
+            <h2>${container.querySelector('h2').textContent}</h2>
+            <div class="trello-loading">
+                <i class="fas fa-spinner fa-spin"></i> Deleting Trello board...
+            </div>
+        `;
+        container.innerHTML = loadingHTML;
+        
+        try {
+            const response = await fetch('{{ path("disable_TrelloBoard") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    task_id: taskId,
+                    board_id: boardId
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to delete Trello board');
+            }
+            
+            // Update the task item in the list
+            const taskItem = document.querySelector(`.task-item[data-tache-id="${taskId}"]`);
+            if (taskItem) {
+                taskItem.dataset.trelloId = '';
+            }
+            
+            // Update the details view
+            this.handleTaskSelection(taskItem);
+            
+        } catch (error) {
+            console.error('Trello disable error:', error);
+            
+            // Show error state
+            const errorHTML = `
+                <h2>${container.querySelector('h2').textContent}</h2>
+                <div class="trello-buttons">
+                    <a href="https://trello.com/b/${boardId}" 
+                       class="btn trello-btn view-trello" 
+                       target="_blank" 
+                       rel="noopener noreferrer">
+                        <i class="fab fa-trello"></i> View Trello
+                    </a>
+                    <button class="btn btn-danger disable-trello" 
+                            data-task-id="${taskId}"
+                            data-board-id="${boardId}">
+                        <i class="fas fa-trash-alt"></i> Disable Trello
+                    </button>
+                    <div class="trello-error alert alert-danger">
+                        ${error.message}
+                    </div>
                 </div>
             `;
             container.innerHTML = errorHTML;
