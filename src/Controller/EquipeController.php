@@ -13,6 +13,9 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Equipeemploye;
 use App\Form\EquipeemployeType;
 use App\Entity\Utilisateur;
+use App\Entity\Projetequipe;
+use App\Entity\Projet;
+use App\Service\TrelloApiService;
 
 #[Route('/equipe')]
 final class EquipeController extends AbstractController
@@ -133,13 +136,65 @@ public function deleteMember(Request $request, int $id_equipe, Utilisateur $id_e
     }
 
     #[Route('/{id}', name: 'app_equipe_delete', methods: ['POST'])]
-    public function delete(Request $request, Equipe $equipe, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$equipe->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($equipe);
-            $entityManager->flush();
+public function delete(
+    Request $request, 
+    Equipe $equipe, 
+    EntityManagerInterface $entityManager,
+    TrelloApiService $trello
+): Response {
+    if (!$this->isCsrfTokenValid('delete'.$equipe->getId(), $request->getPayload()->getString('_token'))) {
+        throw $this->createAccessDeniedException('Invalid CSRF token');
+    }
+
+    try {
+        // Begin transaction for atomic operations
+        $entityManager->beginTransaction();
+
+        // Get all projects associated with this team
+        $projets = $entityManager->getRepository(Projet::class)
+            ->createQueryBuilder('p')
+            ->join('p.projetequipes', 'pe')
+            ->where('pe.equipe = :equipe')
+            ->setParameter('equipe', $equipe)
+            ->getQuery()
+            ->getResult();
+
+        // Process each project's tasks
+        foreach ($projets as $projet) {
+            foreach ($projet->getTaches() as $tache) {
+                $boardId = $tache->getTrelloboardid();
+                if ($boardId) {
+                    try {
+                        // Delete Trello board
+                        $trello->deleteBoard($boardId);
+                    } catch (\Exception $e) {
+                        // Log error but continue with deletion
+                        $this->addFlash('warning', sprintf('Failed to delete Trello board %s: %s', $boardId, $e->getMessage()));
+                    }
+                    
+                    // Clear board ID regardless of Trello deletion success
+                    $tache->setTrelloboardid(null);
+                    $entityManager->persist($tache);
+                }
+            }
         }
 
-        return $this->redirectToRoute('app_equipe_index', [], Response::HTTP_SEE_OTHER);
+        // Remove the team
+        $entityManager->remove($equipe);
+        $entityManager->flush();
+        $entityManager->commit();
+
+        $this->addFlash('success', 'Team deleted successfully');
+    } catch (\Exception $e) {
+        // Rollback transaction on error
+        if ($entityManager->getConnection()->isTransactionActive()) {
+            $entityManager->rollback();
+        }
+        
+        $this->addFlash('error', 'Failed to delete team: '.$e->getMessage());
+        return $this->redirectToRoute('app_equipe_show', ['id' => $equipe->getId()]);
     }
+
+    return $this->redirectToRoute('app_equipe_index', [], Response::HTTP_SEE_OTHER);
+}
 }
