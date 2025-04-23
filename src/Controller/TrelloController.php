@@ -10,28 +10,69 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use \DateTime;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+
 
 class TrelloController extends AbstractController
 {
-    #[Route('/create-board/{id}', name: 'create_TrelloBoard')]
-    public function createBoard(TrelloApiService $trelloService,Tache $tache,EntityManagerInterface $entityManager,ProjetRepository $projetRepository): Response
+    private TrelloApiService $trelloService;
+
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(TrelloApiService $trelloService, EntityManagerInterface $entityManager)
     {
-        $startDate = $tache->getDateDebut();
-        $endDate = $tache->getDateFin();
-        $projet=$tache->getProjet();
-        $projetName = $projet->getNom();
-        $BoardName = $projetName . ' - ' . $tache->getNom();
-        $boardId = $trelloService->createBoardWithLists($BoardName, $startDate, $endDate);
-        if ($boardId) {
-            $tache->setTrelloboardid($boardId);
-            $entityManager->persist($tache);
-            $entityManager->flush();
-            // Add members
-            $trelloService->addMembersToBoard($boardId,$projetRepository->findEquipeEmails($projet));
-            
-            return $this->json(['status' => 'success', 'boardId' => $boardId]);
+        $this->trelloService = $trelloService;
+        $this->entityManager = $entityManager;
+    }
+
+    #[Route('/create-trello-board', name: 'create_TrelloBoard', methods: ['POST'])]
+    public function createTrelloBoard(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $taskId = $data['task_id'] ?? null;
+        $projectId = $data['project_id'] ?? null;
+
+        if (!$taskId || !$projectId) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Missing task or project ID'
+            ], 400);
         }
-        
-        return $this->json(['status' => 'error'], 500);
+
+        try {
+            $task = $this->entityManager
+                ->getRepository(Tache::class)
+                ->find($taskId);
+            $task = $this->entityManager
+                ->getRepository(Tache::class)
+                ->find($taskId);
+
+            if (!$task) {
+                throw new \Exception('Task not found');
+            }
+
+            // Create board with date range
+            $boardId = $this->trelloService->createBoardWithLists(
+                $task->getNom(),
+                $task->getDateDebut(),
+                $task->getDateFin()
+            );
+            $this->entityManager->flush();
+            // Save board ID to task
+            $task->setTrelloboardid($boardId);
+            $this->entityManager->flush();
+
+            return $this->json([
+                'success' => true,
+                'boardId' => $boardId
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

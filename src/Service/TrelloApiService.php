@@ -38,11 +38,11 @@ class TrelloApiService
         }
 
         // Step 2: Generate lists for each day in the range
-        $currentDate = clone $dateDebut;
-        while ($currentDate <= $dateFin) {
+        $currentDate = clone $dateFin;
+        while ($currentDate > $dateDebut) {
             $formattedDate = $this->formatDate($currentDate);
             $this->createList($boardId, $formattedDate);
-            $currentDate->modify('+1 day');
+            $currentDate->modify('-1 day');
         }
 
         return $boardId;
