@@ -15,6 +15,8 @@ use App\Entity\Projetequipe;
 use App\Entity\Equipe;
 use App\Repository\ProjetequipeRepository;
 use App\Repository\EquipeRepository;
+use App\Entity\Tache;
+use App\Service\TrelloApiService;
 
 #[Route('/projet')]
 final class ProjetController extends AbstractController
@@ -72,7 +74,7 @@ public function associateTeam(Request $request, Projet $projet, EntityManagerInt
         
         $entityManager->persist($projetEquipe);
         $entityManager->flush();
-        
+
         return $this->redirectToRoute('app_projet_show', ['id' => $projet->getId()]);
     }
     
@@ -83,7 +85,7 @@ public function associateTeam(Request $request, Projet $projet, EntityManagerInt
 }
 
 #[Route('/projet/{id}/disassociate-team/{equipeId}', name: 'app_projet_disassociate_team', methods: ['POST'])]
-public function disassociateTeam(Request $request, Projet $projet, int $equipeId, EntityManagerInterface $entityManager): Response
+public function disassociateTeam(Request $request, Projet $projet, int $equipeId, EntityManagerInterface $entityManager,TrelloApiService $trello): Response
 {
     $projetEquipe = $entityManager->getRepository(Projetequipe::class)->findOneBy([
         'projet' => $projet,
@@ -93,6 +95,16 @@ public function disassociateTeam(Request $request, Projet $projet, int $equipeId
     if ($projetEquipe) {
         $entityManager->remove($projetEquipe);
         $entityManager->flush();
+    }
+    
+    $taches = $projet->getTaches();
+    foreach ($taches as $tache) {
+        if ($tache->getTrelloboardid() != null) {
+            $trello->deleteBoard($tache->getTrelloboardid());
+            $tache->setTrelloboardid(null);
+            $entityManager->persist($tache);
+            $entityManager->flush();
+        } 
     }
     
     return $this->redirectToRoute('app_projet_show', ['id' => $projet->getId()]);
