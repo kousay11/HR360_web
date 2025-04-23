@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Offre;
+use App\Service\DeepTranslateService;
 use App\Form\OffreType;
 use App\Repository\OffreRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -100,6 +101,117 @@ final class OffreController extends AbstractController
 
         return $this->redirectToRoute('app_offre_index', [], Response::HTTP_SEE_OTHER);
     }
-   
+    #[Route('/api/generate-description', name: 'app_offre_generate_description', methods: ['POST'])]
+    public function generateDescription(Request $request): JsonResponse
+    {
+        if (!$request->isXmlHttpRequest()) {
+            return $this->json(['error' => 'Requête non autorisée'], 403);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $titre = $data['titre'] ?? '';
+        
+        if (empty(trim($titre))) {
+            return $this->json(['error' => 'Le titre est requis et ne peut pas être vide'], 400);
+        }
+        
+        try {
+            $description = $this->generateDescriptionFromAI(trim($titre));
+            return $this->json([
+                'description' => $description,
+                'status' => 'success'
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'error' => 'Erreur de génération',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    // Méthode privée pour l'appel API
+    private function generateDescriptionFromAI(string $titre): string
+    {
+        $apiUrl = 'https://api.together.xyz/v1/chat/completions';
+        $apiKey = $this->getParameter('app.together_api_key');
+        
+        $client = new \GuzzleHttp\Client([
+            'timeout' => 30,
+            'verify' => false // À n'utiliser qu'en développement
+        ]);
+        
+        try {
+            $response = $client->post($apiUrl, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => [
+                    'model' => 'meta-llama/Llama-3.3-70B-Instruct-Turbo',
+                    'messages' => [
+                        [
+                            'role' => 'system',
+                            'content' => 'Tu es un assistant qui génère des descriptions concises pour des offres d\'emploi.'
+                        ],
+                        [
+                            'role' => 'user',
+                            'content' => "Crée une description professionnelle pour le poste: $titre"
+                        ]
+                    ],
+                    'max_tokens' => 500,
+                    'temperature' => 0.7
+                ]
+            ]);
+            
+            $data = json_decode($response->getBody(), true);
+            
+            if (!isset($data['choices'][0]['message']['content'])) {
+                throw new \Exception('Réponse API invalide');
+            }
+            
+            return $this->cleanGeneratedText($data['choices'][0]['message']['content']);
+            
+        } catch (\Exception $e) {
+            error_log('API Error: ' . $e->getMessage());
+            throw new \Exception('Service temporairement indisponible');
+        }
+    }
+    
+    private function cleanGeneratedText(string $text): string
+    {
+        // Supprime les numérotations et les caractères spéciaux
+        $text = preg_replace('/^\d+\.\s*/m', '', $text);
+        // Supprime les sauts de ligne multiples
+        $text = preg_replace('/\n{2,}/', "\n\n", $text);
+        return trim($text);
+    }
+   #[Route('/api/translate', name: 'app_offre_translate', methods: ['POST'])]
+public function translateDescription(Request $request, DeepTranslateService $translator): JsonResponse
+{
+    if (!$request->isXmlHttpRequest()) {
+        return $this->json(['error' => 'Requête non autorisée'], 403);
+    }
+
+    try {
+        $data = json_decode($request->getContent(), true);
+        
+        if (empty($data['text'] ?? '')) {
+            return $this->json(['error' => 'Le texte à traduire est requis'], 400);
+        }
+
+        $translatedText = $translator->translate($data['text']);
+        
+        return $this->json([
+            'translatedText' => $translatedText,
+            'status' => 'success'
+        ]);
+
+    } catch (\Exception $e) {
+        return $this->json([
+            'error' => 'service_unavailable',
+            'message' => $e->getMessage()
+        ], 503);
+    }
+}
    
 }
