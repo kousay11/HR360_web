@@ -165,11 +165,14 @@ public function prioritize(Request $request, ?Projet $projet, TacheRepository $t
     }
 
     #[Route('/{id}', name: 'app_tache_delete', methods: ['POST'])]
-    public function delete(Request $request, Tache $tache, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Tache $tache, EntityManagerInterface $entityManager,TrelloApiService $trello_api_service): Response
     {
         $projetId = $tache->getProjet() ? $tache->getProjet()->getId() : null;
         
         if ($this->isCsrfTokenValid('delete'.$tache->getId(), $request->getPayload()->getString('_token'))) {
+            if ($tache->getTrelloboardid() !== null) {
+                $trello_api_service->deleteBoard($tache->getTrelloboardid());
+            }
             $entityManager->remove($tache);
             $entityManager->flush();
         }
