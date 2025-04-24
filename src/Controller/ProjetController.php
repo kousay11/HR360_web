@@ -185,9 +185,17 @@ public function show(Projet $projet, TacheRepository $tacheRepository): Response
     }
 
     #[Route('/{id}', name: 'app_projet_delete', methods: ['POST'])]
-    public function delete(Request $request, Projet $projet, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Projet $projet, EntityManagerInterface $entityManager,TrelloApiService $trello): Response
     {
         if ($this->isCsrfTokenValid('delete'.$projet->getId(), $request->getPayload()->getString('_token'))) {
+            $taches = $projet->getTaches();
+            foreach ($taches as $tache) {
+                if ($tache->getTrelloboardid() != null) {
+                    $trello->deleteBoard($tache->getTrelloboardid());
+                    $tache->setTrelloboardid(null);
+                    $entityManager->persist($tache);
+                }
+            }
             $entityManager->remove($projet);
             $entityManager->flush();
         }
