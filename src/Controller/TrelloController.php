@@ -55,7 +55,7 @@ class TrelloController extends AbstractController
 
             // Create board with date range
             $boardId = $this->trelloService->createBoardWithLists(
-                $task->getNom(),
+                $task->getProjet()->getNom()."-".$task->getNom(),
                 $task->getDateDebut(),
                 $task->getDateFin()
             );

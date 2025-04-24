@@ -13,13 +13,14 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Projet;
 use App\Enum\StatusTache;
 use App\Repository\ProjetRepository;
+use App\Service\TrelloApiService;
 
 #[Route('/tache')]
 final class TacheController extends AbstractController
 {
     #[Route('/', name: 'app_tache_index', methods: ['GET'])]
     #[Route('/project/{id}', name: 'app_tache_by_project', methods: ['GET'])]
-    public function index(Request $request, ?Projet $projet, TacheRepository $tacheRepository): Response
+    public function index(Request $request, ?Projet $projet, TacheRepository $tacheRepository,TrelloApiService $trello_api_service,EntityManagerInterface $entityManager): Response
     {
         $query = $request->query->get('q', '');
         
@@ -31,6 +32,15 @@ final class TacheController extends AbstractController
             $taches = $query 
                 ? $tacheRepository->search($query)
                 : $tacheRepository->findAll();
+        }
+
+        foreach ($taches as $tache) {
+            if ($tache->getTrelloboardid() !== null) {
+                if ($trello_api_service->isBoardStillOnTrello($tache->getTrelloboardid()) === false) {
+                    $tache->setTrelloboardid(null);
+                    $entityManager->flush();    
+                }
+            }
         }
 
         if ($request->isXmlHttpRequest()) {
@@ -45,6 +55,7 @@ final class TacheController extends AbstractController
             'projet' => $projet
         ]);
     }
+
 
     #[Route('/search/project/{id}', name: 'app_tache_search_project', methods: ['GET'])]
     #[Route('/search', name: 'app_tache_search', methods: ['GET'])]
