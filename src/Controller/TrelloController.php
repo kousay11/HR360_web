@@ -28,7 +28,7 @@ class TrelloController extends AbstractController
     }
 
     #[Route('/create-trello-board', name: 'create_TrelloBoard', methods: ['POST'])]
-    public function createTrelloBoard(Request $request): JsonResponse
+    public function createTrelloBoard(Request $request,ProjetRepository $projet_repository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $taskId = $data['task_id'] ?? null;
@@ -64,6 +64,8 @@ class TrelloController extends AbstractController
             $task->setTrelloboardid($boardId);
             $this->entityManager->flush();
 
+            $emails = $projet_repository->findEquipeEmails($task->getProjet());
+            $this->trelloService->addMembersToBoard($boardId, $emails);
             return $this->json([
                 'success' => true,
                 'boardId' => $boardId

@@ -55,7 +55,7 @@ public function prioritizeFront(Utilisateur $userid): array
 }
 public function findEquipeEmails(Projet $projet): array
 {
-    return $this->createQueryBuilder('p')
+    $results = $this->createQueryBuilder('p')
         ->innerJoin('p.projetequipes', 'pe')
         ->innerJoin('pe.equipe', 'e')
         ->innerJoin('e.equipeemployes', 'ee')
@@ -65,6 +65,9 @@ public function findEquipeEmails(Projet $projet): array
         ->select('u.email')
         ->getQuery()
         ->getArrayResult();
+
+    // Extract just the email strings from the array of arrays
+    return array_column($results, 'email');
 }
     // Add custom methods as needed
 }
