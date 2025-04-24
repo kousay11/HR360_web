@@ -34,18 +34,18 @@ class DeepTranslateService
 
         $data = $response->toArray();
 
-        // Vérification approfondie de la structure de réponse
-        if (!isset($data['data']['translations']['translatedText'])) {
+        // ✅ Adaptation à la structure de réponse réelle
+        if (!isset($data['data']['translations']['translatedText'][0])) {
             error_log('Réponse API inattendue: ' . print_r($data, true));
             throw new \RuntimeException('Structure de réponse API invalide');
         }
 
-        // Retourne explicitement le texte traduit sous forme de string
-        return (string) $data['data']['translations']['translatedText'];
+        return (string) $data['data']['translations']['translatedText'][0];
 
     } catch (\Exception $e) {
         error_log('DeepTranslate API Error: ' . $e->getMessage());
         throw new \RuntimeException('Service de traduction temporairement indisponible');
     }
 }
+
 }

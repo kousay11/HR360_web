@@ -7,6 +7,8 @@ use App\Service\DeepTranslateService;
 use App\Form\OffreType;
 use App\Repository\OffreRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -213,5 +215,4 @@ public function translateDescription(Request $request, DeepTranslateService $tra
         ], 503);
     }
 }
-   
 }

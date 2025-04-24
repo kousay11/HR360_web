@@ -18,6 +18,7 @@
 {% block js %}
     {{ parent() }}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <meta name="csrf-token" content="{{ csrf_token('app') }}">
     </script>
     <script>
@@ -135,6 +136,61 @@ document.getElementById('translate-description-btn')?.addEventListener('click', 
         btn.innerHTML = '<i class="fas fa-language me-2"></i>Traduire en anglais';
     }
 });
-    </script>
+// Export PDF
+ // Initialise jsPDF (en utilisant la version UMD)
+        const { jsPDF } = window.jspdf;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // ... vos autres scripts existants ...
+            
+            // Gestion de l'export PDF
+            document.getElementById('export-pdf-btn')?.addEventListener('click', function() {
+                const description = document.getElementById('offre_description').value.trim();
+                const titre = document.getElementById('offre_titre').value.trim() || 'Description Offre';
+                
+                if (!description) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erreur',
+                        text: 'Veuillez entrer une description à exporter'
+                    });
+                    return;
+                }
+                
+                try {
+                    // Création du PDF
+                    const doc = new jsPDF();
+                    
+                    // Titre
+                    doc.setFontSize(18);
+                    doc.text(titre, 15, 20);
+                    
+                    // Séparateur
+                    doc.setDrawColor(200, 200, 200);
+                    doc.line(15, 25, 195, 25);
+                    
+                    // Description (avec gestion des lignes trop longues)
+                    doc.setFontSize(12);
+                    const splitText = doc.splitTextToSize(description, 180);
+                    doc.text(splitText, 15, 35);
+                    
+                    // Enregistrement
+                    doc.save(`Offre_${titre.substring(0, 20)}.pdf`);
+                    
+                } catch (error) {
+                    console.error('Erreur génération PDF:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erreur',
+                        text: 'Une erreur est survenue lors de la génération du PDF'
+                    });
+                }
+            });
+        });  
+ </script> 
+    
+    
+       
+
     
 {% endblock %}

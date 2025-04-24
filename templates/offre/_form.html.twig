@@ -25,6 +25,9 @@
         <button type="button" class="btn btn-outline-secondary" id="translate-description-btn">
             <i class="fas fa-language me-2"></i>Traduire en anglais
         </button>
+        <button type="button" class="btn btn-outline-danger" id="export-pdf-btn">
+            <i class="fas fa-file-pdf me-2"></i>Exporter en PDF
+        </button>
     </div>
     
     {{ form_widget(form.description, {'attr': {'class': 'form-control' ~ (form.description.vars.valid ? '' : ' is-invalid'), 'rows': '5', 'id': 'offre_description'}}) }}
@@ -236,5 +239,16 @@
 /* Alignement des boutons */
 .d-flex.gap-2 {
     gap: 10px;
+}
+#export-pdf-btn {
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    margin-bottom: 10px;
+}
+
+#export-pdf-btn:hover {
+    background-color: #f8f9fa;
+    color: #dc3545;
 }
 </style>
