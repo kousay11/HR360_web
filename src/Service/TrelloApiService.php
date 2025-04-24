@@ -123,7 +123,45 @@ class TrelloApiService
     return '🗓️ ' . $dayName . ' – ' . $date->format('d/m/Y');
 }
 
+public function addMemberToBoard(string $boardId, string $email): bool
+{
+    $url = $this->trelloUrl . '/boards/' . $boardId . '/members';
 
+    try {
+        $response = $this->client->request('PUT', $url, [
+            'query' => [
+                'email' => $email,
+                'key' => $this->apiKey,
+                'token' => $this->apiToken,
+                'type' => 'normal' // Can be 'normal' or 'admin'
+            ]
+        ]);
+
+        if ($response->getStatusCode() === 200) {
+            $this->logger->info('Member added to board', [
+                'boardId' => $boardId,
+                'email' => $email
+            ]);
+            return true;
+        }
+
+        $this->logger->error('Failed to add member to board', [
+            'boardId' => $boardId,
+            'email' => $email,
+            'status' => $response->getStatusCode(),
+            'response' => $response->getContent(false)
+        ]);
+        return false;
+
+    } catch (\Exception $e) {
+        $this->logger->error('Exception when adding member to board', [
+            'exception' => $e->getMessage(),
+            'boardId' => $boardId,
+            'email' => $email
+        ]);
+        return false;
+    }
+}
     public function addMembersToBoard(string $boardId, array $memberEmails): bool
     {
         foreach ($memberEmails as $email) {

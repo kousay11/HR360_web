@@ -6,7 +6,7 @@ use App\Entity\Tache;
 use App\Entity\Projet;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-
+use App\Entity\Equipe;
 class TacheRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -70,5 +70,16 @@ public function findAllForExport(?Projet $projet = null): array
     }
 
     return $qb->getQuery()->getResult();
+}
+public function findTasksOfTeamWithTrello(Equipe $equipe): array
+{
+    return $this->createQueryBuilder('t')
+        ->innerJoin('t.projet', 'p')
+        ->innerJoin('p.projetequipes', 'pe')
+        ->where('pe.equipe = :equipe')
+        ->andWhere('t.trelloboardid IS NOT NULL')
+        ->setParameter('equipe', $equipe)
+        ->getQuery()
+        ->getResult();
 }
 }

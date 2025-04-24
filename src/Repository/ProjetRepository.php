@@ -66,7 +66,6 @@ public function findEquipeEmails(Projet $projet): array
         ->getQuery()
         ->getArrayResult();
 
-    // Extract just the email strings from the array of arrays
     return array_column($results, 'email');
 }
     // Add custom methods as needed

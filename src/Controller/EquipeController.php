@@ -16,6 +16,7 @@ use App\Entity\Utilisateur;
 use App\Entity\Projetequipe;
 use App\Entity\Projet;
 use App\Service\TrelloApiService;
+use App\Repository\TacheRepository;
 
 #[Route('/equipe')]
 final class EquipeController extends AbstractController
@@ -73,7 +74,7 @@ final class EquipeController extends AbstractController
     }
 
     #[Route('/{id}/add-member', name: 'app_equipeemploye_new', methods: ['GET','POST'])]
-    public function newMember(Request $request, Equipe $equipe, EntityManagerInterface $entityManager): Response
+    public function newMember(Request $request, Equipe $equipe, EntityManagerInterface $entityManager,TacheRepository $tache_repository,TrelloApiService $trello_api_service): Response
 {
     $equipeEmploye = new Equipeemploye();
     $equipeEmploye->setEquipe($equipe); // Set the team ID
@@ -85,7 +86,11 @@ final class EquipeController extends AbstractController
     if ($form->isSubmitted() && $form->isValid()) {
         $entityManager->persist($equipeEmploye);
         $entityManager->flush();
-
+        $email=$equipeEmploye->getUtilisateur()->getEmail();
+        $taches=$tache_repository->findTasksOfTeamWithTrello($equipe);
+        foreach ($taches as $tache) {
+            $trello_api_service->addMemberToBoard($tache->getTrelloboardid(), $email);
+        }
         $this->addFlash('success', 'Member added to team successfully!');
         return $this->redirectToRoute('app_equipe_show', ['id' => $equipe->getId()]);
     }
@@ -96,7 +101,7 @@ final class EquipeController extends AbstractController
     ]);
 }
 #[Route('/equipe/{id_equipe}/remove-member/{id_employe}', name: 'app_equipeemploye_delete', methods: ['POST'])]
-public function deleteMember(Request $request, int $id_equipe, Utilisateur $id_employe, EntityManagerInterface $entityManager): Response
+public function deleteMember(Request $request, int $id_equipe, Utilisateur $id_employe, EntityManagerInterface $entityManager,TacheRepository $tache_repository,TrelloApiService $trello_api_service): Response
 {   $equipe = $entityManager->getRepository(Equipe::class)->find($id_equipe);
     $employe = $entityManager->getRepository(Utilisateur::class)->find($id_employe);
     $equipeEmploye = $entityManager->getRepository(Equipeemploye::class)->findOneBy([
@@ -112,6 +117,11 @@ public function deleteMember(Request $request, int $id_equipe, Utilisateur $id_e
         $entityManager->remove($equipeEmploye);
         $entityManager->flush();
         $this->addFlash('success', 'Member removed from team successfully!');
+        $taches = $tache_repository->findTasksOfTeamWithTrello($equipe);
+        $memberID=$trello_api_service->getMemberIdByEmail($employe->getEmail());
+        foreach ($taches as $tache) {
+                $trello_api_service->removeMemberFromBoard($tache->getTrelloboardid(), $memberID);
+        }
     }
 
     return $this->redirectToRoute('app_equipe_show', ['id' => $id_equipe]);
