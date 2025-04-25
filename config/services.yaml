@@ -9,6 +9,9 @@ parameters:
     images_directory: '%kernel.project_dir%/public/uploads/images'
     app.together_api_key: '%env(TOGETHER_API_KEY)%'
     app.deep_translate_api_key: '%env(DEEP_TRANSLATE_API_KEY)%'
+    # app.rapidapi_grammar_key: '%env(RAPIDAPI_GRAMMAR_KEY)%'
+    # app.rapidapi_grammar_url: 'https://grammar-checker-api.p.rapidapi.com/v1/check'
+    # app.rapidapi_grammar_host: 'grammar-checker-api.p.rapidapi.com'
 
 
 services:
@@ -33,5 +36,11 @@ services:
     App\Service\DeepTranslateService:
         arguments:
             $apiKey: '%app.deep_translate_api_key%'
+    # App\Service\GrammarCheckerService:
+        # arguments:
+            # $client: '@http_client'
+            # $apiKey: '%app.rapidapi_grammar_key%'
+            # $apiUrl: '%app.rapidapi_grammar_url%'
+            # $apiHost: '%app.rapidapi_grammar_host%'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
