@@ -10,3 +10,12 @@ homepage:
     defaults:
         route: app_auth
 
+workload_calendar:
+    path: /equipe/{id}/charge
+    controller: App\Controller\WorkloadCalendarController::show
+    methods: GET
+
+workload_events:
+    path: /api/equipe/{id}/charge/events
+    controller: App\Controller\WorkloadCalendarController::getEvents
+    methods: GET

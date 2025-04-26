@@ -6,6 +6,7 @@ use App\Entity\Projet;
 use App\Entity\Utilisateur;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Equipe;
 
 class ProjetRepository extends ServiceEntityRepository
 {
@@ -68,5 +69,14 @@ public function findEquipeEmails(Projet $projet): array
 
     return array_column($results, 'email');
 }
-    // Add custom methods as needed
+public function findByEquipe(Equipe $equipe): array
+{
+    return $this->createQueryBuilder('p')
+        ->join('p.projetequipes', 'pe') // assure-toi que l'entité Projet a une relation ManyToMany avec Equipe
+        ->where('pe.equipe = :equipe')
+        ->setParameter('equipe', $equipe)
+        ->getQuery()
+        ->getResult();
+}
+
 }

@@ -1,0 +1,72 @@
+{% extends 'baseRH.html.twig' %}
+{% block title %}Charge de l'équipe {{ equipe.nom }}{% endblock %}
+
+{% block heading %}
+    Charge de l'équipe {{ equipe.nom }}
+{% endblock %}
+{% block css %}
+    {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid/main.min.css" rel="stylesheet">
+    <style>
+        .workload-legend {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            border: 1px solid #ddd;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Charge de l'équipe {{ equipe.nom }}</h1>
+        
+        <div class="workload-legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #A3E4A3;"></div>
+                <span>1 projet</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #FFA500;"></div>
+                <span>2 projets</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #FF6B6B;"></div>
+                <span>3+ projets</span>
+            </div>
+        </div>
+        
+        <div id="calendar" style="margin: 40px auto; max-width: 1100px;"></div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                locale: 'fr',
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek'
+                },
+                events: {{ path('workload_events', {id: equipe.id})|json_encode|raw }}
+            });
+            calendar.render();
+        });
+    </script>
+{% endblock %}

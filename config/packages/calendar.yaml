@@ -1,0 +1,10 @@
+calendar:
+    fullcalendar:
+        locale: 'fr'
+        defaultView: 'month'
+        header:
+            left: 'prev,next today'
+            center: 'title'
+            right: 'month,agendaWeek'
+        editable: false
+        eventLimit: true
