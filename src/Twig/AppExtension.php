@@ -7,6 +7,13 @@ use Twig\TwigFunction;
 
 class AppExtension extends AbstractExtension
 {
+    private string $projectDir;
+
+    public function __construct(string $projectDir)
+    {
+        $this->projectDir = $projectDir;
+    }
+
     public function getFunctions()
     {
         return [
