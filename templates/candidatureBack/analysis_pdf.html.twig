@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport d'analyse</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h1 { color: #4e73df; }
+        .score { font-size: 24px; font-weight: bold; margin: 20px 0; }
+        .score-high { color: #28a745; }
+        .score-medium { color: #ffc107; }
+        .score-low { color: #dc3545; }
+        .details { margin-top: 30px; }
+        .detail-item { margin-bottom: 10px; }
+        .footer { margin-top: 50px; font-size: 12px; color: #6c757d; }
+    </style>
+</head>
+<body>
+    <h1>Rapport d'analyse CV/Offre</h1>
+    <p>Date : {{ date|date('d/m/Y H:i') }}</p>
+    
+    <div class="score {{ analysis.score >= 80 ? 'score-high' : (analysis.score >= 50 ? 'score-medium' : 'score-low') }}">
+        Score de correspondance : {{ analysis.score }}%
+    </div>
+    
+    <div class="alert {{ analysis.score < 50 ? 'alert-danger' : 'alert-success' }}">
+        {{ analysis.message }}
+    </div>
+    
+    <div class="details">
+        <h3>Détails de l'analyse :</h3>
+        {{ analysis.details|raw }}
+    </div>
+    
+    <div class="footer">
+        Généré par RH360 - Système de gestion des ressources humaines
+    </div>
+</body>
+</html>

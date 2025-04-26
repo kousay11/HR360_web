@@ -1,13 +1,185 @@
-<!DOCTYPE html>
+{% extends 'baseCAN.html.twig' %}
+{% block form %}
+{% endblock %}
+{% block index %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="text-center mb-0 text-dark">
+                    <i class="fas fa-edit me-2"></i>Modifier la candidature
+                </h1>
+                <a href="{{ path('app_candidature_index') }}" class="btn btn-outline-dark">
+                    <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                </a>
+            </div>
 
-<title>Edit Candidature</title>
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                    
+                    <div class="mb-3">
+    {{ form_label(form.description, 'Description complémentaire', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+    {{ form_widget(form.description, {
+        'attr': {
+            'class': 'form-control' ~ (form.description.vars.valid ? '' : ' is-invalid'),
+            'rows': 5
+        }
+    }) }}
+    <div class="invalid-feedback">
+        {{ form_errors(form.description) }}
+    </div>
+    <div class="form-text">Minimum 50 caractères</div>
+</div>
+                    
+                  <div class="mb-3">
+    {{ form_label(form.cv, 'CV (PDF)', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+    {{ form_widget(form.cv, {'attr': {
+        'class': 'form-control' ~ (form.cv.vars.valid ? '' : ' is-invalid'),
+        'onchange': 'updateFileDisplay(this, "cv-current", "cv-preview")'
+    }}) }}
+    {{ form_errors(form.cv) }}
+    <div class="mt-2" id="cv-current">
+        {% if candidature.cv %}
+            <span class="badge bg-info">
+                <i class="fas fa-file-pdf me-1"></i>Fichier actuel: <span id="cv-filename">{{ candidature.cv }}</span>
+            </span>
+            <a href="{{ asset('uploads/cvs/' ~ candidature.cv) }}" target="_blank" class="ms-2" id="cv-preview">
+                <i class="fas fa-eye"></i> Voir
+            </a>
+        {% endif %}
+    </div>
+</div>
 
-{% block body %}
-    <h1>Edit Candidature</h1>
+<div class="mb-3">
+    {{ form_label(form.lettreMotivation, 'Lettre de motivation (PDF)', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+    {{ form_widget(form.lettreMotivation, {'attr': {
+        'class': 'form-control' ~ (form.lettreMotivation.vars.valid ? '' : ' is-invalid'),
+        'onchange': 'updateFileDisplay(this, "lettre-current", "lettre-preview")'
+    }}) }}
+    {{ form_errors(form.lettreMotivation) }}
+    <div class="mt-2" id="lettre-current">
+        {% if candidature.lettreMotivation %}
+            <span class="badge bg-info">
+                <i class="fas fa-file-pdf me-1"></i>Fichier actuel: <span id="lettre-filename">{{ candidature.lettreMotivation }}</span>
+            </span>
+            <a href="{{ asset('uploads/lettres/' ~ candidature.lettreMotivation) }}" target="_blank" class="ms-2" id="lettre-preview">
+                <i class="fas fa-eye"></i> Voir
+            </a>
+        {% endif %}
+    </div>
+</div>
 
-    {{ include('candidature/_form.html.twig', {'button_label': 'Update'}) }}
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-primary me-md-2">
+                            <i class="fas fa-save me-2"></i>Enregistrer les modifications
+                        </button>
+                        <a href="{{ path('app_candidature_index') }}" class="btn btn-outline-secondary">
+                            Annuler
+                        </a>
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
 
-    <a href="{{ path('app_candidature_index') }}">back to list</a>
-
-    {{ include('candidature/_delete_form.html.twig') }}
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block css %}
+{{ parent() }}
+<style>
+    .card {
+        border-radius: 10px;
+        border: 2px solid rgba(53, 111, 220, 0.2);
+        transition: all 0.3s ease;
+    }
+    .card:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .form-control:focus {
+        border-color: #356fdc;
+        box-shadow: 0 0 0 0.25rem rgba(53, 111, 220, 0.25);
+    }
+    .form-label {
+        color: #495057;
+    }
+    .btn-primary {
+        background-color:rgb(179, 45, 59);
+        border-color:rgb(226, 45, 45);
+    }
+    .btn-primary:hover {
+        background-color:rgb(236, 20, 20);
+        border-color: #2a5ab7;
+    }
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875rem;
+    }
+    .is-invalid {
+        border-color: #dc3545;
+    }
+    .is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+    .text-muted {
+        font-size: 0.8rem;
+    }
+    .badge {
+        font-size: 0.85rem;
+        padding: 0.35em 0.65em;
+    }
+    <style>
+    .invalid-feedback {
+        color: #dc3545; /* Rouge Bootstrap */
+        font-size: 0.875rem;
+    }
+    .is-invalid {
+        border-color: #dc3545;
+    }
+    .is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+</style>
+</style>
+{% endblock %}
+{% block js %}
+{{ parent() }}
+<script>
+function updateFileDisplay(input, currentElementId, previewElementId) {
+    if (input.files && input.files[0]) {
+        const fileName = input.files[0].name;
+        const currentElement = document.getElementById(currentElementId);
+        const filenameSpan = document.getElementById(currentElementId.replace('current', 'filename'));
+        const previewLink = document.getElementById(previewElementId);
+        
+        // Crée l'élément s'il n'existe pas
+        if (!filenameSpan) {
+            currentElement.innerHTML = `
+                <span class="badge bg-info">
+                    <i class="fas fa-file-pdf me-1"></i>Fichier actuel: <span id="${currentElementId.replace('current', 'filename')}">${fileName}</span>
+                </span>
+                <a href="#" target="_blank" class="ms-2" id="${previewElementId}">
+                    <i class="fas fa-eye"></i> Voir
+                </a>
+            `;
+        } else {
+            filenameSpan.textContent = fileName;
+        }
+        
+        // Met à jour le lien de prévisualisation
+        const newPreviewLink = document.getElementById(previewElementId);
+        newPreviewLink.onclick = function(e) {
+            e.preventDefault();
+            const fileUrl = URL.createObjectURL(input.files[0]);
+            window.open(fileUrl, '_blank');
+        };
+    }
+}
+</script>
 {% endblock %}

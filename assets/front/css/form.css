@@ -1,0 +1,43 @@
+/* Style pour les formulaires */
+.php-email-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.php-email-form label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.php-email-form .form-control {
+    height: calc(2.5em + 0.75rem + 2px);
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+
+.php-email-form textarea.form-control {
+    height: auto;
+}
+
+
+
+.php-email-form .is-invalid {
+    border-color: #dc3545;
+}
+
+
+.php-email-form .invalid-feedback {
+    display: none;
+    color: #dc3545;
+    font-size: 0.875em;
+}
+
+.php-email-form .is-invalid ~ .invalid-feedback {
+    display: block;
+}
+
+.php-email-form button[disabled] {
+    opacity: 0.7;
+    cursor: not-allowed;
+}

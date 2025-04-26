@@ -133,7 +133,18 @@ public function setImage(?string $image): self
     $this->image = $image;
     return $this;
 }
+private ?string $qrPath = null;
 
+public function getQrPath(): ?string
+{
+    return $this->qrPath;
+}
+
+public function setQrPath(?string $qrPath): self
+{
+    $this->qrPath = $qrPath;
+    return $this;
+}
 
 
 }

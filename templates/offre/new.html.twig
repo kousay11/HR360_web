@@ -1,11 +1,22 @@
-<!DOCTYPE html>
+{% extends 'baseRH.html.twig' %}
 
-<title>New Offre</title>
+{% block title %}New Offre{% endblock %}
+{% block heading %}New Offre{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+{% endblock %}
 
 {% block body %}
-    <h1>Create new Offre</h1>
+    <div class="container py-5">
+        <h1 class="text-center mb-5 text-dark">Créer une nouvelle offre</h1>
+        {{ include('offre/_form.html.twig', {'form_title': 'Nouvelle Offre'}) }}
+    </div>
+{% endblock %}
 
-    {{ include('offre/_form.html.twig') }}
-
-    <a href="{{ path('app_offre_index') }}">back to list</a>
+{% block js %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </script>
 {% endblock %}

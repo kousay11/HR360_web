@@ -1,0 +1,112 @@
+{% extends 'baseEMP.html.twig' %}
+
+{% block title %}Effectuer le Paiement{% endblock %}
+
+{% block index %}
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #f9f9f9;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        p {
+            text-align: center;
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        #card-element {
+            background: white;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background-color: #2ecc71;
+            color: white;
+            font-size: 16px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #27ae60;
+        }
+
+        #error-message {
+            color: #e74c3c;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+
+    <div class="container">
+        <h1>Réservation - Effectuer le Paiement</h1>
+        <p>Vous avez réservé une ressource. Veuillez procéder au paiement pour confirmer la réservation.</p>
+
+
+        <p>Montant à payer : <strong>{{ reservation.ressource.prix }} €</strong></p>
+
+
+        <div id="payment-form">
+            <form id="payment-form">
+                <div id="card-element">
+                    <!-- Un élément de carte de paiement Stripe sera inséré ici -->
+                </div>
+                <button id="submit" class="btn-submit">
+                    Payer maintenant
+                </button>
+                <div id="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        var stripe = Stripe('{{ stripe_public_key }}');
+        var elements = stripe.elements();
+        var card = elements.create('card');
+        card.mount('#card-element');
+
+        var form = document.getElementById('payment-form');
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const clientSecret = {{ clientSecret|json_encode|raw }};
+
+            const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: card,
+                    billing_details: {
+                        name: 'Nom de l\'utilisateur',
+                    }
+                }
+            });
+
+            if (error) {
+                document.getElementById('error-message').textContent = error.message;
+            } else if (paymentIntent.status === 'succeeded') {
+                window.location.href = '{{ path('app_reservation_index') }}';
+            }
+        });
+    </script>
+{% endblock %}
