@@ -6,7 +6,16 @@
     {{ parent() }}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="{{ asset('front/css/project-card.css') }}" rel="stylesheet" >
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
+
+
+        /* Couleur rouge pour les dates désactivées */
+        .flatpickr-day.disabled {
+            background-color: #ff6b6b !important;
+            color: white !important;
+            cursor: not-allowed !important;
+        }
         .status-form-container {
             max-width: 600px;
             margin: 0 auto;
@@ -121,4 +130,29 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+
+
+{% block js %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const reservedDates = {{ reservedDates|json_encode()|raw }};
+            
+            flatpickr("#{{ form.datedebut.vars.id }}", {
+                dateFormat: "Y-m-d",
+                disable: reservedDates,
+                locale: "fr"
+            });
+
+            flatpickr("#{{ form.datefin.vars.id }}", {
+                dateFormat: "Y-m-d",
+                disable: reservedDates,
+                locale: "fr"
+            });
+        });
+    </script>
 {% endblock %}

@@ -56,6 +56,36 @@ public function new(Request $request, EntityManagerInterface $entityManager, ?in
     $form = $this->createForm(ReservationType::class, $reservation);
     $form->handleRequest($request);
 
+
+
+    // 👉 Fetch des dates réservées pour cette ressource
+    $reservationsExistantes = $entityManager->getRepository(Reservation::class)
+        ->findBy(['ressource' => $ressource]);
+
+    $reservedDates = [];
+    foreach ($reservationsExistantes as $res) {
+        $start = $res->getDatedebut();
+        $end = $res->getDatefin();
+
+        if ($start && $end) {
+            $period = new \DatePeriod(
+                $start,
+                new \DateInterval('P1D'),
+                (clone $end)->modify('+1 day') // inclure la date de fin
+            );
+
+            foreach ($period as $date) {
+                $reservedDates[] = $date->format('Y-m-d');
+            }
+        }
+    }
+
+    // Pour enlever les doublons éventuels
+    $reservedDates = array_values(array_unique($reservedDates));
+
+
+
+
     if ($form->isSubmitted() && $form->isValid()) {
         $entityManager->persist($reservation);
         $entityManager->flush();
@@ -87,6 +117,7 @@ public function new(Request $request, EntityManagerInterface $entityManager, ?in
         'reservation' => $reservation,
         'form' => $form,
         'ressourceID' => $ressourceId,
+        'reservedDates' => $reservedDates,
     ]);
 }
 
@@ -99,22 +130,50 @@ public function new(Request $request, EntityManagerInterface $entityManager, ?in
     }
 
     #[Route('/{id}/edit', name: 'app_reservation_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Reservation $reservation, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(ReservationType::class, $reservation);
-        $form->handleRequest($request);
+public function edit(Request $request, Reservation $reservation, EntityManagerInterface $entityManager): Response
+{
+    $form = $this->createForm(ReservationType::class, $reservation);
+    $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+    // 👉 Calculer les dates réservées (comme dans new)
+    $reservationsExistantes = $entityManager->getRepository(Reservation::class)
+        ->findBy(['ressource' => $reservation->getRessource()]);
 
-            return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
+    $reservedDates = [];
+    foreach ($reservationsExistantes as $res) {
+        // Exclure la réservation actuelle (sinon conflit sur ses propres dates)
+        if ($res->getId() !== $reservation->getId()) {
+            $start = $res->getDatedebut();
+            $end = $res->getDatefin();
+
+            if ($start && $end) {
+                $period = new \DatePeriod(
+                    $start,
+                    new \DateInterval('P1D'),
+                    (clone $end)->modify('+1 day')
+                );
+
+                foreach ($period as $date) {
+                    $reservedDates[] = $date->format('Y-m-d');
+                }
+            }
         }
-
-        return $this->render('reservation/edit.html.twig', [
-            'reservation' => $reservation,
-            'form' => $form,
-        ]);
     }
+    $reservedDates = array_values(array_unique($reservedDates));
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    return $this->render('reservation/edit.html.twig', [
+        'reservation' => $reservation,
+        'form' => $form,
+        'reservedDates' => $reservedDates, // 👈 ajoute cette ligne
+    ]);
+}
+
 
     #[Route('/{id}', name: 'app_reservation_delete', methods: ['POST'])]
     public function delete(Request $request, Reservation $reservation, EntityManagerInterface $entityManager): Response
