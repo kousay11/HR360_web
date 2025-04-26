@@ -13,5 +13,16 @@ class ReservationRepository extends ServiceEntityRepository
         parent::__construct($registry, Reservation::class);
     }
 
-    // Add custom methods as needed
+    public function findUnavailableResourceIds(\DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    {
+        $qb = $this->createQueryBuilder('r')
+            ->select('IDENTITY(r.ressource)')
+            ->where('r.datedebut <= :endDate')
+            ->andWhere('r.datefin >= :startDate')
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate);
+
+        return array_column($qb->getQuery()->getResult(), 1); // renvoie les IDs de ressources réservées
+    }
+
 }

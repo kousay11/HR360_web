@@ -9,6 +9,56 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
 
+        /* Style des cartes pour les ressources recommandées */
+        .card-recommendation {
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card-recommendation:hover {
+            transform: translateY(-10px);
+        }
+
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .btn-recommendation {
+            background-color: #198754;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-recommendation:hover {
+            background-color: #157347;
+        }
+
+        .recommendation-card-body {
+            padding: 15px;
+        }
+
+        .resource-title {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .resource-info {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .resource-price {
+            font-size: 1.1em;
+            color: #198754;
+        }
+
+        .resource-status {
+            font-size: 0.9em;
+        }
+
 
         /* Couleur rouge pour les dates désactivées */
         .flatpickr-day.disabled {
@@ -17,7 +67,7 @@
             cursor: not-allowed !important;
         }
         .status-form-container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
         }
 
@@ -120,6 +170,41 @@
                     </button>
                 </div>
             {{ form_end(form) }}
+
+            {% if recommendations is not empty %}
+                <div class="mt-5">
+                    <h4>Ressources recommandées :</h4>
+                    <div class="row">
+                        {% for ressource in recommendations %}
+                            <div class="col-md-4">
+                                <div class="card card-recommendation mb-4">
+                                    <img src="{{ asset('uploads/images/' ~ ressource.image) }}"
+                                    <div class="card-body recommendation-card-body">
+                                        <h5 class="resource-title">{{ ressource.nom }}</h5>
+                                        <p class="resource-info">
+                                            Type : {{ ressource.type }}<br>
+                                            État : <span class="resource-status">{{ ressource.etat }}</span><br>
+                                            Prix : <span class="resource-price">{{ ressource.prix | number_format(2, '.', ' ') }} DT</span>
+                                        </p>
+
+                                        <a href="{{ path('app_reservation_new', {'ressourceId': ressource.id}) }}" class="btn btn-recommendation">
+                                            <i class="fas fa-check"></i> Réserver cette ressource
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+
+
+
+
+
+
+
 
             <div class="d-flex justify-content-between mt-4">
                 {{ include('reservation/_delete_form.html.twig', {
