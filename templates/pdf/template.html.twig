@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Réservations de {{ employe.nom }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui;
+            margin: 20px;
+            background-color: #f8f9fa;
+            color: #2c3e50;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header img {
+            width: 100px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2em;
+            color: #3498db;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        .reservation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .reservation-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+            transition: transform 0.3s;
+        }
+
+        .reservation-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .reservation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .reservation-id {
+            font-weight: bold;
+            color: #3498db;
+            font-size: 1.4em;
+        }
+
+        .resource-name {
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #2c3e50;
+        }
+
+        .date-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .date-box {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            width: 48%;
+            text-align: center;
+        }
+
+        .date-label {
+            font-size: 0.85em;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+
+        .date-value {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        @media print {
+            body {
+                margin: 0.5cm;
+                font-size: 0.9em;
+                background: none;
+            }
+            .reservation-item {
+                box-shadow: none;
+                border: 1px solid #bbb;
+            }
+            .reservation-item:hover {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Réservations de {{ employe.nom }}</h1>
+        <p>Bonjour {{ employe.nom }}, voici la liste de vos réservations :</p>
+    </div>
+
+    <div class="reservation-grid">
+        {% for reservation in reservations %}
+            <div class="reservation-item">
+                <div class="reservation-header">
+                    <div class="reservation-id">#{{ reservation.id }}</div>
+                    <div class="resource-name">{{ reservation.ressource.nom }}</div>
+                </div>
+                <div class="date-container">
+                    <div class="date-box">
+                        <div class="date-label">Date de Début</div>
+                        <div class="date-value">{{ reservation.datedebut|date('d/m/Y') }}</div>
+                    </div>
+                    <div class="date-box">
+                        <div class="date-label">Date de Fin</div>
+                        <div class="date-value">{{ reservation.datefin|date('d/m/Y') }}</div>
+                    </div>
+                </div>
+                <div class="reservation-header">
+                <div class="resource-name">
+                {% if reservation.ressource.image %}
+<img src="{{ absolute_url(asset('uploads/images/' ~ reservation.ressource.image)) }}" alt="{{ reservation.ressource.nom }}" style="width: 200px; height: 150px; object-fit: cover; border-radius: 8px; margin-right: 10px;">
+                {% else %}
+                    <div style="width: 50px; height: 50px; background-color: #ddd; border-radius: 8px; display: inline-block; margin-right: 10px;"></div>
+                {% endif %}
+                {{ reservation.ressource.nom }}
+            </div>
+        </div>
+
+            </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>
