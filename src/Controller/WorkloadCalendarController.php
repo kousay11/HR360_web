@@ -18,15 +18,22 @@ class WorkloadCalendarController extends AbstractController
         ]);
     }
 
-    #[Route('/api/equipe/{id}/charge/events', name: 'workload_events')]
-    public function getEvents(Equipe $equipe, WorkloadGenerator $generator, Request $request)
+    #[Route('/api/workload_events/{id}', name: 'workload_events')]
+    public function getWorkloadEvents(Equipe $equipe, WorkloadGenerator $calculator): JsonResponse
     {
-        // Filtrage par période si nécessaire
-        $start = $request->query->get('start');
-        $end = $request->query->get('end');
-
-        $events = $generator->generate($equipe);
+        $events = [];
         
-        return new JsonResponse($events);
+        foreach ($calculator->getDailyWorkload($equipe) as $date => $projects) {
+            $events[] = [
+                'title' => count($projects) . ' projet(s)',
+                'start' => $date,
+                'backgroundColor' => $calculator->getColorCode(count($projects)),
+                'extendedProps' => [
+                    'projects' => $projects
+                ]
+            ];
+        }
+        
+        return $this->json($events);
     }
 }
