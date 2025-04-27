@@ -186,7 +186,8 @@ public function edit(Request $request, Reservation $reservation, EntityManagerIn
         'reservation' => $reservation,
         'form' => $form,
         'reservedDates' => $reservedDates,
-        'recommendations' => $recommendations, // ➔ NE PAS OUBLIER de passer recommendations ici
+        'recommendations' => $recommendations,
+         // ➔ NE PAS OUBLIER de passer recommendations ici
     ]);
 }
 

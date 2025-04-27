@@ -113,6 +113,23 @@
         .btn-delete:hover {
             background-color: #c82333;
         }
+
+        .card-recommendation img {
+    transition: transform 0.3s ease;
+    border-top-left-radius: .5rem;
+    border-top-right-radius: .5rem;
+}
+
+.card-recommendation:hover img {
+    transform: scale(1.05);
+}
+
+.badge {
+    padding: 0.5em 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
     </style>
 {% endblock %}
 
@@ -172,31 +189,47 @@
             {{ form_end(form) }}
 
             {% if recommendations is not empty %}
-                <div class="mt-5">
-                    <h4>Ressources recommandées :</h4>
-                    <div class="row">
-                        {% for ressource in recommendations %}
-                            <div class="col-md-4">
-                                <div class="card card-recommendation mb-4">
-                                    <img src="{{ asset('uploads/images/' ~ ressource.image) }}"
-                                    <div class="card-body recommendation-card-body">
-                                        <h5 class="resource-title">{{ ressource.nom }}</h5>
-                                        <p class="resource-info">
-                                            Type : {{ ressource.type }}<br>
-                                            État : <span class="resource-status">{{ ressource.etat }}</span><br>
-                                            Prix : <span class="resource-price">{{ ressource.prix | number_format(2, '.', ' ') }} DT</span>
-                                        </p>
+    <div class="mt-5">
+        <h4 class="mb-4">Ressources recommandées :</h4>
+        <div class="row">
+            {% for ressource in recommendations %}
+                <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+                    <div class="card card-recommendation mb-4">
+                        <div class="position-relative">
+                            <img src="{{ asset('uploads/images/' ~ ressource.image) }}" class="card-img-top" alt="{{ ressource.nom }}">
+                            <span class="badge 
+                                {% if ressource.etat == 'Disponible' %}
+                                    bg-success
+                                {% else %}
+                                    bg-secondary
+                                {% endif %}
+                                position-absolute top-0 end-0 m-2"
+                                style="font-size: 0.8em;">
+                                {{ ressource.etat }}
+                            </span>
+                        </div>
 
-                                        <a href="{{ path('app_reservation_new', {'ressourceId': ressource.id}) }}" class="btn btn-recommendation">
-                                            <i class="fas fa-check"></i> Réserver cette ressource
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
+                        <div class="card-body recommendation-card-body d-flex flex-column">
+                            <h5 class="resource-title mb-2">{{ ressource.nom }}</h5>
+
+                            <p class="resource-info mb-2">
+                                Type : {{ ressource.type }}
+                            </p>
+
+                            <p class="resource-price mb-3">
+                                {{ ressource.prix | number_format(2, '.', ' ') }} DT
+                            </p>
+
+                            <a href="{{ path('app_reservation_new', {'ressourceId': ressource.id}) }}" class="btn btn-recommendation mt-auto">
+                                <i class="fas fa-check"></i> Réserver cette ressource
+                            </a>
+                        </div>
                     </div>
                 </div>
-            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
 
 
 

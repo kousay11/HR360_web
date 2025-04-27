@@ -37,5 +37,74 @@ class RessourceRepository extends ServiceEntityRepository
     return $qb->getQuery()->getResult();
 }
 
+
+
+public function findPotentiallySimilar(Ressource $ressource, int $maxResults = 20): array
+{
+    $qb = $this->createQueryBuilder('r')
+        ->where('r.type = :type')
+        ->andWhere('r.id != :id')
+        ->andWhere('r.prix BETWEEN :minPrice AND :maxPrice')
+        ->setParameter('type', $ressource->getType())
+        ->setParameter('id', $ressource->getId())
+        ->setParameter('minPrice', $ressource->getPrix() * 0.7)
+        ->setParameter('maxPrice', $ressource->getPrix() * 1.3)
+        ->orderBy('ABS(r.prix - :price)', 'ASC')
+        ->setParameter('price', $ressource->getPrix())
+        ->setMaxResults($maxResults);
+
+    return $qb->getQuery()->getResult();
+}
+
+
+// Dans App\Repository\RessourceRepository.php
+public function findLatestPopular(int $maxResults): array
+{
+    return $this->createQueryBuilder('r')
+        ->orderBy('r.createdAt', 'DESC')
+        ->setMaxResults($maxResults)
+        ->getQuery()
+        ->getResult();
+}
     
+
+
+public function findWithFilters(?string $search, ?string $type, ?float $maxPrice, bool $availableOnly, ?string $sort): array
+{
+    $qb = $this->createQueryBuilder('r');
+
+    if ($search) {
+        $qb->andWhere('LOWER(r.nom) LIKE :search')
+            ->setParameter('search', '%' . strtolower($search) . '%');
+    }
+
+    if ($type) {
+        $qb->andWhere('r.type = :type')
+            ->setParameter('type', $type);
+    }
+
+    if ($maxPrice) {
+        $qb->andWhere('r.prix <= :maxPrice')
+            ->setParameter('maxPrice', $maxPrice);
+    }
+
+    if ($availableOnly) {
+        $qb->andWhere('r.etat = :etat')
+            ->setParameter('etat', 'Disponible');
+    }
+
+    if ($sort === 'asc') {
+        $qb->orderBy('r.prix', 'ASC');
+    } elseif ($sort === 'desc') {
+        $qb->orderBy('r.prix', 'DESC');
+    } else {
+        $qb->orderBy('r.nom', 'ASC'); // tri par défaut
+    }
+
+    return $qb->getQuery()->getResult();
+}
+
+
+
+
 }

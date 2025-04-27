@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
-
+use App\Service\RessourceSimilarityService;
 #[Route('/ressource')]
 final class RessourceController extends AbstractController
 {
@@ -30,12 +30,24 @@ final class RessourceController extends AbstractController
     
 
     #[Route('/employee', name: 'app_ressource_index_employee', methods: ['GET'])]
-public function indexForEmployees(RessourceRepository $ressourceRepository): Response
+public function indexForEmployees(Request $request, RessourceRepository $ressourceRepository): Response
 {
+    $search = $request->query->get('search');
+    $type = $request->query->get('type');
+    $maxPrice = $request->query->get('maxPrice');
+    $availableOnly = $request->query->getBoolean('availableOnly');
+    $sort = $request->query->get('sort');
+
+    $ressources = $ressourceRepository->findWithFilters($search, $type, $maxPrice, $availableOnly, $sort);
+    $types = array_unique(array_map(fn($r) => $r->getType(), $ressources));
+
     return $this->render('ressource/index_employee.html.twig', [
-        'ressources' => $ressourceRepository->findAll(),
+        'ressources' => $ressources,
+        'types' => $types,
     ]);
+    
 }
+
 
 #[Route('/new', name: 'app_ressource_new', methods: ['GET', 'POST'])]
 public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
@@ -82,12 +94,17 @@ public function new(Request $request, EntityManagerInterface $entityManager, Slu
 }
 
 
-    #[Route('/{id}', name: 'app_ressource_show', methods: ['GET'])]
-public function show(Ressource $ressource): Response
+#[Route('/{id}', name: 'app_ressource_show', methods: ['GET'])]
+public function show(Ressource $ressource, RessourceRepository $ressourceRepository): Response
 {
+    $allResources = $ressourceRepository->findAll();
+    $similarResourcesEntries = $this->findSimilarResources($ressource, $allResources);
+    $similarResources = array_column($similarResourcesEntries, 'ressource');
+
     return $this->render('ressource/show.html.twig', [
         'ressource' => $ressource,
         'reservations' => $ressource->getReservations(),
+        'similarResources' => $similarResources,
     ]);
 }
 
@@ -151,4 +168,131 @@ public function edit(Request $request, Ressource $ressource, EntityManagerInterf
 
         return $this->redirectToRoute('app_ressource_index', [], Response::HTTP_SEE_OTHER);
     }
+
+
+    private function findSimilarResources(Ressource $ressource, array $allResources, int $limit = 5): array
+    {
+        $similarities = [];
+        $referencePrice = (float)$ressource->getPrix();
+    
+        foreach ($allResources as $otherRessource) {
+            // Exclure la ressource actuelle de la comparaison
+            if ($otherRessource->getId() === $ressource->getId()) {
+                continue;
+            }
+    
+            $similarity = 0;
+            $reasons = [];
+    
+            // 1. Similarité par type (40% du score max)
+            if ($ressource->getType() === $otherRessource->getType()) {
+                $similarity += 40;
+                $reasons[] = [
+                    'icon' => 'fa-tag',
+                    'text' => "Même catégorie: " . $ressource->getType(),
+                    'type' => 'category'
+                ];
+            }
+    
+            // 2. Similarité par prix (35% du score max)
+            if ($referencePrice > 0) { // Éviter la division par zéro
+                $otherPrice = (float)$otherRessource->getPrix();
+                $priceDifference = abs($referencePrice - $otherPrice);
+                $priceRatio = $otherPrice / $referencePrice;
+    
+                if ($priceDifference < 0.01) { // Prix identiques
+                    $similarity += 35;
+                    $reasons[] = [
+                        'icon' => 'fa-money-bill-wave',
+                        'text' => "Prix identique",
+                        'type' => 'price'
+                    ];
+                } elseif ($priceRatio < 0.95) { // Prix inférieur
+                    $discount = round((1 - $priceRatio) * 100);
+                    $similarity += 30 + (5 * (1 - min($priceRatio, 0.95)));
+                    $reasons[] = [
+                        'icon' => 'fa-percentage',
+                        'text' => "Économie de $discount%",
+                        'type' => 'price'
+                    ];
+                } elseif ($priceRatio <= 1.05) { // Prix similaire (±5%)
+                    $similarity += 30;
+                    $reasons[] = [
+                        'icon' => 'fa-balance-scale',
+                        'text' => "Prix similaire (±5%)",
+                        'type' => 'price'
+                    ];
+                } elseif ($priceRatio <= 1.20) { // Prix légèrement supérieur
+                    $similarity += 20;
+                    $reasons[] = [
+                        'icon' => 'fa-coins',
+                        'text' => "Prix légèrement supérieur",
+                        'type' => 'price'
+                    ];
+                }
+            }
+    
+            // 3. Similarité par état (15% du score max)
+            $stateScore = match($otherRessource->getEtat()) {
+                'Neuf' => 15,
+                'Comme neuf' => 12,
+                'Bon état' => 8,
+                'Usagé' => 5,
+                default => 0
+            };
+            $similarity += $stateScore;
+            $reasons[] = [
+                'icon' => 'fa-star',
+                'text' => "État: " . $otherRessource->getEtat(),
+                'type' => 'condition'
+            ];
+    
+            // 4. Bonus disponibilité (10% du score max)
+            if ($otherRessource->isAvailable()) {
+                $similarity += 10;
+                $reasons[] = [
+                    'icon' => 'fa-check-circle',
+                    'text' => "Disponible maintenant",
+                    'type' => 'availability'
+                ];
+            }
+    
+            // Normalisation du score entre 0-100
+            $similarity = min(100, $similarity);
+    
+            $similarities[] = [
+                'ressource' => $otherRessource,
+                'similarity' => $similarity,
+                'reasons' => $reasons
+            ];
+        }
+    
+        // Tri par similarité décroissante
+        usort($similarities, fn($a, $b) => $b['similarity'] <=> $a['similarity']);
+    
+        // Retourne les $limit meilleures suggestions
+        return array_slice($similarities, 0, $limit);
+    }
+
+#[Route('/{id}/suggestions', name: 'show_suggestions', methods: ['GET'])]
+public function showSuggestions(Ressource $ressource, RessourceRepository $ressourceRepository): Response
+{
+    $allResources = $ressourceRepository->findAll();
+    $mainSuggestions = $this->findSimilarResources($ressource, $allResources);
+
+    // Ajout de suggestions alternatives si nécessaire
+    if (count($mainSuggestions) < 3) {
+        $fallbacks = $ressourceRepository->findLatestPopular(3 - count($mainSuggestions));
+        $mainSuggestions = array_merge($mainSuggestions, $fallbacks);
+    }
+
+    return $this->render('ressource/show_suggestions.html.twig', [
+        'ressource' => $ressource,
+        'similarResources' => array_slice($mainSuggestions, 0, 5),
+    ]);
+}
+
+
+
+
 }

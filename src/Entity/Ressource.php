@@ -146,5 +146,26 @@ public function setQrPath(?string $qrPath): self
     return $this;
 }
 
+// Add this method to your Ressource entity class
+public function isAvailable(\DateTimeInterface $startDate = null, \DateTimeInterface $endDate = null): bool
+{
+    // If no dates provided, just check the general availability status
+    if ($startDate === null || $endDate === null) {
+        return $this->etat === 'disponible';
+    }
+
+    // Check for conflicting reservations if dates are provided
+    foreach ($this->getReservations() as $reservation) {
+        if ($reservation->conflictsWith($startDate, $endDate)) {
+            return false;
+        }
+    }
+    
+    return $this->etat === 'disponible';
+}
+
+
+
+
 
 }
