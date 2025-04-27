@@ -13,6 +13,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\TextType; 
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType; 
+use Symfony\Component\Form\CallbackTransformer;
 
 
 class EntretienType extends AbstractType
@@ -29,14 +31,18 @@ class EntretienType extends AbstractType
                 'empty_data' => null,
                 'invalid_message' => 'la date entretien est obligatoire'
             ])
-            ->add('heure', TextType::class, [
+            ->add('heure', TimeType::class, [
                 'label' => 'Heure',
+                'widget' => 'single_text',
+                'input' => 'datetime',
                 'attr' => [
                     'class' => 'form-control',
                     'placeholder' => 'HH:MM',
                     'pattern' => null, // Enlève le pattern HTML5
                     'novalidate' => 'novalidate',
-                    'invalid_message' => 'heure entretien est obligatoire'
+                    'invalid_message' => 'heure entretien est obligatoire',
+                    
+    
 
                 ]
             ])           
@@ -64,6 +70,17 @@ class EntretienType extends AbstractType
             ])
             
         ;
+
+         // Ajoutez ce transformateur
+    $builder->get('heure')
+    ->addModelTransformer(new CallbackTransformer(
+        function ($timeAsString) {
+            return $timeAsString ? \DateTime::createFromFormat('H:i', $timeAsString) : null;
+        },
+        function ($timeAsDateTime) {
+            return $timeAsDateTime instanceof \DateTimeInterface ? $timeAsDateTime->format('H:i') : null;
+        }
+    ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void

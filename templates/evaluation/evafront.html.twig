@@ -9,8 +9,33 @@
 <style>
     /* Styles complémentaires */
     .evaluations-container {
-        padding: 30px 0;
-    }
+    padding: 30px 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 80vh; /* Prend au moins 80% de la hauteur de l'écran */
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.row {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center; /* Centre verticalement */
+    justify-content: center; /* Centre horizontalement */
+    gap: 20px; /* Espacement entre les cartes */
+}
+
+/* Pour les cartes elles-mêmes */
+.entity-card-container {
+    width: 100%;
+    max-width: 400px; /* Largeur maximale des cartes */
+    margin: 0 auto; /* Centre la carte dans sa colonne */
+}
     
     .section-title {
         margin-bottom: 30px;
@@ -92,23 +117,20 @@
     <div class="section-title">
       <h2>Mes Évaluations</h2>
       <p class="text-muted">Retrouvez ici toutes vos évaluations</p>
-            <div class="d-sm-flex align-items-center justify-content-between mb-5"> <!-- mb-5 au lieu de mb-4 -->
-      <div class="btn-group">
-            </div>
-            </div>
-
     </div>
 
-    <div class="row">
+    <div class="row justify-content-center">
       {% if evaluations|length > 0 %}
         {% for evaluation in evaluations %}
-        <div class="col-md-6 col-lg-4 mb-4">
+        <div class="col-md-6 col-lg-4 mb-4 d-flex">
+        <div class="entity-card-container w-100">
+            
           <div class="entity-card">
             <div class="entity-header">
               <i class="fas fa-clipboard-check entity-icon"></i>
               <h5 class="entity-title text-white" >{{ evaluation.titreEva }}</h5>
-              <span class="badge bg-{{ evaluation.commentaire == 'ACCEPTÉ' ? 'success' : 'danger' }} badge-position">
-                {{ evaluation.commentaire }}
+              <span class="badge bg-{{ evaluation.commentaire.value == 'ACCEPTÉ' ? 'success' : 'danger' }} badge-position">
+                {{ evaluation.commentaire.value }}
               </span>
             </div>
             <div class="entity-body">
@@ -154,7 +176,20 @@
               </div>
             </div>
             <div class="entity-footer d-flex justify-content-between">
-
+    {% if evaluation.questions|length > 0 %}
+        <a href="{{ path('app_evaluation_quiz_front', {'idEvaluation': evaluation.idEvaluation}) }}" 
+           class="btn btn-sm btn-success" 
+           title="Passer le quiz">
+            <i class="fas fa-play"></i> Passer
+        </a>
+    {% else %}
+                            <button class="btn btn-sm btn-secondary"
+                                    title="Aucun quiz disponible"
+                                    disabled>
+                                <i class="fas fa-ban"></i>
+                            </button>
+    {% endif %}
+              </div>
             </div>
           </div>
         </div>

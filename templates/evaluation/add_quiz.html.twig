@@ -1,0 +1,61 @@
+{% extends 'baseRH.html.twig' %}
+
+{% block title %}Ajouter un Quiz{% endblock %}
+{% block heading %}Ajouter un Quiz{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                Ajouter un Quiz à: {{ evaluation.titreEva }}
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div class="form-group">
+                    <label for="category">Catégorie</label>
+                    <select name="category" id="category" class="form-control" required>
+                        <option value="">-- Sélectionnez une catégorie --</option>
+                        {% for category in categories %}
+                            <option value="{{ category }}">{{ category }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="difficulty">Difficulté</label>
+                    <select name="difficulty" id="difficulty" class="form-control" required>
+                        <option value="">-- Sélectionnez une difficulté --</option>
+                        {% for difficulty in difficulties %}
+                            <option value="{{ difficulty }}">{{ difficulty }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="limit">Nombre de questions</label>
+                    <input type="number" name="limit" id="limit" class="form-control" 
+                           min="1" max="20" value="10" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Générer le Quiz
+                </button>
+                
+                {% if evaluation.entretien %}
+                    <a href="{{ path('app_evaluation_index_for_entretien', {'idEntretien': evaluation.entretien.idEntretien}) }}" 
+                       class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Annuler
+                    </a>
+                {% else %}
+                    <a href="{{ path('app_evaluation_index') }}" 
+                       class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Annuler
+                    </a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

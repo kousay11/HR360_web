@@ -9,4 +9,3 @@ homepage:
     controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController
     defaults:
         route: app_auth
-

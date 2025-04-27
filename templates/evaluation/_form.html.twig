@@ -25,18 +25,6 @@
         <small class="form-text text-muted">Fuseau horaire: Tunis (UTC+1)</small>
         {{ form_errors(form.dateEvaluation) }}
     </div>
-    <div class="col-md-6 mb-3">
-        <label for="inputText" class="col-sm-4 col-form-label">Score Quiz (/10)</label>
-        {{ form_widget(form.scorequiz, {
-            'attr': {
-                'class': 'form-control',
-                'min': 0,
-                'max': 10,
-                'onchange': 'updateCommentaire(this.value)'
-            }
-        }) }}
-        {{ form_errors(form.scorequiz) }}
-    </div>
 </div>
 
 <div class="form-group row">
@@ -52,19 +40,7 @@
     </div>
 </div>
 
-<div class="form-group row">
-    <div class="col-md-4">
-    <label for="inputText" class="col-sm-4 col-form-label">Décision</label>
-        {{ form_widget(form.commentaire, {
-            'attr': {
-                'class': 'form-control',
-                'rows': 1,
-                'readonly': 'readonly'
-            }
-        }) }}
-        {{ form_errors(form.commentaire) }}
-    </div>
-</div>
+
 
 {# Champ caché pour la redirection #}
 {% if evaluation.entretien is defined and evaluation.entretien is not null %}
@@ -89,22 +65,6 @@
 {{ form_end(form) }}
 
 <script>
-function updateCommentaire(score) {
-    const commentaireField = document.getElementById('{{ form.commentaire.vars.id }}');
-    if (score > 7) {
-        commentaireField.value = 'ACCEPTÉ';
-    } else {
-        commentaireField.value = 'REFUSÉ';
-    }
-}
-
-// Initialiser le commentaire au chargement
-document.addEventListener('DOMContentLoaded', function() {
-    const initialScore = document.getElementById('{{ form.scorequiz.vars.id }}').value;
-    if (initialScore) {
-        updateCommentaire(initialScore);
-    }
-});
 
 // Initialisation du datetimepicker
 $(function () {
