@@ -1,464 +1,513 @@
 {% extends 'baseRH.html.twig' %}
 
-{% block title %}Tasks for {{ projet.nom }}{% endblock %}
-{% block heading %}Tasks for {{ projet.nom }}{% endblock %}
+{% block title %}Tasks for
+	{{ projet.nom }}
+{% endblock %}
+{% block heading %}Tasks for
+	{{ projet.nom }}
+{% endblock %}
 
 {% block css %}
-    {{ parent() }}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('front/css/styleTache.css') }}">
+	{{ parent() }}
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+	<link rel="stylesheet" href="{{ asset('front/css/styleTache.css') }}">
 {% endblock %}
 
 {% block body %}
-<div class="task-container">
-    <div class="task-header">
-        <a href="{{ path('app_projet_show', {'id': projet.id}) }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Project
-        </a>
-    </div>
+	<div class="task-container">
+		<div class="task-header">
+			<a href="{{ path('app_projet_show', {'id': projet.id}) }}" class="btn btn-secondary">
+				<i class="fas fa-arrow-left"></i>
+				Back to Project
+			</a>
+		</div>
 
-    <div class="task-controls">
-        <input type="text" class="search-box" placeholder="Search tasks..." id="searchInput">
-        <div class="action-buttons">
-            <a href="{{ path('app_tache_prioritize_project',{'id': projet.id}) }}" class="btn btn-primary">
-                <i class="fas fa-sort-amount-up"></i> Prioritize
-            </a>
-            <a href="{{ path('app_tache_export_project', {'id': projet.id}) }}" class="btn btn-primary">
-                <i class="fas fa-file-export"></i> Export
-            </a>
-            <a href="{{ path('app_tache_by_project',{'id': projet.id}) }}" class="btn btn-primary">
-                <i class="fas fa-sync-alt"></i> Refresh
-            </a>
-            <a href="{{ path('app_tache_new', {'projetId': projet.id}) }}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> New Task
-            </a>
-        </div>
-    </div>
+		<div class="task-controls">
+			<input type="text" class="search-box" placeholder="Search tasks..." id="searchInput">
+			<div class="filters">
+				<select id="statusFilter" class="form-select">
+					<option value="">All Statuses</option>
+					{% for status in ['A faire', 'En cours', 'Terminée'] %}
+						<option value="{{ status }}">{{ status }}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div class="action-buttons">
+				<a href="{{ path('app_tache_prioritize_project',{'id': projet.id}) }}" class="btn btn-primary">
+					<i class="fas fa-sort-amount-up"></i>
+					Prioritize
+				</a>
+				<a href="{{ path('app_tache_export_project', {'id': projet.id}) }}" class="btn btn-primary">
+					<i class="fas fa-file-export"></i>
+					Export
+				</a>
+				<a href="{{ path('app_tache_by_project',{'id': projet.id}) }}" class="btn btn-primary">
+					<i class="fas fa-sync-alt"></i>
+					Refresh
+				</a>
+				<a href="{{ path('app_tache_new', {'projetId': projet.id}) }}" class="btn btn-primary">
+					<i class="fas fa-plus"></i>
+					New Task
+				</a>
+			</div>
+		</div>
 
-    <div class="task-layout">
-        <!-- Left Column - Task List -->
-        <div class="task-list-column">
-            <div class="task-list" id="tasksContainer">
-                {{ include('tache/_task_list.html.twig') }}
-            </div>
-        </div>
+		<div
+			class="task-layout">
+			<!-- Left Column - Task List -->
+			<div class="task-list-column">
+				<div class="task-list" id="tasksContainer">
+					{{ include('tache/_task_list.html.twig') }}
+				</div>
+			</div>
 
-        <!-- Right Column - Task Details -->
-        <div class="task-details-column">
-            <div class="task-details-card" id="taskDetails">
-                {% if taches|length > 0 %}
-                    {% set firstTask = taches|first %}
-                    <div class="task-details-header">
-                        <h2>{{ firstTask.nom }}</h2>
-           {% if firstTask.projet.hasEquipe() %}
-    {% if firstTask.trelloboardid %}
-        <div class="trello-buttons">
-            <a href="https://trello.com/b/{{ firstTask.trelloboardid }}" 
-               class="btn trello-btn view-trello" 
-               target="_blank" 
-               rel="noopener noreferrer">
-                <i class="fab fa-trello"></i> View Trello
-            </a>
-            <button class="btn btn-danger disable-trello" 
-                    data-task-id="{{ firstTask.id }}"
-                    data-board-id="{{ firstTask.trelloboardid }}">
-                <i class="fas fa-trash-alt"></i> Disable Trello
-            </button>
-            <div class="trello-loading" style="display: none;">
-                <i class="fas fa-spinner fa-spin"></i> Deleting Trello board...
-            </div>
-        </div>
-    {% else %}
-        <button class="btn trello-btn enable-trello" 
-                data-task-id="{{ firstTask.id }}"
-                data-project-id="{{ firstTask.projet.id }}">
-            <i class="fab fa-trello"></i> Enable Trello
-        </button>
-        <div class="trello-loading" style="display: none;">
-            <i class="fas fa-spinner fa-spin"></i> Creating Trello board...
-        </div>
-    {% endif %}
-{% endif %}
-                    </div>
-                    
-                    <div class="task-content">
-                        <p class="task-description">{{ firstTask.description }}</p>
-                        
-                        <div class="task-meta">
-                            <div class="task-dates">
-                                <div class="task-date">
-                                    <span class="task-date-label">Start Date</span>
-                                    <span class="task-date-value">
-                                        {{ firstTask.dateDebut ? firstTask.dateDebut|date('M d, Y') : 'Not set' }}
-                                    </span>
-                                </div>
-                                <div class="task-date">
-                                    <span class="task-date-label">End Date</span>
-                                    <span class="task-date-value">
-                                        {{ firstTask.dateFin ? firstTask.dateFin|date('M d, Y') : 'Not set' }}
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <div class="task-status-display">
-                                <span class="task-status-label">Status:</span>
-                                <span class="task-status-badge status-{{ firstTask.statut.value|lower|replace({' ': '-'}) }}">
-                                    <i class="fas fa-{{ firstTask.statut.value == 'A faire' ? 'clock' : (firstTask.statut.value == 'En cours' ? 'spinner' : 'check-circle') }}"></i>
-                                    {{ firstTask.statut.value }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                {% else %}
-                    <div class="task-empty-state">
-                        <i class="fas fa-tasks"></i>
-                        <p>No tasks found</p>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
+			<!-- Right Column - Task Details -->
+			<div class="task-details-column">
+				<div class="task-details-card" id="taskDetails">
+					{% if taches|length > 0 %}
+						{% set firstTask = taches|first %}
+						<div class="task-details-header">
+							<h2>{{ firstTask.nom }}</h2>
+							{% if firstTask.projet.hasEquipe() %}
+								{% if firstTask.trelloboardid %}
+									<div class="trello-buttons">
+										<a href="https://trello.com/b/{{ firstTask.trelloboardid }}" class="btn trello-btn view-trello" target="_blank" rel="noopener noreferrer">
+											<i class="fab fa-trello"></i>
+											View Trello
+										</a>
+										<button class="btn btn-danger disable-trello" data-task-id="{{ firstTask.id }}" data-board-id="{{ firstTask.trelloboardid }}">
+											<i class="fas fa-trash-alt"></i>
+											Disable Trello
+										</button>
+										<div class="trello-loading" style="display: none;">
+											<i class="fas fa-spinner fa-spin"></i>
+											Deleting Trello board...
+										</div>
+									</div>
+								{% else %}
+									<button class="btn trello-btn enable-trello" data-task-id="{{ firstTask.id }}" data-project-id="{{ firstTask.projet.id }}">
+										<i class="fab fa-trello"></i>
+										Enable Trello
+									</button>
+									<div class="trello-loading" style="display: none;">
+										<i class="fas fa-spinner fa-spin"></i>
+										Creating Trello board...
+									</div>
+								{% endif %}
+							{% endif %}
+						</div>
+
+						<div class="task-content">
+							<p class="task-description">{{ firstTask.description }}</p>
+
+							<div class="task-meta">
+								<div class="task-dates">
+									<div class="task-date">
+										<span class="task-date-label">Start Date</span>
+										<span class="task-date-value">
+											{{ firstTask.dateDebut ? firstTask.dateDebut|date('M d, Y') : 'Not set' }}
+										</span>
+									</div>
+									<div class="task-date">
+										<span class="task-date-label">End Date</span>
+										<span class="task-date-value">
+											{{ firstTask.dateFin ? firstTask.dateFin|date('M d, Y') : 'Not set' }}
+										</span>
+									</div>
+								</div>
+
+								<div class="task-status-display">
+									<span class="task-status-label">Status:</span>
+									<span class="task-status-badge status-{{ firstTask.statut.value|lower|replace({' ': '-'}) }}">
+										<i class="fas fa-{{ firstTask.statut.value == 'A faire' ? 'clock' : (firstTask.statut.value == 'En cours' ? 'spinner' : 'check-circle') }}"></i>
+										{{ firstTask.statut.value }}
+									</span>
+								</div>
+							</div>
+						</div>
+					{% else %}
+						<div class="task-empty-state">
+							<i class="fas fa-tasks"></i>
+							<p>No tasks found</p>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}
 
 {% block js %}
-{{ parent() }}
-<script>
-// Main controller object to manage state
-const TaskManager = {
-    init() {
-        this.searchInput = document.getElementById('searchInput');
-        this.tasksContainer = document.getElementById('tasksContainer');
-        this.searchTimeout = null;
-        
-        // Set up event listeners once
-        this.setupEventListeners();
-        
-        // Initialize first task selection if exists
-        const firstTask = this.tasksContainer.querySelector('.task-item');
-        if (firstTask) {
-            firstTask.click();
-        }
-    },
-    
-    setupEventListeners() {
-        // Task list click handling
-        this.tasksContainer.addEventListener('click', (event) => {
-            const taskItem = event.target.closest('.task-item');
-            if (taskItem) {
-                this.handleTaskSelection(taskItem);
-            }
-        });
-        
-        // Search input handling
-        this.searchInput.addEventListener('input', () => {
-            clearTimeout(this.searchTimeout);
-            const query = this.searchInput.value.trim();
-            
-            this.searchTimeout = setTimeout(() => {
-                if (query.length >= 2 || query.length === 0) {
-                    this.fetchSearchResults(query);
-                }
-            }, 300);
-        });
-        
-        // Single delegated event listener for all buttons
-        document.addEventListener('click', (event) => {
-            // Handle Enable Trello button
-            if (event.target.closest('.enable-trello')) {
-                event.preventDefault();
-                const button = event.target.closest('.enable-trello');
-                this.enableTrelloForTask(button);
-                return false;
-            }
-            
-            // Handle View Trello link
-            if (event.target.closest('.view-trello')) {
-                event.preventDefault();
-                const link = event.target.closest('.view-trello');
-                window.open(link.href, '_blank');
-                return false;
-            }
-            
-            // Handle Disable Trello button
-            if (event.target.closest('.disable-trello')) {
-                event.preventDefault();
-                const button = event.target.closest('.disable-trello');
-                this.disableTrelloForTask(button);
-                return false;
-            }
-        });
-    },
-    
-    handleTaskSelection(taskItem) {
-        // Remove selected class from all items
-        document.querySelectorAll('.task-item').forEach(item => {
-            item.classList.remove('selected');
-        });
-        
-        // Add selected class to clicked item
-        taskItem.classList.add('selected');
-        
-        // Update task details
-        const taskId = taskItem.dataset.tacheId;
-        const taskName = taskItem.querySelector('.task-name').textContent;
-        const taskDescription = taskItem.dataset.description || '';
-        const taskDateDebut = taskItem.dataset.dateDebut || 'null';
-        const taskDateFin = taskItem.dataset.dateFin || 'null';
-        const taskStatut = taskItem.querySelector('.task-status').textContent.replace(/\s+/g, ' ').trim();
-        const taskTrelloId = taskItem.dataset.trelloId || 'null';
-        const hasTeamAssociation = taskItem.dataset.hasTeam;
-        
-        this.updateTaskDetails(
-            taskId, 
-            taskName, 
-            taskDescription, 
-            taskDateDebut, 
-            taskDateFin, 
-            taskStatut, 
-            taskTrelloId, 
-            hasTeamAssociation
-        );
-    },
-    
-    updateTaskDetails(taskId, taskName, taskDescription, taskDateDebut, taskDateFin, taskStatut, taskTrelloId, hasTeamAssociation) {
-        const detailsContainer = document.getElementById('taskDetails');
-        if (!detailsContainer) return;
-        
-        // Update basic info
-        const titleElement = detailsContainer.querySelector('h2');
-        const descriptionElement = detailsContainer.querySelector('.task-description');
-        
-        if (titleElement) titleElement.textContent = taskName;
-        if (descriptionElement) descriptionElement.textContent = taskDescription;
-        
-        // Update dates
-        const formatDate = (dateString) => {
-            if (!dateString || dateString === 'null') return 'Not set';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        };
-        
-        const dateElements = detailsContainer.querySelectorAll('.task-date-value');
-        if (dateElements[0]) dateElements[0].textContent = formatDate(taskDateDebut);
-        if (dateElements[1]) dateElements[1].textContent = formatDate(taskDateFin);
-        
-        // Update status
-        const statusBadge = detailsContainer.querySelector('.task-status-badge');
-        if (statusBadge) {
-            statusBadge.className = `task-status-badge status-${taskStatut.toLowerCase().replace(' ', '-')}`;
-            statusBadge.innerHTML = `
-                <i class="fas fa-${taskStatut == 'A faire' ? 'clock' : (taskStatut == 'En cours' ? 'spinner' : 'check-circle')}"></i>
-                ${taskStatut}
-            `;
-        }
-        
-        // Update Trello button
-        const trelloContainer = detailsContainer.querySelector('.task-details-header');
-        if (trelloContainer) {
-            if (hasTeamAssociation === 'true') {
-                if (taskTrelloId && taskTrelloId !== 'null') {
-                    trelloContainer.innerHTML = `
-                        <h2>${taskName}</h2>
-                        <div class="trello-buttons">
-                            <a href="https://trello.com/b/${taskTrelloId}" 
-                               class="btn trello-btn view-trello" 
-                               target="_blank" 
-                               rel="noopener noreferrer">
-                                <i class="fab fa-trello"></i> View Trello
-                            </a>
-                            <button class="btn btn-danger disable-trello" 
-                                    data-task-id="${taskId}"
-                                    data-board-id="${taskTrelloId}">
-                                <i class="fas fa-trash-alt"></i> Disable Trello
-                            </button>
-                            <div class="trello-loading" style="display: none;">
-                                <i class="fas fa-spinner fa-spin"></i> Deleting Trello board...
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    trelloContainer.innerHTML = `
-                        <h2>${taskName}</h2>
-                        <button class="btn trello-btn enable-trello" 
-                                data-task-id="${taskId}"
-                                data-project-id="${hasTeamAssociation}">
-                            <i class="fab fa-trello"></i> Enable Trello
-                        </button>
-                        <div class="trello-loading" style="display: none;">
-                            <i class="fas fa-spinner fa-spin"></i> Creating Trello board...
-                        </div>
-                        <div class="trello-error alert alert-danger" style="display: none;"></div>
-                    `;
-                }
-            } else {
-                trelloContainer.innerHTML = `<h2>${taskName}</h2>`;
-            }
-        }
-    },
-    
-    async fetchSearchResults(query) {
-        const projectId = {{ projet.id|default('null') }};
-        const url = projectId 
-            ? `{{ path('app_tache_search_project', {'id': projet.id}) }}?q=${encodeURIComponent(query)}`
-            : `{{ path('app_tache_search') }}?q=${encodeURIComponent(query)}`;
-        
-        try {
-            const response = await fetch(url, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'text/html'
-                }
-            });
-            
-            if (!response.ok) throw new Error('Network response was not ok');
-            
-            const html = await response.text();
-            this.tasksContainer.innerHTML = html;
-            
-            // Select the first task after search if any exist
-            const firstTask = this.tasksContainer.querySelector('.task-item');
-            if (firstTask) {
-                this.handleTaskSelection(firstTask);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            this.tasksContainer.innerHTML = '<div class="alert alert-danger">Error loading tasks</div>';
-        }
-    },
-    
-    async enableTrelloForTask(button) {
-        const taskId = button.dataset.taskId;
-        const projectId = button.dataset.projectId;
-        const container = button.closest('.task-details-header');
-        
-        // Show loading state
-        const loadingHTML = `
-            <h2>${container.querySelector('h2').textContent}</h2>
-            <div class="trello-loading">
-                <i class="fas fa-spinner fa-spin"></i> Creating Trello board...
-            </div>
-        `;
-        container.innerHTML = loadingHTML;
-        
-        try {
-            const response = await fetch('{{ path("create_TrelloBoard") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({
-                    task_id: taskId,
-                    project_id: projectId
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (!response.ok) {
-                throw new Error(data.message || 'Failed to create Trello board');
-            }
-            
-            // Update the task item in the list
-            const taskItem = document.querySelector(`.task-item[data-tache-id="${taskId}"]`);
-            if (taskItem) {
-                taskItem.dataset.trelloId = data.boardId;
-            }
-            
-            // Update the details view
-            this.handleTaskSelection(taskItem);
-            
-        } catch (error) {
-            console.error('Trello error:', error);
-            
-            // Show error state
-            const errorHTML = `
-                <h2>${container.querySelector('h2').textContent}</h2>
-                <button class="btn trello-btn enable-trello" 
-                        data-task-id="${taskId}"
-                        data-project-id="${projectId}">
-                    <i class="fab fa-trello"></i> Enable Trello
-                </button>
-                <div class="trello-error alert alert-danger">
-                    ${error.message}
-                </div>
-            `;
-            container.innerHTML = errorHTML;
-        }
-    },
-    
-    async disableTrelloForTask(button) {
-        const taskId = button.dataset.taskId;
-        const boardId = button.dataset.boardId;
-        const container = button.closest('.task-details-header');
-        
-        // Show loading state
-        const loadingHTML = `
-            <h2>${container.querySelector('h2').textContent}</h2>
-            <div class="trello-loading">
-                <i class="fas fa-spinner fa-spin"></i> Deleting Trello board...
-            </div>
-        `;
-        container.innerHTML = loadingHTML;
-        
-        try {
-            const response = await fetch('{{ path("disable_TrelloBoard") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({
-                    task_id: taskId,
-                    board_id: boardId
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (!response.ok) {
-                throw new Error(data.message || 'Failed to delete Trello board');
-            }
-            
-            // Update the task item in the list
-            const taskItem = document.querySelector(`.task-item[data-tache-id="${taskId}"]`);
-            if (taskItem) {
-                taskItem.dataset.trelloId = '';
-            }
-            
-            // Update the details view
-            this.handleTaskSelection(taskItem);
-            
-        } catch (error) {
-            console.error('Trello disable error:', error);
-            
-            // Show error state
-            const errorHTML = `
-                <h2>${container.querySelector('h2').textContent}</h2>
-                <div class="trello-buttons">
-                    <a href="https://trello.com/b/${boardId}" 
-                       class="btn trello-btn view-trello" 
-                       target="_blank" 
-                       rel="noopener noreferrer">
-                        <i class="fab fa-trello"></i> View Trello
-                    </a>
-                    <button class="btn btn-danger disable-trello" 
-                            data-task-id="${taskId}"
-                            data-board-id="${boardId}">
-                        <i class="fas fa-trash-alt"></i> Disable Trello
-                    </button>
-                    <div class="trello-error alert alert-danger">
-                        ${error.message}
-                    </div>
-                </div>
-            `;
-            container.innerHTML = errorHTML;
-        }
-    }
-};
-
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => TaskManager.init());
-</script>
+	{{ parent() }}
+	 <script>
+			// Main controller object to manage state
+			const TaskManager = {
+			    init() {
+			        this.searchInput = document.getElementById('searchInput');
+			        this.tasksContainer = document.getElementById('tasksContainer');
+			        this.searchTimeout = null;
+			        
+			        // Set up event listeners once
+			        this.setupEventListeners();
+			        
+			        // Initialize first task selection if exists
+			        const firstTask = this.tasksContainer.querySelector('.task-item');
+			        if (firstTask) {
+			            firstTask.click();
+			        }
+			    },
+			    
+			    setupEventListeners() {
+			        // Task list click handling
+			        this.tasksContainer.addEventListener('click', (event) => {
+			            const taskItem = event.target.closest('.task-item');
+			            if (taskItem) {
+			                this.handleTaskSelection(taskItem);
+			            }
+			        });
+			        
+			        // Search input handling
+			        this.searchInput.addEventListener('input', () => {
+			            clearTimeout(this.searchTimeout);
+			            const query = this.searchInput.value.trim();
+			            
+			            this.searchTimeout = setTimeout(() => {
+			                if (query.length >= 2 || query.length === 0) {
+			                    this.fetchSearchResults(query);
+			                }
+			            }, 300);
+			        });
+			            document.getElementById('statusFilter')?.addEventListener('change', () => {
+		        this.fetchFilteredTasks();
+		    });
+		},
+		
+		async fetchFilteredTasks() {
+		    const status = document.getElementById('statusFilter').value;
+		    const projectId = {{ projet.id|default('null') }};
+		    const url = projectId 
+		        ? `{{ path('app_tache_filter_project', {'id': projet.id}) }}?status=${encodeURIComponent(status)}`
+		        : `{{ path('app_tache_filter') }}?status=${encodeURIComponent(status)}`;
+		    
+		    try {
+		        const response = await fetch(url, {
+		            headers: {
+		                'X-Requested-With': 'XMLHttpRequest',
+		                'Accept': 'text/html'
+		            }
+		        });
+		        
+		        if (!response.ok) throw new Error('Network response was not ok');
+		        
+		        const html = await response.text();
+		        this.tasksContainer.innerHTML = html;
+		        
+		        // Select the first task after filtering if any exist
+		        const firstTask = this.tasksContainer.querySelector('.task-item');
+		        if (firstTask) {
+		            this.handleTaskSelection(firstTask);
+		        }
+		    } catch (error) {
+		        console.error('Error:', error);
+		        this.tasksContainer.innerHTML = '<div class="alert alert-danger">Error loading tasks</div>';
+		    }
+			        // Single delegated event listener for all buttons
+			        document.addEventListener('click', (event) => {
+			            // Handle Enable Trello button
+			            if (event.target.closest('.enable-trello')) {
+			                event.preventDefault();
+			                const button = event.target.closest('.enable-trello');
+			                this.enableTrelloForTask(button);
+			                return false;
+			            }
+			            
+			            // Handle View Trello link
+			            if (event.target.closest('.view-trello')) {
+			                event.preventDefault();
+			                const link = event.target.closest('.view-trello');
+			                window.open(link.href, '_blank');
+			                return false;
+			            }
+			            
+			            // Handle Disable Trello button
+			            if (event.target.closest('.disable-trello')) {
+			                event.preventDefault();
+			                const button = event.target.closest('.disable-trello');
+			                this.disableTrelloForTask(button);
+			                return false;
+			            }
+			        });
+			    },
+			    
+			    handleTaskSelection(taskItem) {
+			        // Remove selected class from all items
+			        document.querySelectorAll('.task-item').forEach(item => {
+			            item.classList.remove('selected');
+			        });
+			        
+			        // Add selected class to clicked item
+			        taskItem.classList.add('selected');
+			        
+			        // Update task details
+			        const taskId = taskItem.dataset.tacheId;
+			        const taskName = taskItem.querySelector('.task-name').textContent;
+			        const taskDescription = taskItem.dataset.description || '';
+			        const taskDateDebut = taskItem.dataset.dateDebut || 'null';
+			        const taskDateFin = taskItem.dataset.dateFin || 'null';
+			        const taskStatut = taskItem.querySelector('.task-status').textContent.replace(/\s+/g, ' ').trim();
+			        const taskTrelloId = taskItem.dataset.trelloId || 'null';
+			        const hasTeamAssociation = taskItem.dataset.hasTeam;
+			        
+			        this.updateTaskDetails(
+			            taskId, 
+			            taskName, 
+			            taskDescription, 
+			            taskDateDebut, 
+			            taskDateFin, 
+			            taskStatut, 
+			            taskTrelloId, 
+			            hasTeamAssociation
+			        );
+			    },
+			    
+			    updateTaskDetails(taskId, taskName, taskDescription, taskDateDebut, taskDateFin, taskStatut, taskTrelloId, hasTeamAssociation) {
+			        const detailsContainer = document.getElementById('taskDetails');
+			        if (!detailsContainer) return;
+			        
+			        // Update basic info
+			        const titleElement = detailsContainer.querySelector('h2');
+			        const descriptionElement = detailsContainer.querySelector('.task-description');
+			        
+			        if (titleElement) titleElement.textContent = taskName;
+			        if (descriptionElement) descriptionElement.textContent = taskDescription;
+			        
+			        // Update dates
+			        const formatDate = (dateString) => {
+			            if (!dateString || dateString === 'null') return 'Not set';
+			            const date = new Date(dateString);
+			            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+			        };
+			        
+			        const dateElements = detailsContainer.querySelectorAll('.task-date-value');
+			        if (dateElements[0]) dateElements[0].textContent = formatDate(taskDateDebut);
+			        if (dateElements[1]) dateElements[1].textContent = formatDate(taskDateFin);
+			        
+			        // Update status
+			        const statusBadge = detailsContainer.querySelector('.task-status-badge');
+			        if (statusBadge) {
+			            statusBadge.className = `task-status-badge status-${taskStatut.toLowerCase().replace(' ', '-')}`;
+			            statusBadge.innerHTML = `
+			                <i class="fas fa-${taskStatut == 'A faire' ? 'clock' : (taskStatut == 'En cours' ? 'spinner' : 'check-circle')}"></i>
+			                ${taskStatut}
+			            `;
+			        }
+			        
+			        // Update Trello button
+			        const trelloContainer = detailsContainer.querySelector('.task-details-header');
+			        if (trelloContainer) {
+			            if (hasTeamAssociation === 'true') {
+			                if (taskTrelloId && taskTrelloId !== 'null') {
+			                    trelloContainer.innerHTML = `
+			                        <h2>${taskName}</h2>
+			                        <div class="trello-buttons">
+			                            <a href="https://trello.com/b/${taskTrelloId}" 
+			                               class="btn trello-btn view-trello" 
+			                               target="_blank" 
+			                               rel="noopener noreferrer">
+			                                <i class="fab fa-trello"></i> View Trello
+			                            </a>
+			                            <button class="btn btn-danger disable-trello" 
+			                                    data-task-id="${taskId}"
+			                                    data-board-id="${taskTrelloId}">
+			                                <i class="fas fa-trash-alt"></i> Disable Trello
+			                            </button>
+			                            <div class="trello-loading" style="display: none;">
+			                                <i class="fas fa-spinner fa-spin"></i> Deleting Trello board...
+			                            </div>
+			                        </div>
+			                    `;
+			                } else {
+			                    trelloContainer.innerHTML = `
+			                        <h2>${taskName}</h2>
+			                        <button class="btn trello-btn enable-trello" 
+			                                data-task-id="${taskId}"
+			                                data-project-id="${hasTeamAssociation}">
+			                            <i class="fab fa-trello"></i> Enable Trello
+			                        </button>
+			                        <div class="trello-loading" style="display: none;">
+			                            <i class="fas fa-spinner fa-spin"></i> Creating Trello board...
+			                        </div>
+			                        <div class="trello-error alert alert-danger" style="display: none;"></div>
+			                    `;
+			                }
+			            } else {
+			                trelloContainer.innerHTML = `<h2>${taskName}</h2>`;
+			            }
+			        }
+			    },
+			    
+			    async fetchSearchResults(query) {
+			        const projectId = {{ projet.id|default('null') }};
+			        const url = projectId 
+			            ? `{{ path('app_tache_search_project', {'id': projet.id}) }}?q=${encodeURIComponent(query)}`
+			            : `{{ path('app_tache_search') }}?q=${encodeURIComponent(query)}`;
+			        
+			        try {
+			            const response = await fetch(url, {
+			                headers: {
+			                    'X-Requested-With': 'XMLHttpRequest',
+			                    'Accept': 'text/html'
+			                }
+			            });
+			            
+			            if (!response.ok) throw new Error('Network response was not ok');
+			            
+			            const html = await response.text();
+			            this.tasksContainer.innerHTML = html;
+			            
+			            // Select the first task after search if any exist
+			            const firstTask = this.tasksContainer.querySelector('.task-item');
+			            if (firstTask) {
+			                this.handleTaskSelection(firstTask);
+			            }
+			        } catch (error) {
+			            console.error('Error:', error);
+			            this.tasksContainer.innerHTML = '<div class="alert alert-danger">Error loading tasks</div>';
+			        }
+			    },
+			    
+			    async enableTrelloForTask(button) {
+			        const taskId = button.dataset.taskId;
+			        const projectId = button.dataset.projectId;
+			        const container = button.closest('.task-details-header');
+			        
+			        // Show loading state
+			        const loadingHTML = `
+			            <h2>${container.querySelector('h2').textContent}</h2>
+			            <div class="trello-loading">
+			                <i class="fas fa-spinner fa-spin"></i> Creating Trello board...
+			            </div>
+			        `;
+			        container.innerHTML = loadingHTML;
+			        
+			        try {
+			            const response = await fetch('{{ path("create_TrelloBoard") }}', {
+			                method: 'POST',
+			                headers: {
+			                    'Content-Type': 'application/json',
+			                    'X-Requested-With': 'XMLHttpRequest'
+			                },
+			                body: JSON.stringify({
+			                    task_id: taskId,
+			                    project_id: projectId
+			                })
+			            });
+			            
+			            const data = await response.json();
+			            
+			            if (!response.ok) {
+			                throw new Error(data.message || 'Failed to create Trello board');
+			            }
+			            
+			            // Update the task item in the list
+			            const taskItem = document.querySelector(`.task-item[data-tache-id="${taskId}"]`);
+			            if (taskItem) {
+			                taskItem.dataset.trelloId = data.boardId;
+			            }
+			            
+			            // Update the details view
+			            this.handleTaskSelection(taskItem);
+			            
+			        } catch (error) {
+			            console.error('Trello error:', error);
+			            
+			            // Show error state
+			            const errorHTML = `
+			                <h2>${container.querySelector('h2').textContent}</h2>
+			                <button class="btn trello-btn enable-trello" 
+			                        data-task-id="${taskId}"
+			                        data-project-id="${projectId}">
+			                    <i class="fab fa-trello"></i> Enable Trello
+			                </button>
+			                <div class="trello-error alert alert-danger">
+			                    ${error.message}
+			                </div>
+			            `;
+			            container.innerHTML = errorHTML;
+			        }
+			    },
+			    
+			    async disableTrelloForTask(button) {
+			        const taskId = button.dataset.taskId;
+			        const boardId = button.dataset.boardId;
+			        const container = button.closest('.task-details-header');
+			        
+			        // Show loading state
+			        const loadingHTML = `
+			            <h2>${container.querySelector('h2').textContent}</h2>
+			            <div class="trello-loading">
+			                <i class="fas fa-spinner fa-spin"></i> Deleting Trello board...
+			            </div>
+			        `;
+			        container.innerHTML = loadingHTML;
+			        
+			        try {
+			            const response = await fetch('{{ path("disable_TrelloBoard") }}', {
+			                method: 'POST',
+			                headers: {
+			                    'Content-Type': 'application/json',
+			                    'X-Requested-With': 'XMLHttpRequest'
+			                },
+			                body: JSON.stringify({
+			                    task_id: taskId,
+			                    board_id: boardId
+			                })
+			            });
+			            
+			            const data = await response.json();
+			            
+			            if (!response.ok) {
+			                throw new Error(data.message || 'Failed to delete Trello board');
+			            }
+			            
+			            // Update the task item in the list
+			            const taskItem = document.querySelector(`.task-item[data-tache-id="${taskId}"]`);
+			            if (taskItem) {
+			                taskItem.dataset.trelloId = '';
+			            }
+			            
+			            // Update the details view
+			            this.handleTaskSelection(taskItem);
+			            
+			        } catch (error) {
+			            console.error('Trello disable error:', error);
+			            
+			            // Show error state
+			            const errorHTML = `
+			                <h2>${container.querySelector('h2').textContent}</h2>
+			                <div class="trello-buttons">
+			                    <a href="https://trello.com/b/${boardId}" 
+			                       class="btn trello-btn view-trello" 
+			                       target="_blank" 
+			                       rel="noopener noreferrer">
+			                        <i class="fab fa-trello"></i> View Trello
+			                    </a>
+			                    <button class="btn btn-danger disable-trello" 
+			                            data-task-id="${taskId}"
+			                            data-board-id="${boardId}">
+			                        <i class="fas fa-trash-alt"></i> Disable Trello
+			                    </button>
+			                    <div class="trello-error alert alert-danger">
+			                        ${error.message}
+			                    </div>
+			                </div>
+			            `;
+			            container.innerHTML = errorHTML;
+			        }
+			    }
+			};
+			
+			// Initialize when DOM is loaded
+			document.addEventListener('DOMContentLoaded', () => TaskManager.init());
+			</script>
 {% endblock %}
