@@ -59,56 +59,56 @@ final class ProjetController extends AbstractController
         ]);
     }
 
-#[Route('/projet/{id}/associate-team', name: 'app_projet_associate_team', methods: ['GET', 'POST'])]
-public function associateTeam(Request $request, Projet $projet, EntityManagerInterface $entityManager): Response
-{
-    $equipes = $entityManager->getRepository(Equipe::class)->findAll();
-    
-    if ($request->isMethod('POST')) {
-        $equipeId = $request->request->get('equipe');
-        $equipe = $entityManager->getRepository(Equipe::class)->find($equipeId);
-        
-        $projetEquipe = new Projetequipe();
-        $projetEquipe->setProjet($projet);
-        $projetEquipe->setEquipe($equipe);
-        
-        $entityManager->persist($projetEquipe);
-        $entityManager->flush();
+    #[Route('/projet/{id}/associate-team', name: 'app_projet_associate_team', methods: ['GET', 'POST'])]
+    public function associateTeam(Request $request, Projet $projet, EntityManagerInterface $entityManager): Response
+    {
+        $equipes = $entityManager->getRepository(Equipe::class)->findAll();
+
+        if ($request->isMethod('POST')) {
+            $equipeId = $request->request->get('equipe');
+            $equipe = $entityManager->getRepository(Equipe::class)->find($equipeId);
+
+            $projetEquipe = new Projetequipe();
+            $projetEquipe->setProjet($projet);
+            $projetEquipe->setEquipe($equipe);
+
+            $entityManager->persist($projetEquipe);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_projet_show', ['id' => $projet->getId()]);
+        }
+
+        return $this->render('projet/associate_team.html.twig', [
+            'projet' => $projet,
+            'equipes' => $equipes,
+        ]);
+    }
+
+    #[Route('/projet/{id}/disassociate-team/{equipeId}', name: 'app_projet_disassociate_team', methods: ['POST'])]
+    public function disassociateTeam(Request $request, Projet $projet, int $equipeId, EntityManagerInterface $entityManager, TrelloApiService $trello): Response
+    {
+        $projetEquipe = $entityManager->getRepository(Projetequipe::class)->findOneBy([
+            'projet' => $projet,
+            'equipe' => $equipeId
+        ]);
+
+        if ($projetEquipe) {
+            $entityManager->remove($projetEquipe);
+            $entityManager->flush();
+        }
+
+        $taches = $projet->getTaches();
+        foreach ($taches as $tache) {
+            if ($tache->getTrelloboardid() != null) {
+                $trello->deleteBoard($tache->getTrelloboardid());
+                $tache->setTrelloboardid(null);
+                $entityManager->persist($tache);
+                $entityManager->flush();
+            }
+        }
 
         return $this->redirectToRoute('app_projet_show', ['id' => $projet->getId()]);
     }
-    
-    return $this->render('projet/associate_team.html.twig', [
-        'projet' => $projet,
-        'equipes' => $equipes,
-    ]);
-}
-
-#[Route('/projet/{id}/disassociate-team/{equipeId}', name: 'app_projet_disassociate_team', methods: ['POST'])]
-public function disassociateTeam(Request $request, Projet $projet, int $equipeId, EntityManagerInterface $entityManager,TrelloApiService $trello): Response
-{
-    $projetEquipe = $entityManager->getRepository(Projetequipe::class)->findOneBy([
-        'projet' => $projet,
-        'equipe' => $equipeId
-    ]);
-    
-    if ($projetEquipe) {
-        $entityManager->remove($projetEquipe);
-        $entityManager->flush();
-    }
-    
-    $taches = $projet->getTaches();
-    foreach ($taches as $tache) {
-        if ($tache->getTrelloboardid() != null) {
-            $trello->deleteBoard($tache->getTrelloboardid());
-            $tache->setTrelloboardid(null);
-            $entityManager->persist($tache);
-            $entityManager->flush();
-        } 
-    }
-    
-    return $this->redirectToRoute('app_projet_show', ['id' => $projet->getId()]);
-}
 
     #[Route('/new', name: 'app_projet_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -131,40 +131,46 @@ public function disassociateTeam(Request $request, Projet $projet, int $equipeId
     }
 
     #[Route('/{id}', name: 'app_projet_show', methods: ['GET'])]
-public function show(Projet $projet, TacheRepository $tacheRepository): Response
-{
-    $taches = $tacheRepository->findBy(['projet' => $projet]);
-    
-    // Initialize counters
-    $counts = [
-        'total' => count($taches),
-        'a_faire' => 0,
-        'en_cours' => 0,
-        'terminee' => 0
-    ];
-    
-    // Count tasks by status
-    foreach ($taches as $tache) {
-        switch ($tache->getStatut()->value) {
-            case 'A faire': $counts['a_faire']++; break;
-            case 'En cours': $counts['en_cours']++; break;
-            case 'Terminée': $counts['terminee']++; break;
-        }
-    }
-    
-    // Calculate completion percentage
-    $completionPercentage = $counts['total'] > 0 
-        ? (($counts['a_faire'] * 0 + $counts['en_cours'] * 0.5 + $counts['terminee'] * 1) / $counts['total'] * 100)
-        : 0;
-    $completionPercentage = round($completionPercentage, 2);
+    public function show(Projet $projet, TacheRepository $tacheRepository): Response
+    {
+        $taches = $tacheRepository->findBy(['projet' => $projet]);
 
-    return $this->render('projet/show.html.twig', [
-        'projet' => $projet,
-        'taches' => $taches,
-        'counts' => $counts,
-        'completionPercentage' => $completionPercentage
-    ]);
-}
+        // Initialize counters
+        $counts = [
+            'total' => count($taches),
+            'a_faire' => 0,
+            'en_cours' => 0,
+            'terminee' => 0
+        ];
+
+        // Count tasks by status
+        foreach ($taches as $tache) {
+            switch ($tache->getStatut()->value) {
+                case 'A faire':
+                    $counts['a_faire']++;
+                    break;
+                case 'En cours':
+                    $counts['en_cours']++;
+                    break;
+                case 'Terminée':
+                    $counts['terminee']++;
+                    break;
+            }
+        }
+
+        // Calculate completion percentage
+        $completionPercentage = $counts['total'] > 0
+            ? (($counts['a_faire'] * 0 + $counts['en_cours'] * 0.5 + $counts['terminee'] * 1) / $counts['total'] * 100)
+            : 0;
+        $completionPercentage = round($completionPercentage, 2);
+
+        return $this->render('projet/show.html.twig', [
+            'projet' => $projet,
+            'taches' => $taches,
+            'counts' => $counts,
+            'completionPercentage' => $completionPercentage
+        ]);
+    }
 
     #[Route('/{id}/edit', name: 'app_projet_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Projet $projet, EntityManagerInterface $entityManager): Response
@@ -185,9 +191,9 @@ public function show(Projet $projet, TacheRepository $tacheRepository): Response
     }
 
     #[Route('/{id}', name: 'app_projet_delete', methods: ['POST'])]
-    public function delete(Request $request, Projet $projet, EntityManagerInterface $entityManager,TrelloApiService $trello): Response
+    public function delete(Request $request, Projet $projet, EntityManagerInterface $entityManager, TrelloApiService $trello): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$projet->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $projet->getId(), $request->getPayload()->getString('_token'))) {
             $taches = $projet->getTaches();
             foreach ($taches as $tache) {
                 if ($tache->getTrelloboardid() != null) {

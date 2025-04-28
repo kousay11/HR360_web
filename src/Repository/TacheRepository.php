@@ -93,4 +93,15 @@ class TacheRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function countTachesParProjet(int $limit = 6): array
+    {
+        return $this->createQueryBuilder('t')
+            ->select('p.nom as projet_nom, COUNT(t.id) as count')
+            ->join('t.projet', 'p')
+            ->groupBy('p.id')
+            ->orderBy('count', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }
