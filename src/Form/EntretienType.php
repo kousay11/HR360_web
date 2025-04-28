@@ -15,8 +15,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType; 
 use Symfony\Component\Form\CallbackTransformer;
-
-
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormError;
 class EntretienType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -42,8 +43,6 @@ class EntretienType extends AbstractType
                     'novalidate' => 'novalidate',
                     'invalid_message' => 'heure entretien est obligatoire',
                     
-    
-
                 ]
             ])           
             ->add('type', EnumType::class, [
@@ -51,6 +50,8 @@ class EntretienType extends AbstractType
                 'choice_label' => fn(TypeEnt $type) => $type->getLabel(),
                 'label' => 'Type',
                 'placeholder' => 'Sélectionnez un type',
+                'required' => true,
+                'invalid_message' => 'Veuillez sélectionner un type valide',
                 'attr' => [
                     'class' => 'form-control entretien-type-selector',
                     'onchange' => "toggleFields(this.value)"
@@ -60,7 +61,12 @@ class EntretienType extends AbstractType
                 'class' => Statut::class,
                 'choice_label' => fn(Statut $statut) => $statut->getLabel(),
                 'label' => 'Statut',
-                'placeholder' => 'Sélectionnez une statut',
+                'placeholder' => 'Sélectionnez un statut',
+                'required' => true,
+                'invalid_message' => 'Veuillez sélectionner un statut valide',
+                'attr' => [
+                    'class' => 'form-control'
+                ]
             ])
             
             ->add('localisation', null, [
@@ -71,17 +77,19 @@ class EntretienType extends AbstractType
             
         ;
 
-         // Ajoutez ce transformateur
-    $builder->get('heure')
-    ->addModelTransformer(new CallbackTransformer(
-        function ($timeAsString) {
-            return $timeAsString ? \DateTime::createFromFormat('H:i', $timeAsString) : null;
-        },
-        function ($timeAsDateTime) {
-            return $timeAsDateTime instanceof \DateTimeInterface ? $timeAsDateTime->format('H:i') : null;
-        }
-    ));
+        // In EntretienType.php
+$builder->get('heure')
+->addModelTransformer(new CallbackTransformer(
+    function ($timeAsString) {
+        return $timeAsString ? \DateTime::createFromFormat('H:i', $timeAsString) : null;
+    },
+    function ($timeAsDateTime) {
+        return $timeAsDateTime instanceof \DateTimeInterface ? $timeAsDateTime->format('H:i') : '';
     }
+));
+
+    }
+
 
     public function configureOptions(OptionsResolver $resolver): void
     {

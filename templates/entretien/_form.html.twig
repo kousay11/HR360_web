@@ -7,30 +7,42 @@
         {{ form_errors(form.date, {'attr': {'class': 'text-danger'}}) }}
     </div>
     <div class="col-md-6 mb-3">
-        <label for="{{ form.heure.vars.id }}" class="col-sm-4 col-form-label">Heure de l'Interview</label>
-        <div class="col-sm-10">
-            {{ form_widget(form.heure, {'attr': {'class': 'form-control'}}) }}
-        </div>
-        {{ form_errors(form.heure, {'attr': {'class': 'text-danger'}}) }}
+    <label for="{{ form.heure.vars.id }}" class="col-sm-4 col-form-label">Heure de l'Interview</label>
+    <div class="col-sm-10">
+        {{ form_widget(form.heure, {
+            'attr': {
+                'class': 'form-control',
+                'required': 'required'
+            }
+        }) }}
     </div>
+    {{ form_errors(form.heure, {'attr': {'class': 'text-danger'}}) }}
+</div>
 </div>
 
 
 <div class="form-group row">
     <div class="col-md-6 mb-3">
-    <label for="inputText" class="col-sm-4 col-form-label">Type d'entretien</label>
-        {{ form_widget(form.type, {
-            'attr': {
-                'class': 'form-control entretien-type-selector'
-            }
-        }) }}
-        {{ form_errors(form.type, {'attr': {'class': 'text-danger'}}) }}
-    </div>
-    <div class="col-md-6 mb-3">
-    <label for="inputText" class="col-sm-4 col-form-label">Statut</label>
-        {{ form_widget(form.statut, {'attr': {'class': 'form-control'}}) }}
-        {{ form_errors(form.statut, {'attr': {'class': 'text-danger'}}) }}
-    </div>
+    <label for="{{ form.type.vars.id }}" class="col-sm-4 col-form-label">Type</label>
+    {{ form_widget(form.type, {
+        'attr': {
+            'class': 'form-control entretien-type-selector',
+            'required': 'required'
+        }
+    }) }}
+    {{ form_errors(form.type) }}
+</div>
+
+<div class="col-md-6 mb-3">
+    <label for="{{ form.statut.vars.id }}" class="col-sm-4 col-form-label">Statut</label>
+    {{ form_widget(form.statut, {
+        'attr': {
+            'class': 'form-control',
+            'required': 'required'
+        }
+    }) }}
+    {{ form_errors(form.statut) }}
+</div>
 </div>
 
 

@@ -118,7 +118,7 @@ class Entretien
         return $this->type;
     }
 
-    public function setType(TypeEnt $type): self
+    public function setType(?TypeEnt $type): self
     {
         $this->type = $type;
         return $this;
@@ -129,7 +129,7 @@ class Entretien
         return $this->statut;
     }
 
-    public function setStatut(Statut $statut): self
+    public function setStatut(?Statut $statut): self
     {
         $this->statut = $statut;
         return $this;
