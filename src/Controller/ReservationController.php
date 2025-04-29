@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
+use App\Service\QRCodeService;
 #[Route('/reservation')]
 final class ReservationController extends AbstractController
 {
@@ -42,7 +43,7 @@ final class ReservationController extends AbstractController
 
 
     #[Route('/new/{ressourceId}', name: 'app_reservation_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, RessourceRepository $ressourceRepository, ?int $ressourceId = null): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, RessourceRepository $ressourceRepository, ?int $ressourceId = null, QRCodeService $qrCodeService): Response
     {
         $reservation = new Reservation();
         $ressource = $entityManager->getRepository(Ressource::class)->find($ressourceId);
@@ -97,7 +98,7 @@ final class ReservationController extends AbstractController
                 'currency' => 'eur',
                 'metadata' => ['reservation_id' => $reservation->getId()],
             ]);
-
+            $qrCodeService->generateQRCodeForRessource($reservation->getRessource());
             return $this->render('reservation/payment.html.twig', [
                 'reservation' => $reservation,
                 'clientSecret' => $paymentIntent->client_secret,
@@ -124,6 +125,67 @@ final class ReservationController extends AbstractController
             'similarResources' => $similarResources, // ✅ Envoi au template
         ]);
     }
+
+
+    #[Route('/history', name: 'app_reservation_history', methods: ['GET'])]
+public function history(ReservationRepository $reservationRepository): Response
+{
+    /** @var Utilisateur $user */
+    $user = $this->getUser();
+    $now = new \DateTime();
+
+    // Récupération des statistiques de base
+    $stats = $reservationRepository->getUserStats($user);
+        // Récupérer les données
+        $upcoming = $reservationRepository->findUpcoming($user, $now);
+        $active = $reservationRepository->findActive($user, $now);
+        $completed = $reservationRepository->findCompleted($user, $now);
+    // Préparation des données pour les graphiques
+    $reservationsByMonth = array_fill(0, 12, 0); // Index 0-11 pour Jan-Déc
+    $averageDurationByMonth = array_fill(0, 12, 0);
+    
+    $totalDurationByMonth = array_fill(0, 12, 0);
+    $countByMonth = array_fill(0, 12, 0);
+
+    $reservations = $reservationRepository->findBy(['utilisateur' => $user]);
+
+    foreach ($reservations as $reservation) {
+        if ($reservation->getDatedebut() && $reservation->getDatefin()) {
+            $start = $reservation->getDatedebut();
+            $monthIndex = (int)$start->format('n') - 1; // Convertir 1-12 en 0-11
+            
+            // Calcul durée
+            $interval = $start->diff($reservation->getDatefin());
+            $duration = $interval->days + 1; // Inclure le jour de départ
+
+            // Mise à jour des compteurs
+            $reservationsByMonth[$monthIndex]++;
+            $totalDurationByMonth[$monthIndex] += $duration;
+            $countByMonth[$monthIndex]++;
+        }
+    }
+
+    // Calcul des moyennes
+    foreach ($countByMonth as $month => $count) {
+        if ($count > 0) {
+            $averageDurationByMonth[$month] = round($totalDurationByMonth[$month] / $count, 1);
+        }
+    }
+
+    return $this->render('reservation/history.html.twig', [
+        'upcoming' => $upcoming,
+        'active' => $active,
+        'completed' => $completed,
+        'stats' => $stats,
+        'reservations_by_month' => array_values($reservationsByMonth),
+        'average_duration_by_month' => array_values($averageDurationByMonth),
+        'months' => [
+            'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+            'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+        ],
+    ]);
+}
+
 
 
     
@@ -193,15 +255,17 @@ public function edit(Request $request, Reservation $reservation, EntityManagerIn
 
 
     #[Route('/{id}', name: 'app_reservation_delete', methods: ['POST'])]
-    public function delete(Request $request, Reservation $reservation, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Reservation $reservation, EntityManagerInterface $entityManager, QRCodeService $qrCodeService): Response
     {
         if ($this->isCsrfTokenValid('delete'.$reservation->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($reservation);
             $entityManager->flush();
         }
-
+        
         return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
     }
 
+
+    
     
 }

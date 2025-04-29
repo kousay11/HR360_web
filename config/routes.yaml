@@ -10,3 +10,9 @@ homepage:
     defaults:
         route: app_auth
 
+
+
+# config/routes.yaml
+chatbot:
+    path: /chatbot
+    controller: App\Controller\ChatbotController::handleChatbot

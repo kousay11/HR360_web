@@ -21,9 +21,6 @@
         <p>Découvrez toutes nos ressources disponibles</p>
     </div>
 
-
-
-
     <form method="get" action="{{ path('app_ressource_index_employee') }}" class="row g-3 mb-4">
     <div class="col-md-3">
         <input type="text" name="search" id="searchInput" class="form-control" placeholder="Rechercher..." value="{{ app.request.get('search') }}">
@@ -56,75 +53,137 @@
     </div>
 </form>
 
-
     <div class="container">
-        
-
         <div class="row ressources-grid g-4">
             {% for ressource in ressources %}
-    <div class="col-12 col-sm-6 col-xl-4 mb-4 ressource-card"
-         data-nom="{{ ressource.nom|lower }}"
-         data-type="{{ ressource.type }}">
-<a href="{{ path('show_suggestions', {'id': ressource.id}) }}" class="text-decoration-none text-dark">
-    <div class="card entity-card h-100 position-relative">
-                <div class="image-container">
-                    {% if ressource.image %}
-                        <img src="{{ asset('uploads/images/' ~ ressource.image) }}"
-                             class="card-img-top"
-                             alt="{{ ressource.nom }}"
-                             style="height: 200px; object-fit: cover; border-radius: 0 !important;">
-                    {% else %}
-                        <div class="card-img-top d-flex align-items-center justify-content-center bg-light"
-                             style="height: 200px; border-radius: 0 !important;">
-                            <i class="bi bi-image fs-1 text-muted"></i>
+                <div class="col-12 col-sm-6 col-xl-4 mb-4 ressource-card"
+                    data-nom="{{ ressource.nom|lower }}"
+                    data-type="{{ ressource.type }}">
+                    
+                    {% set qrPath = 'uploads/qrcodes/qr_ressource_' ~ ressource.id ~ '.png' %}
+                    {% if file_exists(qrPath) %}
+                            <div class="text-center mt-3">
+                                <button type="button"
+                                        class="btn btn-sm btn-info w-100"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#qrModal{{ ressource.id }}">
+                                    <i class="fas fa-qrcode me-2"></i>Voir QR Code
+                                </button>
+                            </div>
+
+                            <!-- Modal QR -->
+                            <div class="modal fade"
+                                id="qrModal{{ ressource.id }}"
+                                tabindex="-1"
+                                aria-labelledby="qrModalLabel{{ ressource.id }}"
+                                aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-light">
+                                            <h5 class="modal-title fs-5" id="qrModalLabel{{ ressource.id }}">
+                                                <i class="fas fa-qrcode me-2"></i>{{ ressource.nom }}
+                                            </h5>
+                                            <button type="button"
+                                                    class="btn-close"
+                                                    data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body text-center p-4">
+                                            <div class="d-flex justify-content-center mb-4">
+                                                <img src="{{ asset(qrPath) }}"
+                                                    class="img-fluid rounded shadow-sm"
+                                                    alt="QR Code {{ ressource.nom }}"
+                                                    style="max-width: 400px; width: 100%;">
+                                            </div>
+
+                                            {% set dates = reservedDates[ressource.id]|default([]) %}
+                                            {% if dates is not empty %}
+                                                <div class="text-start">
+                                                    <h6 class="text-primary"><i class="fas fa-calendar-alt me-2"></i>Dates réservées :</h6>
+                                                    <ul>
+                                                        {% for date in reservedDates[ressource.id] ?? [] %}
+                                                            <li>De {{ date.start|date('Y-m-d') }} à {{ date.end|date('Y-m-d') }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% else %}
+                                                <p class="text-muted">Aucune réservation enregistrée.</p>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="modal-footer bg-light">
+                                            <button type="button"
+                                                    class="btn btn-primary"
+                                                    data-bs-dismiss="modal">
+                                                <i class="fas fa-times me-2"></i>Fermer
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    <div class="card entity-card h-100 position-relative">
+                        <a href="{{ path('show_suggestions', {'id': ressource.id}) }}" class="text-decoration-none text-dark">
+                            <div class="image-container">
+                                {% if ressource.image %}
+                                    <img src="{{ asset('uploads/images/' ~ ressource.image) }}"
+                                        class="card-img-top"
+                                        alt="{{ ressource.nom }}"
+                                        style="height: 200px; object-fit: cover; border-radius: 0 !important;">
+                                {% else %}
+                                    <div class="card-img-top d-flex align-items-center justify-content-center bg-light"
+                                        style="height: 200px; border-radius: 0 !important;">
+                                        <i class="bi bi-image fs-1 text-muted"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="card-header entity-header">
+                                <i class="fas fa-pc entity-icon"></i>
+                                <h5 class="entity-title">{{ ressource.nom }}</h5>
+                                <span class="badge bg-{{ ressource.etat == 'Disponible' ? 'success' : 'danger' }} badge-position">
+                                    <i class="fas fa-{{ ressource.etat == 'Disponible' ? 'check-circle' : 'times-circle' }} me-1"></i>
+                                    {{ ressource.etat }}
+                                </span>
+                            </div>
+
+                            <div class="card-body entity-body">
+                                <hr>
+                                <div class="project-meta">
+                                    <i class="fas fa-tag"></i>
+                                    <span>Type: {{ ressource.type }}</span>
+                                </div>
+                                <div class="project-meta">
+                                    <i class="fas fa-euro-sign"></i>
+                                    <span>Prix: {{ ressource.prix|number_format(3, '.', ' ') }}</span>
+                                </div>
+                            </div>
+                        </a>
+
+                        <div class="card-footer entity-footer">
+                            <a href="{{ ressource.etat == 'Disponible' ? path('app_reservation_new', {'ressourceId': ressource.id}) : '#' }}"
+                               class="btn btn-outline-primary btn-sm {{ ressource.etat != 'Disponible' ? 'disabled' : '' }}"
+                               {% if ressource.etat != 'Disponible' %}
+                                   aria-disabled="true"
+                                   data-bs-toggle="tooltip"
+                                   title="Ressource indisponible"
+                               {% endif %}>
+                                <i class="fas fa-calendar-plus me-1"></i>
+                                Réserver
+                            </a>
                         </div>
-                    {% endif %}
-                </div>
 
-                <div class="card-header entity-header">
-                    <i class="fas fa-pc entity-icon"></i>
-                    <h5 class="entity-title">{{ ressource.nom }}</h5>
-                    <span class="badge bg-{{ ressource.etat == 'Disponible' ? 'success' : 'danger' }} badge-position">
-                        <i class="fas fa-{{ ressource.etat == 'Disponible' ? 'check-circle' : 'times-circle' }} me-1"></i>
-                        {{ ressource.etat }}
-                    </span>
-                </div>
-
-                <div class="card-body entity-body">
-                    <hr>
-                    <div class="project-meta">
-                        <i class="fas fa-tag"></i>
-                        <span>Type: {{ ressource.type }}</span>
-                    </div>
-                    <div class="project-meta">
-                        <i class="fas fa-euro-sign"></i>
-                        <span>Prix: {{ ressource.prix|number_format(3, '.', ' ') }}</span>
+                        
+                        
                     </div>
                 </div>
-            </a> <!-- Fin du lien -->
-            
-            <div class="card-footer entity-footer">
-                <a href="{{ ressource.etat == 'Disponible' ? path('app_reservation_new', {'ressourceId': ressource.id}) : '#' }}"
-                   class="btn btn-outline-primary btn-sm {{ ressource.etat != 'Disponible' ? 'disabled' : '' }}"
-                   {% if ressource.etat != 'Disponible' %}
-                       aria-disabled="true"
-                       data-bs-toggle="tooltip"
-                       title="Ressource indisponible"
-                   {% endif %}>
-                    <i class="fas fa-calendar-plus me-1"></i>
-                    Réserver
-                </a>
-            </div>
-        </div>
-    </div>
-{% else %}
-    <div class="empty-state col-12">
-        <i class="bi bi-inboxes"></i>
-        <h3>Aucune ressource disponible</h3>
-        <p>Veuillez vérifier ultérieurement</p>
-    </div>
-{% endfor %}
-
+            {% else %}
+                <div class="empty-state col-12">
+                    <i class="bi bi-inboxes"></i>
+                    <h3>Aucune ressource disponible</h3>
+                    <p>Veuillez vérifier ultérieurement</p>
+                </div>
+            {% endfor %}
         </div>
     </div>
 </section>
@@ -212,4 +271,3 @@
   });
 </script>
 {% endblock %}
-

@@ -105,6 +105,20 @@ public function findWithFilters(?string $search, ?string $type, ?float $maxPrice
 }
 
 
-
+public function findAvailabilityGrid(\DateTimeInterface $start, \DateTimeInterface $end): array
+{
+    return $this->createQueryBuilder('r')
+        ->leftJoin('r.reservations', 'res')
+        ->addSelect('
+            CASE 
+                WHEN res.id IS NOT NULL AND res.date_debut BETWEEN :start AND :end THEN false
+                ELSE true
+            END as available'
+        )
+        ->setParameter('start', $start)
+        ->setParameter('end', $end)
+        ->getQuery()
+        ->getResult();
+}
 
 }

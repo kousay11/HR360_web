@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Ressource;
 use App\Form\RessourceType;
 use App\Repository\RessourceRepository;
+use App\Repository\ReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,7 +31,7 @@ final class RessourceController extends AbstractController
     
 
     #[Route('/employee', name: 'app_ressource_index_employee', methods: ['GET'])]
-public function indexForEmployees(Request $request, RessourceRepository $ressourceRepository): Response
+public function indexForEmployees(Request $request, RessourceRepository $ressourceRepository, ReservationRepository $reservationRepository): Response
 {
     $search = $request->query->get('search');
     $type = $request->query->get('type');
@@ -41,12 +42,32 @@ public function indexForEmployees(Request $request, RessourceRepository $ressour
     $ressources = $ressourceRepository->findWithFilters($search, $type, $maxPrice, $availableOnly, $sort);
     $types = array_unique(array_map(fn($r) => $r->getType(), $ressources));
 
+    // Ajout du code pour récupérer les dates réservées
+    $reservedDates = [];
+
+    foreach ($ressources as $ressource) {
+        $reservations = $reservationRepository->findBy(['ressource' => $ressource]);
+        $dates = [];
+
+        foreach ($reservations as $reservation) {
+            $dates[] = [
+                'start' => $reservation->getDatedebut(),
+                'end' => $reservation->getDatefin(),
+            ];
+            
+            
+        }
+
+        $reservedDates[$ressource->getId()] = $dates;
+    }
+
     return $this->render('ressource/index_employee.html.twig', [
         'ressources' => $ressources,
         'types' => $types,
+        'reservedDates' => $reservedDates, // ➔ on envoie aussi les dates réservées à Twig
     ]);
-    
 }
+
 
 
 #[Route('/new', name: 'app_ressource_new', methods: ['GET', 'POST'])]
@@ -291,8 +312,4 @@ public function showSuggestions(Ressource $ressource, RessourceRepository $resso
         'similarResources' => array_slice($mainSuggestions, 0, 5),
     ]);
 }
-
-
-
-
 }
