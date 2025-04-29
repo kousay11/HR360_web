@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Candidature;
 use App\Entity\Offre;
 use App\Form\CandidatureOtherType;
+use App\Service\CvParserService;
 use App\Repository\CandidatureRepository;
 use App\Repository\OffreRepository;
 use App\Service\EmailService;
@@ -370,6 +371,73 @@ private function generateAnalysisPdf(array $analysisData, Request $request): ?st
         // Logger l'erreur si nécessaire
         return null;
     }
+}
+#[Route('/parse-cv/{idCandidature}', name: 'app_candidature_parse_cv', methods: ['GET'])]
+public function parseCv(Candidature $candidature, CvParserService $cvParserService): JsonResponse
+{
+    $result = $cvParserService->parseCv($candidature->getCv());
+
+    // Si le service a retourné une erreur
+    if (isset($result['error'])) {
+        return $this->json([
+            'success' => false,
+            'error' => $result['error']
+        ], 400);
+    }
+
+    try {
+        // Générer le PDF d'analyse
+        $pdfPath = $this->generateCvAnalysisPdf($result, $candidature);
+
+        return $this->json([
+            'success' => true,
+            'data' => $result,
+            'pdfPath' => $pdfPath
+        ]);
+
+    } catch (\Exception $e) {
+        return $this->json([
+            'success' => false,
+            'error' => 'Erreur lors de la génération du PDF: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+private function generateCvAnalysisPdf(array $analysisData, Candidature $candidature): string
+{
+    $pdfOptions = new Options();
+    $pdfOptions->set('defaultFont', 'Arial');
+    
+    $dompdf = new Dompdf($pdfOptions);
+    
+    // Préparer les données pour le template
+    $templateData = [
+        'analysis' => [
+            'personal_info' => $analysisData['personal_info'] ?? null,
+            'work_experience' => $analysisData['work_experience'] ?? null,
+            // Ajoutez d'autres champs si nécessaire
+        ],
+        'candidature' => $candidature,
+        'date' => new \DateTime()
+    ];
+    
+    $html = $this->renderView('candidatureBack/cv_analysis_pdf.html.twig', $templateData);
+    
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+    
+    $pdfDir = $this->getParameter('kernel.project_dir') . '/public/uploads/pdfs/';
+    if (!file_exists($pdfDir)) {
+        mkdir($pdfDir, 0777, true);
+    }
+    
+    $filename = 'cv_analysis_' . $candidature->getIdCandidature() . '_' . uniqid() . '.pdf';
+    $pdfPath = $pdfDir . $filename;
+    
+    file_put_contents($pdfPath, $dompdf->output());
+    
+    return '/uploads/pdfs/' . $filename;
 }
 
 }

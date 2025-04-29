@@ -285,6 +285,11 @@
                                                     data-candidature-id="{{ candidature.idCandidature }}">
                                                 <i class="fas fa-search"></i>
                                             </button>
+                                            <button class="btn btn-sm btn-outline-danger action-btn parse-cv-btn" 
+                                                    title="Analyser le CV" 
+                                                    data-candidature-id="{{ candidature.idCandidature }}">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </button>
                                              {# Nouveau bouton Entretien#}
         
             <a href="{{ path('app_entretien_index', {'idCandidature': candidature.idCandidature}) }}" 
@@ -344,6 +349,31 @@
             {% endif %}
         </div>
         <!-- Ajoutez ce modal avant la fermeture du div.container -->
+<div class="modal fade" id="cvParseModal" tabindex="-1" aria-labelledby="cvParseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cvParseModalLabel">Analyse du CV</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="cvParseResult">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p>Analyse du CV en cours...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="downloadCvAnalysisPdf" class="btn btn-primary d-none">
+                    <i class="fas fa-file-pdf me-2"></i>Télécharger le rapport
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+        <!-- Ajoutez ce modal avant la fermeture du div.container -->
 <div class="modal fade" id="analyseModal" tabindex="-1" aria-labelledby="analyseModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -370,7 +400,7 @@
                     <div class="text-center">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-search me-2"></i>Analyser
-                        </button>
+                            </button>
                     </div>
                 </form>
                 
@@ -589,6 +619,76 @@ if (result.success) {
         console.error('Error:', error);
         alert('Une erreur est survenue lors de l\'analyse');
     }
+});
+// Gestion de l'analyse de CV
+document.querySelectorAll('.parse-cv-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const candidatureId = this.getAttribute('data-candidature-id');
+        const modal = new bootstrap.Modal(document.getElementById('cvParseModal'));
+        
+        // Réinitialiser le modal
+        document.getElementById('cvParseResult').innerHTML = `
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+                <p>Analyse du CV en cours...</p>
+            </div>
+        `;
+        document.getElementById('downloadCvAnalysisPdf').classList.add('d-none');
+        
+        modal.show();
+        
+        // Appeler l'API
+        fetch(`/candidatureBack/parse-cv/${candidatureId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Afficher les résultats
+                    let html = '<h4>Résultats de l\'analyse</h4>';
+                    
+                    if (data.data.personal_info) {
+                        html += `
+                            <div class="card mb-3">
+                                <div class="card-header">Informations personnelles</div>
+                                <div class="card-body">
+                                    <dl class="row">
+                                        ${Object.entries(data.data.personal_info).map(([key, value]) => `
+                                            <dt class="col-sm-3">${key.charAt(0).toUpperCase() + key.slice(1)}</dt>
+                                            <dd class="col-sm-9">${value || 'Non spécifié'}</dd>
+                                        `).join('')}
+                                    </dl>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Ajouter d'autres sections (expérience, éducation, etc.)
+                    
+                    document.getElementById('cvParseResult').innerHTML = html;
+                    
+                    // Afficher le bouton de téléchargement
+                    if (data.pdfPath) {
+                        const downloadBtn = document.getElementById('downloadCvAnalysisPdf');
+                        downloadBtn.classList.remove('d-none');
+                        downloadBtn.href = data.pdfPath;
+                    }
+                } else {
+                    document.getElementById('cvParseResult').innerHTML = `
+                        <div class="alert alert-danger">
+                            Erreur lors de l'analyse: ${data.error || 'Erreur inconnue'}
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                document.getElementById('cvParseResult').innerHTML = `
+                    <div class="alert alert-danger">
+                        Erreur: ${error.message}
+                    </div>
+                `;
+            });
+    });
 });
     </script>
 {% endblock %}

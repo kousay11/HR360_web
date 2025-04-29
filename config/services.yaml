@@ -9,6 +9,7 @@ parameters:
     images_directory: '%kernel.project_dir%/public/uploads/images'
     app.together_api_key: '%env(TOGETHER_API_KEY)%'
     app.deep_translate_api_key: '%env(DEEP_TRANSLATE_API_KEY)%'
+    app.base_url: '%env(APP_BASE_URL)%'
     # app.rapidapi_grammar_key: '%env(RAPIDAPI_GRAMMAR_KEY)%'
     # app.rapidapi_grammar_url: 'https://grammar-checker-api.p.rapidapi.com/v1/check'
     # app.rapidapi_grammar_host: 'grammar-checker-api.p.rapidapi.com'
