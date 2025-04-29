@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Chart\Layout;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Chart\Chart;
 use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
@@ -50,137 +51,225 @@ final class StatsProjetController extends AbstractController
             $topProjetsParTaches = $tacheRepository->countTachesParProjet(6);
             $evolutionProjets = $projetRepository->evolutionProjetsParMoisExcel($em);
 
-
             // 2. Créer un nouveau Spreadsheet
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
+            
+            // Style général
+            $sheet->getDefaultColumnDimension()->setWidth(10);
+            $headerStyle = [
+                'font' => ['bold' => true, 'color' => ['rgb' => '2C3E50']],
+                'alignment' => ['horizontal' => 'center'],
+                'fill' => ['fillType' => 'solid', 'color' => ['rgb' => 'ECF0F1']]
+            ];
+            $titleStyle = [
+                'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => 'FFFFFF']],
+                'fill' => ['fillType' => 'solid', 'color' => ['rgb' => '3498DB']],
+                'alignment' => ['horizontal' => 'center']
+            ];
 
-            // 3. Ajouter un titre général
+            // 3. Titre général
             $sheet->setCellValue('A1', 'Rapport des Statistiques de Projets');
-            $sheet->mergeCells('A1:F1');
-            $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+            $sheet->mergeCells('A1:P1');
+            $sheet->getStyle('A1')->applyFromArray($titleStyle);
 
-            // 4. Ajouter les données pour le graphique "Projets par équipe" (Bar Chart)
+            // 4. Projets par équipe
             $sheet->setCellValue('A3', 'Projets par Équipe');
-            $sheet->getStyle('A3')->getFont()->setBold(true);
+            $sheet->getStyle('A3')->applyFromArray(['font' => ['bold' => true, 'size' => 14]]);
 
             $sheet->setCellValue('A4', 'Équipe');
             $sheet->setCellValue('B4', 'Nombre de Projets');
-            $sheet->getStyle('A4:B4')->getFont()->setBold(true);
+            $sheet->getStyle('A4:B4')->applyFromArray($headerStyle);
+
+            // Générer des couleurs distinctes
+            $colors = [
+                '3498DB', 'E74C3C', '2ECC71', 'F1C40F', '9B59B6', 
+                '1ABC9C', 'E67E22', '34495E', '7F8C8D', '16A085'
+            ];
 
             $row = 5;
-            foreach ($projetsParEquipe as $item) {
+            foreach ($projetsParEquipe as $index => $item) {
                 $sheet->setCellValue('A' . $row, $item['equipe_nom']);
                 $sheet->setCellValue('B' . $row, $item['count']);
-                $row++;
-            }
-            // Ajouter cette ligne avant de créer le graphique
-            $sheet->getStyle('B5:B' . ($row - 1))->getNumberFormat()->setFormatCode('0');
-            // Avant de créer les DataSeries
-            foreach ($projetsParEquipe as $index => $item) {
-                $color = sprintf('%06X', mt_rand(0, 0xFFFFFF));
-                $sheet->getStyle('B' . ($index + 5))->getFill()
+                $color = $colors[$index % count($colors)];
+                $sheet->getStyle('A' . $row . ':B' . $row)->getFill()
                     ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                     ->getStartColor()->setRGB($color);
+                $row++;
             }
-            // 5. Créer un graphique "Projets par équipe" (Bar Chart)
 
-            $seriesProjets = new DataSeries(
+            // Graphique Projets par équipe
+            $dataSeriesLabels1 = [
+                new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Worksheet!$B$4', null, 1)
+            ];
+            $xAxisTickValues1 = [
+                new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Worksheet!$A$5:$A$' . ($row - 1), null, count($projetsParEquipe))
+            ];
+            $dataSeriesValues1 = [
+                new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Worksheet!$B$5:$B$' . ($row - 1), null, count($projetsParEquipe))
+            ];
+            
+            foreach ($dataSeriesValues1 as $i => $series) {
+                $series->setFillColor($colors);
+            }
+
+            $series1 = new DataSeries(
                 DataSeries::TYPE_BARCHART,
-                DataSeries::GROUPING_STANDARD,
-                [0],
-                [new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Worksheet!$A$5:$A$' . ($row - 1), null, count($projetsParEquipe))],
-                [],
-                [new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Worksheet!$B$5:$B$' . ($row - 1), null, count($projetsParEquipe))]
+                DataSeries::GROUPING_CLUSTERED,
+                range(0, count($dataSeriesValues1) - 1),
+                $dataSeriesLabels1,
+                $xAxisTickValues1,
+                $dataSeriesValues1
             );
 
-            $plotArea = new PlotArea(null, [$seriesProjets]);
-            $chart = new Chart(
+            $layout1 = new Layout();
+            $layout1->setShowVal(true);
+            
+            $plotArea1 = new PlotArea($layout1, [$series1]);
+            $legend1 = new Legend(Legend::POSITION_RIGHT, null, false);
+            
+            $chart1 = new Chart(
                 'Projets par Équipe',
                 new Title('Projets par Équipe'),
-                null,
-                $plotArea
+                $legend1,
+                $plotArea1
             );
 
-            $chart->setTopLeftPosition('D3');
-            $chart->setBottomRightPosition('M20');
-            $sheet->addChart($chart);
+            $chart1->setTopLeftPosition('D3');
+            $chart1->setBottomRightPosition('M20');
+            $sheet->addChart($chart1);
 
-            // 6. Ajouter les données pour le graphique "Tâches par projet" (Horizontal Bar Chart)
+            // 5. Tâches par projet
             $sheet->setCellValue('A22', 'Tâches par Projet (Top 6)');
-            $sheet->getStyle('A22')->getFont()->setBold(true);
+            $sheet->getStyle('A22')->applyFromArray(['font' => ['bold' => true, 'size' => 14]]);
 
             $sheet->setCellValue('A23', 'Projet');
             $sheet->setCellValue('B23', 'Nombre de Tâches');
-            $sheet->getStyle('A23:B23')->getFont()->setBold(true);
+            $sheet->getStyle('A23:B23')->applyFromArray($headerStyle);
 
             $rowTasks = 24;
-            foreach ($topProjetsParTaches as $item) {
+            foreach ($topProjetsParTaches as $index => $item) {
                 $sheet->setCellValue('A' . $rowTasks, $item['projet_nom']);
                 $sheet->setCellValue('B' . $rowTasks, $item['count']);
+                $color = $colors[$index % count($colors)];
+                $sheet->getStyle('A' . $rowTasks . ':B' . $rowTasks)->getFill()
+                    ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                    ->getStartColor()->setRGB($color);
                 $rowTasks++;
             }
 
-            // 7. Créer un graphique "Tâches par projet" (Horizontal Bar Chart)
+            // Graphique Tâches par projet
+            $dataSeriesLabels2 = [
+                new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Worksheet!$B$23', null, 1)
+            ];
+            $xAxisTickValues2 = [
+                new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Worksheet!$A$24:$A$' . ($rowTasks - 1), null, count($topProjetsParTaches))
+            ];
+            $dataSeriesValues2 = [
+                new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Worksheet!$B$24:$B$' . ($rowTasks - 1), null, count($topProjetsParTaches))
+            ];
 
-            $seriesTaches = new DataSeries(
+            foreach ($dataSeriesValues2 as $series) {
+                $series->setFillColor(array_slice($colors, 0, count($topProjetsParTaches)));
+            }
+
+            $series2 = new DataSeries(
                 DataSeries::TYPE_BARCHART,
-                DataSeries::GROUPING_STANDARD,
-                [0],
-                [new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Worksheet!$A$24:$A$' . ($rowTasks - 1), null, count($topProjetsParTaches))],
-                [],
-                [new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Worksheet!$B$24:$B$' . ($rowTasks - 1), null, count($topProjetsParTaches))],
+                DataSeries::GROUPING_CLUSTERED,
+                range(0, count($dataSeriesValues2) - 1),
+                $dataSeriesLabels2,
+                $xAxisTickValues2,
+                $dataSeriesValues2,
                 DataSeries::DIRECTION_HORIZONTAL
             );
 
-            $plotAreaTasks = new PlotArea(null, [$seriesTaches]);
-            $chartTasks = new Chart(
+            $layout2 = new Layout();
+            $layout2->setShowVal(true);
+            
+            $plotArea2 = new PlotArea($layout2, [$series2]);
+            $legend2 = new Legend(Legend::POSITION_RIGHT, null, false);
+            
+            $chart2 = new Chart(
                 'Tâches par Projet',
                 new Title('Tâches par Projet (Top 6)'),
-                null,
-                $plotAreaTasks
+                $legend2,
+                $plotArea2
             );
 
-            $chartTasks->setTopLeftPosition('D22');
-            $chartTasks->setBottomRightPosition('M40');
-            $sheet->addChart($chartTasks);
-            // 3. Graphique Évolution des Projets (Line Chart)
-            $rowEvol = 5; // Commencer à la ligne 5
+            $chart2->setTopLeftPosition('D22');
+            $chart2->setBottomRightPosition('M40');
+            $sheet->addChart($chart2);
+
+            // 6. Évolution des projets
+            $sheet->setCellValue('A42', 'Évolution des Projets');
+            $sheet->getStyle('A42')->applyFromArray(['font' => ['bold' => true, 'size' => 14]]);
+
+            $sheet->setCellValue('A43', 'Mois');
+            $sheet->setCellValue('B43', 'Projets Débutés');
+            $sheet->setCellValue('C43', 'Projets Terminés');
+            $sheet->getStyle('A43:C43')->applyFromArray($headerStyle);
+
+            $rowEvol = 44;
             foreach ($evolutionProjets as $item) {
-                $sheet->setCellValue('G' . $rowEvol, $item['mois']);
-                $sheet->setCellValue('H' . $rowEvol, $item['debut']);
-                $sheet->setCellValue('I' . $rowEvol, $item['fin']);
+                $sheet->setCellValue('A' . $rowEvol, $item['mois']);
+                $sheet->setCellValue('B' . $rowEvol, $item['debut']);
+                $sheet->setCellValue('C' . $rowEvol, $item['fin']);
                 $rowEvol++;
             }
-            
-            $seriesEvolution = new DataSeries(
+
+            // Graphique Évolution des projets
+            $dataSeriesLabels3 = [
+                new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Worksheet!$B$43', null, 1),
+                new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Worksheet!$C$43', null, 1),
+            ];
+            $xAxisTickValues3 = [
+                new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Worksheet!$A$44:$A$' . ($rowEvol - 1), null, count($evolutionProjets))
+            ];
+            $dataSeriesValues3 = [
+                new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Worksheet!$B$44:$B$' . ($rowEvol - 1), null, count($evolutionProjets)),
+                new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Worksheet!$C$44:$C$' . ($rowEvol - 1), null, count($evolutionProjets))
+            ];
+
+            $dataSeriesValues3[0]->setFillColor(['3498DB']);
+            $dataSeriesValues3[1]->setFillColor(['E74C3C']);
+
+            $series3 = new DataSeries(
                 DataSeries::TYPE_LINECHART,
                 DataSeries::GROUPING_STANDARD,
-                range(0, 1), // Deux séries (début et fin)
-                [new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Worksheet!$G$5:$G$' . ($rowEvol - 1), null, count($evolutionProjets))],
-                [],
-                [
-                    new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Worksheet!$H$5:$H$' . ($rowEvol - 1), null, count($evolutionProjets)),
-                    new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Worksheet!$I$5:$I$' . ($rowEvol - 1), null, count($evolutionProjets))
-                ]
+                range(0, count($dataSeriesValues3) - 1),
+                $dataSeriesLabels3,
+                $xAxisTickValues3,
+                $dataSeriesValues3
             );
+
+            $layout3 = new Layout();
+            $layout3->setShowVal(true);
             
-            $plotAreaEvol = new PlotArea(null, [$seriesEvolution]);
-            $chartEvol = new Chart(
+            $plotArea3 = new PlotArea($layout3, [$series3]);
+            $legend3 = new Legend(Legend::POSITION_RIGHT, null, false);
+            
+            $chart3 = new Chart(
                 'Évolution des Projets',
-                new Title('Évolution des Projets'),
-                null,
-                $plotAreaEvol
+                new Title('Évolution des Projets par Mois'),
+                $legend3,
+                $plotArea3
             );
-            $chartEvol->setTopLeftPosition('D50');
-            $chartEvol->setBottomRightPosition('M80');
-            $sheet->addChart($chartEvol);
-            // 8. Générer le fichier Excel
+
+            $chart3->setTopLeftPosition('D42');
+            $chart3->setBottomRightPosition('M60');
+            $sheet->addChart($chart3);
+
+            // Ajustement automatique des colonnes
+            foreach (range('A', 'M') as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+
+            // Générer le fichier Excel
             $writer = new Xlsx($spreadsheet);
+            $writer->setIncludeCharts(true);
 
             $response = new StreamedResponse(
                 function () use ($writer) {
-                    $writer->setIncludeCharts(true);
                     $writer->save('php://output');
                 }
             );
@@ -189,10 +278,9 @@ final class StatsProjetController extends AbstractController
             $response->headers->set('Content-Disposition', 'attachment;filename="project_stats.xlsx"');
 
             return $response;
-        } catch (\Exception $e) { // Log l'erreur
-            error_log($e->getMessage());
 
-            // Retourne une réponse d'erreur
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
             return new Response(
                 'Une erreur est survenue lors de la génération du fichier Excel: ' . $e->getMessage(),
                 Response::HTTP_INTERNAL_SERVER_ERROR
