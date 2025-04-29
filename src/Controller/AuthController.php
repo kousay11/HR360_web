@@ -19,7 +19,7 @@ class AuthController extends AbstractController
         if ($this->getUser()) {
             // Rediriger vers la page d'accueil si l'utilisateur est déjà connecté
             return $this->redirectToRoute('app_home');
-        }
+        }   
 
         // Récupérer l'erreur de connexion s'il y en a une
         $error = $authenticationUtils->getLastAuthenticationError();
