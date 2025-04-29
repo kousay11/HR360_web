@@ -51,7 +51,7 @@ final class FormationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            
+
             $entityManager->persist($formation);
             $entityManager->flush();
 
@@ -106,31 +106,101 @@ final class FormationController extends AbstractController
     public function frontIndex(Request $request, FormationRepository $formationRepository): Response
     {
         $search = $request->query->get('search');
+        $favoritesOnly = $request->query->getBoolean('favorites');
         $page = $request->query->getInt('page', 1);
-        $limit = 3; // Nombre d'éléments par page
-    
-        $query = $formationRepository->createQueryBuilder('f');
-        
+        $limit = 3;
+
+        // Création de la requête de base
+        $queryBuilder = $formationRepository->createQueryBuilder('f');
+
+        // Application des filtres
         if ($search) {
-            $query->where('f.titre LIKE :search')
-                  ->setParameter('search', '%'.$search.'%');
+            $queryBuilder->andWhere('f.titre LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
         }
-    
-        $paginator = new Paginator($query->getQuery());
+
+        if ($favoritesOnly) {
+            $queryBuilder->andWhere('f.isFavorite = :isFavorite')
+                ->setParameter('isFavorite', true);
+        }
+
+        // Configuration de la pagination
+        $query = $queryBuilder->getQuery();
+        $paginator = new Paginator($query);
         $total = count($paginator);
-        $formations = $paginator
-            ->getQuery()
+
+        $formations = $query
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit)
             ->getResult();
-    
+
         return $this->render('formation/front/index.html.twig', [
             'formations' => $formations,
             'search' => $search,
             'page' => $page,
             'total' => $total,
             'limit' => $limit,
+            'favoritesOnly' => $favoritesOnly
         ]);
+    }
+
+
+    #[Route('/front/favorites', name: 'app_formation_favorites', methods: ['GET'])]
+    public function favorites(Request $request, FormationRepository $formationRepository): Response
+    {
+        $search = $request->query->get('search');
+        $page = $request->query->getInt('page', 1);
+        $limit = 3;
+
+        // Debug: Vérifiez ce que la requête retourne
+        $queryBuilder = $formationRepository->createQueryBuilder('f')
+            ->where('f.isFavorite = :isFavorite')
+            ->setParameter('isFavorite', true);
+
+        if ($search) {
+            $queryBuilder->andWhere('f.titre LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
+        }
+
+        $query = $queryBuilder->getQuery();
+
+        // Debug: Affichez la requête SQL générée
+        // dd($query->getSQL(), $query->getParameters());
+
+        $paginator = new Paginator($query);
+        $total = count($paginator);
+
+        $formations = $query
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getResult();
+
+        // Debug: Vérifiez les formations retournées
+        // dd($formations);
+
+        return $this->render('formation/front/favorites.html.twig', [
+            'formations' => $formations,
+            'search' => $search,
+            'page' => $page,
+            'total' => $total,
+            'limit' => $limit
+        ]);
+    }
+
+    #[Route('/front/{id}/toggle-favorite', name: 'app_formation_toggle_favorite', methods: ['POST'])]
+    public function toggleFavorite(Request $request, Formation $formation, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('toggle-favorite' . $formation->getId(), $request->request->get('_token'))) {
+            $formation->setIsFavorite(!$formation->isIsFavorite());
+            $entityManager->flush();
+
+            $this->addFlash('success', $formation->isIsFavorite() ?
+                'Formation ajoutée aux favoris' : 'Formation retirée des favoris');
+        }
+
+        // Redirection vers la page précédente ou vers les favoris
+        $redirectTo = $request->request->get('redirect_to', $this->generateUrl('app_formation_favorites'));
+        return $this->redirect($redirectTo);
     }
 
     #[Route('/frontnew', name: 'app_formation_front_new', methods: ['GET', 'POST'])]
@@ -139,21 +209,21 @@ final class FormationController extends AbstractController
         $formation = new Formation();
         $form = $this->createForm(FormationType::class, $formation);
         $form->handleRequest($request);
-    
+
         if ($form->isSubmitted()) {
             dump($form->isValid()); // Vérifiez si le formulaire est valide
             dump($form->getErrors(true)); // Affichez les erreurs éventuelles
-            
+
             if ($form->isValid()) {
                 $entityManager->persist($formation);
                 $entityManager->flush();
                 $this->addFlash('success', 'Formation créée avec succès');
                 return $this->redirectToRoute('app_formation_front_index');
             }
-            
+
             $this->addFlash('error', 'Il y a des erreurs dans le formulaire');
         }
-    
+
         return $this->render('formation/front/new.html.twig', [
             'form' => $form->createView(),
         ]);
@@ -191,9 +261,7 @@ final class FormationController extends AbstractController
         // Note: Ce n'est pas sécurisé sans token CSRF en GET
         $entityManager->remove($formation);
         $entityManager->flush();
-    
+
         return $this->redirectToRoute('app_formation_front_index', [], Response::HTTP_SEE_OTHER);
     }
-
-    
 }

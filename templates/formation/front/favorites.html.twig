@@ -1,6 +1,6 @@
 {% extends 'baseEMP.html.twig' %}
 
-{% block title %}Liste des Formations - HR360
+{% block title %}Mes Formations Favorites - HR360
 {% endblock %}
 
 {% block css %}
@@ -11,17 +11,16 @@
 {% endblock %}
 
 {% block index %}
-	<section id="formations" class="formations section">
+	<section id="favorites" class="formations section">
 		<div class="container section-title" data-aos="fade-up">
-			<h2>Nos Formations</h2>
-			<p>Découvrez notre catalogue de formations</p>
+			<h2>Mes Formations Favorites</h2>
+			<p>Retrouvez toutes vos formations marquées comme favorites</p>
 		</div>
 
-		{# Affichage des messages flash #}
 		<div class="container mb-3">
 			{% for label, messages in app.flashes %}
 				{% for message in messages %}
-					<div class="alert alert-{{ label == 'success' ? 'success' : (label == 'warning' ? 'warning' : (label == 'danger' ? 'danger' : 'info')) }} alert-dismissible fade show" role="alert">
+					<div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
 						<i class="fas fa-info-circle me-2"></i>
 						{{ message }}
 						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -30,25 +29,33 @@
 			{% endfor %}
 		</div>
 
-
 		<div class="container">
 			<div class="row mb-4">
 				<div class="col-md-6">
-					<form method="get" class="search-form">
+					<form method="get" action="{{ path('app_formation_favorites') }}" class="search-form">
 						<div class="input-group search-container">
-							<input type="text" name="search" class="form-control search-box" placeholder="Rechercher..." value="{{ app.request.query.get('search') ?? '' }}">
+							<input type="text" name="search" class="form-control search-box" placeholder="Rechercher dans mes favoris..." value="{{ search ?? '' }}">
 							<button class="btn btn-outline-danger" type="submit">
 								<i class="fas fa-search"></i>
 							</button>
 						</div>
 					</form>
 				</div>
+				<div class="col-md-6 text-end">
+					<a href="{{ path('app_formation_front_index') }}" class="btn btn-outline-primary">
+						<i class="fas fa-list me-1"></i>
+						Voir toutes les formations
+					</a>
+				</div>
 			</div>
 
+			{# Répétez le même contenu de cartes que dans index.html.twig #}
 			<div class="row">
 				{% for formation in formations %}
 					<div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
-						<div class="card entity-card">
+						<div
+							class="card entity-card">
+							{# ... (même contenu que dans index.html.twig) ... #}
 							<div class="card-header entity-header">
 								<i class="fas fa-graduation-cap entity-icon"></i>
 								<h5 class="entity-title">{{ formation.titre }}</h5>
@@ -99,39 +106,39 @@
 									</div>
 								</div>
 							</div>
-							
 						</div>
 					</div>
 				{% else %}
 					<div class="col-12" data-aos="fade-up">
 						<div class="alert alert-info">
-							Aucune formation trouvée.
+							Aucune formation favorite trouvée.
 						</div>
 					</div>
 				{% endfor %}
 			</div>
 
+			{# Pagination identique à index.html.twig #}
 			{% if total > limit %}
 				<div class="row mt-4">
 					<div class="col-12">
 						<nav aria-label="Page navigation">
 							<ul class="pagination justify-content-center">
 								<li class="page-item {{ page == 1 ? 'disabled' : '' }}">
-									<a class="page-link" href="{{ path('app_formation_front_index', {'page': page - 1, 'search': search}) }}">
+									<a class="page-link" href="{{ path('app_formation_favorites', {'page': page - 1, 'search': search}) }}">
 										&laquo; Précédent
 									</a>
 								</li>
 
 								{% for i in 1..((total / limit)|round(0, 'ceil')) %}
 									<li class="page-item {{ page == i ? 'active' : '' }}">
-										<a class="page-link" href="{{ path('app_formation_front_index', {'page': i, 'search': search}) }}">
+										<a class="page-link" href="{{ path('app_formation_favorites', {'page': i, 'search': search}) }}">
 											{{ i }}
 										</a>
 									</li>
 								{% endfor %}
 
 								<li class="page-item {{ page * limit >= total ? 'disabled' : '' }}">
-									<a class="page-link" href="{{ path('app_formation_front_index', {'page': page + 1, 'search': search}) }}">
+									<a class="page-link" href="{{ path('app_formation_favorites', {'page': page + 1, 'search': search}) }}">
 										Suivant &raquo;
 									</a>
 								</li>
@@ -142,25 +149,4 @@
 			{% endif %}
 		</div>
 	</section>
-{% endblock %}
-
-{% block js %}
-	{{ parent() }}
-	<script>
-		document.addEventListener('DOMContentLoaded', function () { // Animation des cartes
-const formationCards = document.querySelectorAll('.entity-card');
-formationCards.forEach((card, index) => {
-card.style.animationDelay = `${
-index * 0.1
-}s`;
-});
-
-// Gestion des favoris
-document.querySelectorAll('.btn-outline-warning').forEach(btn => {
-btn.addEventListener('click', function () {
-this.classList.toggle('active');
-});
-});
-});
-	</script>
 {% endblock %}
