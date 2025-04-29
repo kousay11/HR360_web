@@ -8,5 +8,5 @@ homepage:
     path: /
     controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController
     defaults:
-        route: app_auth
+        route: app_login
 

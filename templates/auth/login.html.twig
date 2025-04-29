@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - HR360</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('front/css/login.css') }}">
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="auth-form-container">
+                    <form method="post" action="{{ path('app_login') }}" class="auth-form">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                        <div class="auth-header">
+                            <h2 class="auth-title">Connexion</h2>
+                            <div class="auth-subtitle">Accédez à votre espace personnel</div>
+                        </div>
+
+                        {% if error %}
+                            <div class="auth-alert alert-danger">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>{{ error.messageKey|trans(error.messageData, 'security') }}</span>
+                            </div>
+                        {% endif %}
+
+                        <div class="form-group {{ error ? 'has-error' : '' }}">
+                            <label for="inputEmail" class="form-label">Email</label>
+                            <div class="input-wrapper">
+                                <input type="email" name="email" id="inputEmail" class="form-input" value="{{ last_username }}" placeholder="exemple@email.com" required autofocus>
+                                <i class="input-icon fas fa-envelope"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group {{ error ? 'has-error' : '' }}">
+                            <label for="inputPassword" class="form-label">Mot de passe</label>
+                            <div class="input-wrapper">
+                                <input type="password" name="password" id="inputPassword" class="form-input" placeholder="••••••••" required>
+                                <i class="input-icon fas fa-lock"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-options">
+                            <div class="remember-me">
+                                <input type="checkbox" id="remember_me" name="_remember_me">
+                                <label for="remember_me">Se souvenir de moi</label>
+                            </div>
+                            <a href="#" class="forgot-password">Mot de passe oublié ?</a>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="auth-button">
+                                <span class="button-text">Se connecter</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+
+                        <div class="auth-footer">
+                            <p>Pas encore de compte ?
+                                <a href="{{ path('app_register') }}" class="auth-link">S'inscrire</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
