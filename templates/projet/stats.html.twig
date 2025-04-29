@@ -157,15 +157,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const evolutionData = {{ evolutionProjets|json_encode|raw }};
     
     // Préparer les données pour le graphique
-    const labels = [...new Set(evolutionData.map(item => item.mois_debut))].sort();
-    const startedData = labels.map(month => {
-        const item = evolutionData.find(d => d.mois_debut === month);
-        return item ? item.count : 0;
-    });
-    const endedData = labels.map(month => {
-        const item = evolutionData.find(d => d.mois_fin === month);
-        return item ? item.count : 0;
-    });
+    const labels = evolutionData.map(item => item.mois);
+    const startedData = evolutionData.map(item => item.debut);
+    const endedData = evolutionData.map(item => item.fin);
 
     new Chart(ctx3, {
         type: 'line',
@@ -173,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
             labels: labels,
             datasets: [
                 {
-                    label: 'Projects Started',
+                    label: 'Projets Démarrés',
                     data: startedData,
                     borderColor: 'rgba(54, 162, 235, 1)',
                     backgroundColor: 'rgba(54, 162, 235, 0.1)',
@@ -181,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     fill: true
                 },
                 {
-                    label: 'Projects Ended',
+                    label: 'Projets Terminés', 
                     data: endedData,
                     borderColor: 'rgba(255, 99, 132, 1)',
                     backgroundColor: 'rgba(255, 99, 132, 0.1)',

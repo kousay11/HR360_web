@@ -49,7 +49,7 @@ final class StatsProjetController extends AbstractController
             // 1. Récupérer les données
             $projetsParEquipe = $projetRepository->countProjetsParEquipe();
             $topProjetsParTaches = $tacheRepository->countTachesParProjet(6);
-            $evolutionProjets = $projetRepository->evolutionProjetsParMoisExcel($em);
+            $evolutionProjets = $projetRepository->evolutionProjetsParMois($em);
 
             // 2. Créer un nouveau Spreadsheet
             $spreadsheet = new Spreadsheet();

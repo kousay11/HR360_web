@@ -92,23 +92,6 @@ class ProjetRepository extends ServiceEntityRepository
 
     public function evolutionProjetsParMois(EntityManagerInterface $em): array
     {
-        $sql = "
-        SELECT 
-            DATE_FORMAT(p.dateDebut, '%Y-%m') as mois_debut,
-            DATE_FORMAT(p.dateFin, '%Y-%m') as mois_fin,
-            COUNT(p.id) as count
-        FROM projet p
-        GROUP BY mois_debut, mois_fin
-        ORDER BY mois_debut
-    ";
-
-        $stmt = $em->getConnection()->prepare($sql);
-        $result = $stmt->executeQuery();
-
-        return $result->fetchAllAssociative();
-    }
-    public function evolutionProjetsParMoisExcel(EntityManagerInterface $em): array
-    {
         // Requête pour les projets démarrés par mois
         $started = $em->getConnection()->executeQuery(
             "SELECT DATE_FORMAT(p.dateDebut, '%Y-%m') as mois, COUNT(p.id) as debut
