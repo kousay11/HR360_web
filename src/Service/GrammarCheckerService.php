@@ -31,14 +31,13 @@ class GrammarCheckerService
     
         // Vérification manuelle des erreurs évidentes
         $preCheckErrors = $this->preCheckGrammar($text);
-        if (!empty($preCheckErrors['errors']['details'])) {
-            $this->logger->info('Erreurs détectées en pré-vérification', [
-                'errors_count' => count($preCheckErrors['errors']['details']),
-                'correction' => $preCheckErrors['errors']['correction']
-            ]);
-            return $preCheckErrors;
-        }
-    
+        // On peut logger ce que trouve preCheckGrammar, mais NE PAS retourner tout de suite
+        $this->logger->info('Erreurs détectées en pré-vérification', [
+            'errors_count' => count($preCheckErrors['errors']['details']),
+            'correction' => $preCheckErrors['errors']['correction']
+        ]);
+        // Continuer à appeler l'API malgré tout
+        
         try {
             $requestPayload = [
                 'text' => $text,

@@ -47,11 +47,10 @@ public function exportPdf(
     Request $request,
     ?int $offreId = null,
     ?OffreRepository $offreRepository = null
-): Response
-{
+): Response {
     $pdfOptions = new Options();
     $pdfOptions->set('defaultFont', 'Arial');
-    $pdfOptions->set('isRemoteEnabled', true);
+    $pdfOptions->set('isRemoteEnabled', true); // Autorise le chargement des images externes
     $pdfOptions->set('isHtml5ParserEnabled', true);
 
     $dompdf = new Dompdf($pdfOptions);
@@ -66,16 +65,24 @@ public function exportPdf(
         $title = "Liste de toutes les candidatures";
     }
 
-    // Générer une URL absolue vers l'image publique
-    $logoRelativePath = '/images/logoRH360.png';
-    $logoAbsoluteUrl = $request->getSchemeAndHttpHost() . $logoRelativePath;
-    $logoFilePath = $this->getParameter('kernel.project_dir') . '/public' . $logoRelativePath;
-    $logoExists = file_exists($logoFilePath);
+    // Chemin physique du logo
+    $logoPath = $this->getParameter('kernel.project_dir') . '/public/images/logoRH360.png';
 
+    // Vérification de l'existence et encodage en Base64
+    if (file_exists($logoPath)) {
+        $logoData = base64_encode(file_get_contents($logoPath));
+        $logoUrl = 'data:image/png;base64,' . $logoData;
+        $logoExists = true;
+    } else {
+        $logoUrl = null;
+        $logoExists = false;
+    }
+
+    // Passage au template
     $html = $this->renderView('candidatureBack/pdf.html.twig', [
         'candidatures' => $candidatures,
         'title' => $title,
-        'logo_path' => $logoExists ? $logoAbsoluteUrl : null,
+        'logo_path' => $logoUrl,
         'logo_exists' => $logoExists,
         'offre' => $offreId ? $offre : null
     ]);

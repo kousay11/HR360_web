@@ -140,53 +140,132 @@ document.getElementById('translate-description-btn')?.addEventListener('click', 
  // Initialise jsPDF (en utilisant la version UMD)
         const { jsPDF } = window.jspdf;
         
-        document.addEventListener('DOMContentLoaded', function() {
-            // ... vos autres scripts existants ...
-            
-            // Gestion de l'export PDF
-            document.getElementById('export-pdf-btn')?.addEventListener('click', function() {
-                const description = document.getElementById('offre_description').value.trim();
-                const titre = document.getElementById('offre_titre').value.trim() || 'Description Offre';
-                
-                if (!description) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Erreur',
-                        text: 'Veuillez entrer une description à exporter'
-                    });
-                    return;
-                }
-                
-                try {
-                    // Création du PDF
-                    const doc = new jsPDF();
-                    
-                    // Titre
-                    doc.setFontSize(18);
-                    doc.text(titre, 15, 20);
-                    
-                    // Séparateur
-                    doc.setDrawColor(200, 200, 200);
-                    doc.line(15, 25, 195, 25);
-                    
-                    // Description (avec gestion des lignes trop longues)
-                    doc.setFontSize(12);
-                    const splitText = doc.splitTextToSize(description, 180);
-                    doc.text(splitText, 15, 35);
-                    
-                    // Enregistrement
-                    doc.save(`Offre_${titre.substring(0, 20)}.pdf`);
-                    
-                } catch (error) {
-                    console.error('Erreur génération PDF:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Erreur',
-                        text: 'Une erreur est survenue lors de la génération du PDF'
-                    });
-                }
+    document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('export-pdf-btn')?.addEventListener('click', async function() {
+        const description = document.getElementById('offre_description').value.trim();
+        const titre = document.getElementById('offre_titre').value.trim() || 'Description Offre';
+
+        if (!description || !titre) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: "Veuillez remplir le titre et la description avant d'exporter"
             });
-        });  
+            return;
+        }
+
+        try {
+            const doc = new jsPDF({
+                unit: 'mm',
+                format: 'a4',
+                putOnlyUsedFonts: true
+            });
+
+            let y = 15;
+            const pageHeight = doc.internal.pageSize.height;
+            const pageWidth = doc.internal.pageSize.width;
+
+            // 1. Ajouter le logo + RH Entreprise 360 à gauche
+            const logoUrl = '/images/logoRH360.png';
+            const img = new Image();
+            img.src = logoUrl;
+            img.onload = function() {
+                // Logo à gauche
+                const logoWidth = 30;
+                const logoHeight = 30;
+                const logoX = 15; // 15mm margin left
+                const logoY = y;
+                doc.addImage(img, 'PNG', logoX, logoY, logoWidth, logoHeight);
+
+                // Texte "RH Entreprise 360" à droite du logo
+                doc.setFontSize(16);
+                doc.setFont('helvetica', 'bold');
+                doc.text('RH Entreprise 360', logoX + logoWidth + 5, logoY + 15); // à droite du logo
+
+                y += 40; // Avancer un peu
+
+                // 2. Titre "Offre d'emploi" centré
+                doc.setFontSize(20);
+                doc.setFont('helvetica', 'bold');
+                doc.text("Offre d'emploi", pageWidth / 2, y, { align: 'center' });
+
+                y += 20;
+
+                // Nettoyer la description
+                const cleanedDescription = description.replace(/\*\*/g, '');
+
+                // Séparer en sections
+                const sections = cleanedDescription.split(/\n(?=\s*[A-Z])/);
+
+                sections.forEach(section => {
+                    section = section.trim();
+                    if (section.length === 0) return;
+
+                    const match = section.match(/^(.+?)\s*:/);
+                    if (match) {
+                        const title = match[1];
+
+                        // Titre de section
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(14);
+                        doc.text(title, 15, y);
+                        y += 6; // **Petit écart**, pour rapprocher mieux le texte
+
+                        // Contenu de section
+                        const content = section.substring(match[0].length).trim();
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(12);
+
+                        const lines = doc.splitTextToSize(content, 180);
+                        lines.forEach(line => {
+                            if (y > pageHeight - 20) {
+                                doc.addPage();
+                                y = 15;
+                            }
+                            doc.text(line, 15, y);
+                            y += 6; // rapprocher aussi les lignes légèrement
+                        });
+
+                        y += 4; // Petit espace entre sections
+                    } else {
+                        // Cas spécial si pas de titre
+                        const lines = doc.splitTextToSize(section, 180);
+                        lines.forEach(line => {
+                            if (y > pageHeight - 20) {
+                                doc.addPage();
+                                y = 15;
+                            }
+                            doc.text(line, 15, y);
+                            y += 6;
+                        });
+                    }
+                });
+
+                // 7. Sauvegarder le fichier
+                doc.save(`Offre_${titre.substring(0, 20)}.pdf`);
+            };
+
+            img.onerror = function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur',
+                    text: "Impossible de charger le logo. Vérifiez le chemin du fichier."
+                });
+            };
+
+        } catch (error) {
+            console.error('Erreur génération PDF:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: 'Une erreur est survenue lors de la génération du PDF'
+            });
+        }
+    });
+});
+
+
+
  </script> 
     
     
