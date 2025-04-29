@@ -13,6 +13,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Karser\Recaptcha3Bundle\Form\Recaptcha3Type;
+use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3;
+
 
 class LoginType extends AbstractType
 {
@@ -42,6 +45,13 @@ class LoginType extends AbstractType
             ->add('remember_me', CheckboxType::class, [
                 'required' => false,
                 'label' => 'Se souvenir de moi'
+            ])
+            ->add('recaptcha', Recaptcha3Type::class, [
+                'constraints' => new Recaptcha3([
+                    'message' => 'Veuillez vérifier le CAPTCHA'
+                ]),
+                'action_name' => 'login',
+                'script_nonce_csp' => $nonceCsp = 'recaptcha3',
             ]);
     }
 

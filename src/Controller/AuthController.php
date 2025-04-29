@@ -7,33 +7,61 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Karser\Recaptcha3Bundle\Services\RecaptchaValidatorInterface;
 use App\Form\LoginType;
+use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+
+
 
 
 class AuthController extends AbstractController
 {
-    #[Route('/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils): Response
-    {
 
+    public function __construct(private HttpClientInterface $httpClient) {}#[Route('/login', name: 'app_login')]
+    public function login(
+        AuthenticationUtils $authenticationUtils,
+        ParameterBagInterface $params,
+        Request $request
+    ): Response {
         if ($this->getUser()) {
-            // Rediriger vers la page d'accueil si l'utilisateur est déjà connecté
             return $this->redirectToRoute('app_home');
-        }   
-
-        // Récupérer l'erreur de connexion s'il y en a une
+        }
+    
         $error = $authenticationUtils->getLastAuthenticationError();
-        // Dernier nom d'utilisateur saisi par l'utilisateur
         $lastUsername = $authenticationUtils->getLastUsername();
-
-        $form = $this->createForm(LoginType::class);
-
+    
+        if ($request->isMethod('POST')) {
+            $recaptchaResponse = $request->request->get('g-recaptcha-response');
+            $secret = $params->get('recaptcha3_secret');
+    
+            $response = $this->httpClient->request('POST', 'https://www.google.com/recaptcha/api/siteverify', [
+                'body' => [
+                    'secret' => $secret,
+                    'response' => $recaptchaResponse,
+                ]
+            ]);
+    
+            $data = $response->toArray();
+    
+            if (!$data['success']) {
+                $error = new AuthenticationException('Veuillez valider le reCAPTCHA.');
+                $this->addFlash('error', 'Veuillez valider le reCAPTCHA.');
+                return $this->redirectToRoute('app_login');            
+            }
+        }
+    
         return $this->render('auth/login.html.twig', [
-            'loginForm' => $form->createView(),
             'last_username' => $lastUsername,
             'error' => $error,
+            'recaptcha_site_key' => $params->get('recaptcha3_key'),
         ]);
     }
+    
+
 
     #[Route('/logout', name: 'app_logout')]
     public function logout(): void

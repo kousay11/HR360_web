@@ -288,3 +288,40 @@ body {
     padding: 0.875rem;
   }
 }
+
+
+.g-recaptcha {
+  margin: 15px 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* Pour le badge Google */
+.grecaptcha-badge {
+  visibility: hidden;
+} 
+
+/* Style pour le conteneur reCAPTCHA */
+.recaptcha-container {
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+/* Style pour le widget reCAPTCHA */
+.g-recaptcha {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+/* Style pour la notice */
+.recaptcha-notice {
+  display: block;
+  color: #6c757d;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.recaptcha-notice a {
+  color: #6c757d;
+  text-decoration: underline;
+}

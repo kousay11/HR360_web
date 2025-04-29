@@ -7,7 +7,8 @@ parameters:
     cvs_directory: '%kernel.project_dir%/public/uploads/cvs'
     lettres_directory: '%kernel.project_dir%/public/uploads/lettres'
     images_directory: '%kernel.project_dir%/public/uploads/images'
-
+    recaptcha3_key: '%env(RECAPTCHA3_KEY)%'
+    recaptcha3_secret: '%env(RECAPTCHA3_SECRET)%'
 
 services:
     App\Twig\AppExtension:
@@ -43,3 +44,5 @@ services:
             $authToken: '%env(twilio_auth_token)%'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    
