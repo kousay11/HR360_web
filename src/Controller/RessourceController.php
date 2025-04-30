@@ -336,4 +336,6 @@ public function showSuggestions(Ressource $ressource, RessourceRepository $resso
         'similarResources' => array_slice($mainSuggestions, 0, 5),
     ]);
 }
+
+
 }

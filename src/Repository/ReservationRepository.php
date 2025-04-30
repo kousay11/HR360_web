@@ -86,4 +86,40 @@ public function getUserStats(Utilisateur $user): array
     return $stats;
 }
 
+
+
+public function countReservationsByPeriod(string $period = 'week'): array
+{
+    $conn = $this->getEntityManager()->getConnection();
+
+    $format = $period === 'month' ? '%Y-%m' : '%Y-%u';
+
+    $sql = "
+        SELECT DATE_FORMAT(date_debut, :format) AS period, COUNT(id) AS count
+        FROM reservation
+        GROUP BY period
+        ORDER BY period DESC
+    ";
+
+    $stmt = $conn->prepare($sql);
+    $result = $stmt->executeQuery(['format' => $format]);
+
+    return $result->fetchAllAssociative();
+}
+
+
+
+public function getMostRequestedResource(): ?array
+{
+    return $this->createQueryBuilder('r')
+        ->select('res.nom as resourceName, COUNT(r.id) as reservationCount')
+        ->join('r.ressource', 'res')
+        ->groupBy('res.id')
+        ->orderBy('reservationCount', 'DESC')
+        ->setMaxResults(1)
+        ->getQuery()
+        ->getOneOrNullResult();
+}
+
+
 }
