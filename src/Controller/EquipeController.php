@@ -17,6 +17,7 @@ use App\Entity\Projetequipe;
 use App\Entity\Projet;
 use App\Service\TrelloApiService;
 use App\Repository\TacheRepository;
+use App\Repository\ProjetRepository;
 
 #[Route('/equipe')]
 final class EquipeController extends AbstractController
@@ -28,6 +29,103 @@ final class EquipeController extends AbstractController
             'equipes' => $equipeRepository->findAll(),
         ]);
     }
+
+    #[Route('/report', name: 'app_equipe_report', methods: ['GET'])]
+    public function generateReport(EquipeRepository $equipeRepository, ProjetRepository $projetRepository): Response
+    {
+        // Create response object with JSON content type
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
+        try {
+            error_log("Starting report generation");
+
+            // Get all teams at once
+            $teams = $equipeRepository->findAll();
+            if (empty($teams)) {
+                error_log("No teams found");
+                return new Response(json_encode(['error' => 'No teams found']), Response::HTTP_NOT_FOUND);
+            }
+
+            error_log("Found " . count($teams) . " teams");
+            
+            // Build complete report data structure
+            $reportData = [
+                'teams' => [],
+                'generated_at' => (new \DateTime())->format('Y-m-d H:i:s'),
+                'total_teams' => count($teams)
+            ];
+
+            foreach ($teams as $team) {
+                if (!$team) continue;
+
+                $teamData = [
+                    'name' => $team->getNom() ?? 'Unnamed Team',
+                    'projects' => [],
+                    'employees' => []
+                ];
+
+                // Get all projects for this team
+                $projets = $projetRepository->findByEquipe($team);
+                foreach ($projets as $projet) {
+                    if (!$projet) continue;
+
+                    $projectData = [
+                        'name' => $projet->getNom() ?? 'Unnamed Project',
+                        'description' => $projet->getDescription() ?? '',
+                        'start_date' => $projet->getDateDebut() ? $projet->getDateDebut()->format('Y-m-d') : null,
+                        'end_date' => $projet->getDateFin() ? $projet->getDateFin()->format('Y-m-d') : null,
+                        'tasks' => []
+                    ];
+
+                    // Add all tasks for this project
+                    foreach ($projet->getTaches() as $tache) {
+                        if (!$tache) continue;
+                        
+                        $projectData['tasks'][] = [
+                            'name' => $tache->getNom() ?? 'Unnamed Task',
+                            'description' => $tache->getDescription() ?? '',
+                            'start_date' => $tache->getDateDebut() ? $tache->getDateDebut()->format('Y-m-d') : null,
+                            'end_date' => $tache->getDateFin() ? $tache->getDateFin()->format('Y-m-d') : null,
+                            'status' => $tache->getStatut() ?? 'Unknown'
+                        ];
+                    }
+
+                    $teamData['projects'][] = $projectData;
+                }
+
+                // Add all employees for this team
+                foreach ($team->getEquipeemployes() as $equipeEmploye) {
+                    if (!$equipeEmploye || !$equipeEmploye->getUtilisateur()) continue;
+
+                    $employe = $equipeEmploye->getUtilisateur();
+                    $teamData['employees'][] = [
+                        'first_name' => $employe->getPrenom() ?? '',
+                        'last_name' => $employe->getNom() ?? '',
+                        'email' => $employe->getEmail() ?? ''
+                    ];
+                }
+
+                $reportData['teams'][] = $teamData;
+            }
+
+            if (empty($reportData['teams'])) {
+                error_log("No valid data found after processing");
+                return new Response(json_encode(['error' => 'No valid data found']), Response::HTTP_NOT_FOUND);
+            }
+
+            error_log("Successfully generated complete report");
+            return new Response(json_encode($reportData), Response::HTTP_OK);
+
+        } catch (\Exception $e) {
+            error_log("Critical error in report generation: " . $e->getMessage());
+            return new Response(json_encode([
+                'error' => 'Failed to generate report',
+                'message' => $e->getMessage()
+            ]), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     #[Route('/search', name: 'app_equipe_search', methods: ['GET'])]
     public function search(Request $request, EquipeRepository $equipeRepository): Response
     {

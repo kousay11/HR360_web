@@ -21,6 +21,9 @@
         <a href="{{ path('app_equipe_new') }}" class="btn btn-add">
             <i class="fas fa-plus me-2"></i> Add Team
         </a>
+        <button class="btn btn-report" id="sendReportBtn">
+            <i class="fas fa-paper-plane me-2"></i> Send Report
+        </button>
     </div>
     {{ include('equipe/_grid.html.twig') }}
 
@@ -34,6 +37,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const teamsContainer = document.getElementById('teamsContainer');
+    const sendReportBtn = document.getElementById('sendReportBtn');
     let searchTimeout;
 
     searchInput.addEventListener('input', function() {
@@ -61,6 +65,68 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error:', error);
         });
     }
+
+    // Handle report sending
+    sendReportBtn.addEventListener('click', async function() {
+        try {
+            // Show loading state
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Sending...';
+
+            // Fetch all teams data
+            const response = await fetch('{{ path("app_equipe_report") }}');
+            const responseText = await response.text();
+            
+            console.log('Raw server response:', responseText); // Debug log
+            
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                console.error('Failed to parse JSON response:', e);
+                console.error('Raw response:', responseText);
+                throw new Error('Server returned invalid JSON format. Please check server logs.');
+            }
+
+            if (!response.ok) {
+                console.error('Server error response:', data);
+                throw new Error(data.message || `Server error: ${response.status} ${response.statusText}`);
+            }
+
+            if (data.error) {
+                console.error('Server reported error:', data);
+                throw new Error(data.error);
+            }
+
+            console.log('Processed data:', data); // Debug log
+
+            // Send to webhook
+            const webhookResponse = await fetch('https://hook.eu2.make.com/otiqugcz7vqmofq8bvse1nqvcxqdin9e', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            const webhookResponseText = await webhookResponse.text();
+            console.log('Webhook raw response:', webhookResponseText); // Debug log
+            
+            if (!webhookResponse.ok) {
+                console.error('Webhook error response:', webhookResponseText);
+                throw new Error(`Webhook error: ${webhookResponseText || webhookResponse.statusText}`);
+            }
+
+            alert('Report sent successfully!');
+        } catch (error) {
+            console.error('Detailed error:', error);
+            alert(`Failed to send report: ${error.message}\n\nCheck the browser console for more details.`);
+        } finally {
+            // Reset button state
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Send Report';
+        }
+    });
 });
 </script>
 {% endblock %}
