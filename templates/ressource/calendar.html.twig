@@ -1,22 +1,161 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseRH.html.twig' %}
+
+{% block title %}Tableau de bord RH{% endblock %}
 
 {% block body %}
-<div id='calendar' style="max-width: 800px; margin: 40px auto;"></div>
+    <div class="container-fluid">
+        <!-- Statistiques sous forme de cartes -->
+        <div class="row">
+            <!-- Réservations (Semaine) -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Réservations (Semaine)</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ weeklyStats|length }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Réservations (Mois) -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Réservations (Mois)</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ monthlyStats|length }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Autres cartes ici -->
+        </div>
+
+        <!-- Calendrier des Réservations -->
+        <div class="row mt-4">
+            <div class="col">
+                <h5 class="text-primary">📅 Calendrier des Réservations</h5>
+                <div id="calendar" style="max-width: 1200px; margin: 40px auto;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- fullCalendar CSS et JS -->
+    <link rel="stylesheet" href="{{ asset('assets/fullcalendar/fullcalendar.min.css') }}">
+<script src="{{ asset('assets/fullcalendar/jquery.min.js') }}"></script>
+<script src="{{ asset('assets/fullcalendar/moment.min.js') }}"></script>
+<script src="{{ asset('assets/fullcalendar/fullcalendar.min.js') }}"></script>
+<script src="{{ asset('assets/fullcalendar/locales/fr.js') }}"></script> <!-- Si nécessaire -->
+{# Dans votre template Twig #}
+{# Utilisez la dernière version v6 #}
+<!-- Ordre correct des imports -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/fr.global.min.js'></script>
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.min.js'></script>
+
+
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const pieCtx = document.getElementById('myPieChart').getContext('2d');
+        const myPieChart = new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ pieLabels|raw }},
+                datasets: [{
+                    data: {{ pieData|raw }},
+                    backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'],
+                    hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#f4b619', '#be2617'],
+                    borderColor: '#fff',
+                }],
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                },
+                cutout: '70%',
+            }
+        });
+    </script>
+
+    <script>
+
+document.addEventListener('DOMContentLoaded', function () {
     var calendarEl = document.getElementById('calendar');
+    
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        events: {{ events|raw }},
+        initialDate: '2025-03-01', // Focus sur la période des événements
+        events: "{{ path('app_dashboard_events') }}",
+        eventDidMount: function(info) {
+            // Style personnalisé pour meilleure visibilité
+            info.el.style.backgroundColor = '#4e73df';
+            info.el.style.borderColor = '#2e59d9';
+            info.el.style.fontWeight = 'bold';
+        },
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        }
+        },
+        locale: 'fr',
+        height: 'auto', // Adapte la hauteur au contenu
+        eventOrder: 'start', // Ordonne les événements par date
+        eventDisplay: 'block',
+        eventTextColor: '#ffffff'
     });
+
     calendar.render();
 });
-</script>
+
+
+        const ctx = document.getElementById('myAreaChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ chartLabels|raw }},
+                datasets: [{
+                    label: 'Réservations par mois',
+                    data: {{ chartData|raw }},
+                    backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                    borderColor: 'rgba(78, 115, 223, 1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointBackgroundColor: 'rgba(78, 115, 223, 1)',
+                    fill: true
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 {% endblock %}

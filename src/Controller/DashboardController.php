@@ -7,16 +7,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\ReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use App\Entity\Reservation;
 
 final class DashboardController extends AbstractController
 {
-    #[Route('/dashboard', name: 'app_dashboard')]
-    public function index(): Response
-    {
-        return $this->render('dashboard/index.html.twig', [
-            'controller_name' => 'DashboardController',
-        ]);
-    }
+
 
     #[Route('/dashboard', name: 'app_dashboard')]
     public function dashboard(ReservationRepository $repo, EntityManagerInterface $em): Response
@@ -57,4 +54,67 @@ final class DashboardController extends AbstractController
             'pieData' => json_encode($pieData),
         ]);
     }
+
+    #[Route('/dashboard/events', name: 'app_dashboard_events')]
+public function events(ReservationRepository $reservationRepository): JsonResponse
+{
+    $reservations = $reservationRepository->findAll();
+    $events = [];
+
+    foreach ($reservations as $reservation) {
+        // Dans le contrôleur PHP
+$start = $reservation->getDateDebut()
+->setTimezone(new \DateTimeZone('UTC'))
+->format('Y-m-d');
+        $end = $reservation->getDateFin()->modify('+1 day')->format('Y-m-d');
+        
+        $events[] = [
+            'title' => $reservation->getRessource()->getNom(),
+            'start' => $start,
+            'end' => $end,
+            'description' => 'Réservation de ' . $reservation->getUtilisateur()->getNom(),
+            'display' => 'block', // Ajout optionnel pour le style
+        ];
+    }
+
+    return new JsonResponse($events);
+
+}
+
+#[Route('/reservations/update/{id}', name: 'app_reservation_update', methods: ['PUT'])]
+    public function updateEvent(
+        Request $request,
+        Reservation $reservation,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        try {
+            // Récupérer les données de la requête
+            $data = json_decode($request->getContent(), true);
+
+            // Mettre à jour les dates
+            if (isset($data['start'])) {
+                $startDate = \DateTime::createFromFormat(\DateTime::ISO8601, $data['start']);
+                $reservation->setDateDebut($startDate);
+            }
+
+            if (isset($data['end']) && !empty($data['end'])) {
+                $endDate = \DateTime::createFromFormat(\DateTime::ISO8601, $data['end']);
+                $reservation->setDateFin($endDate);
+            }
+
+            $em->persist($reservation);
+            $em->flush();
+
+            return new JsonResponse([
+                'status' => 'success',
+                'message' => 'Réservation mise à jour avec succès'
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => 'Erreur lors de la mise à jour : ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 }

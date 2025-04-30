@@ -3,136 +3,255 @@
 {% block title %}Tableau de bord RH{% endblock %}
 
 {% block body %}
-    <div class="container-fluid">
-        <!-- Statistiques sous forme de cartes -->
-        <div class="row">
-            <!-- Réservations (Semaine) -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-primary shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Réservations (Semaine)</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ weeklyStats|length }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-calendar fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        --info-gradient: linear-gradient(135deg, #0bc5ea 0%, #00a3c4 100%);
+        --warning-gradient: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+        --chart-gradient: linear-gradient(180deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.1) 100%);
+    }
 
-            <!-- Réservations (Mois) -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-success shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Réservations (Mois)</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ monthlyStats|length }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    .stat-card {
+        border: none;
+        border-radius: 15px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+    }
 
-            <!-- Tâches (Exemple statique) -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-info shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tâches</div>
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col-auto">
-                                        <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">||50%</div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="progress progress-sm mr-2">
-                                            <div class="progress-bar bg-info" role="progressbar" style="width: 50%"
-                                                 aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-tasks fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+    }
 
-            <!-- Demandes en attente (statique) -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-warning shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Demandes en attente</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+    }
+
+    .border-left-primary { background: var(--primary-gradient); }
+    .border-left-success { background: var(--success-gradient); }
+    .border-left-info { background: var(--info-gradient); }
+    .border-left-warning { background: var(--warning-gradient); }
+
+    .card-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.2);
+    }
+
+    .chart-container {
+        border-radius: 15px;
+        background: white;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .chart-container::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: var(--chart-gradient);
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    .fc-theme-standard .fc-scrollgrid {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .progress-modern {
+        height: 0.8rem;
+        border-radius: 20px;
+        background-color: #e9ecef;
+        overflow: visible;
+    }
+
+    .progress-modern .progress-bar {
+        position: relative;
+        overflow: visible;
+        border-radius: 20px;
+        box-shadow: 0 2px 10px rgba(11, 197, 234, 0.2);
+    }
+
+    .progress-modern .progress-bar::after {
+        content: '';
+        position: absolute;
+        right: -8px;
+        top: -3px;
+        width: 16px;
+        height: 16px;
+        background: inherit;
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(11, 197, 234, 0.4);
+    }
+
+    .highlight-section {
+        background: linear-gradient(135deg, rgba(245, 245, 245, 0.9) 0%, rgba(255,255,255,0.9) 100%);
+        border-radius: 15px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.3);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+    }
+</style>
+
+
+
+<div class="container-fluid">
+    <!-- Statistiques -->
+    <div class="row">
+        {% for card in [
+            {color: 'primary', title: 'Réservations (Semaine)', value: weeklyStats|length, icon: 'calendar'},
+            {color: 'success', title: 'Réservations (Mois)', value: monthlyStats|length, icon: 'calendar-alt'},
+            {color: 'info', title: 'Tâches', value: '50%', icon: 'tasks', progress: true},
+            {color: 'warning', title: 'Demandes en attente', value: 18, icon: 'comments'}
+        ] %}
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card shadow h-100 py-2 border-left-{{ card.color }}">
+                <div class="card-body position-relative">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-uppercase mb-1 small font-weight-bold text-muted">{{ card.title }}</div>
+                            <div class="h3 mb-0 font-weight-bold text-dark">
+                                {{ card.value }}
+                                {% if card.progress is defined %}<small class="text-sm ml-2">complétées</small>{% endif %}
                             </div>
-                            <div class="col-auto">
-                                <i class="fas fa-comments fa-2x text-gray-300"></i>
+                        </div>
+                        <div class="col-auto">
+                            <div class="card-icon">
+                                <i class="fas fa-{{ card.icon }} text-{{ card.color }}"></i>
                             </div>
                         </div>
                     </div>
+                    {% if card.progress is defined %}
+                    <div class="mt-3">
+                        <div class="progress progress-modern">
+                            <div class="progress-bar bg-{{ card.color }}" style="width: 50%"></div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
+        {% endfor %}
+    </div>
+
+
 
         <!-- Graphiques -->
-        <div class="row">
-            <!-- Graphique en courbes -->
-            <div class="col-xl-8 col-lg-7">
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Évolution des Réservations (Mensuelles)</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-area">
-                            <canvas id="myAreaChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Graphique circulaire (statique ou à adapter) -->
-            <div class="col-xl-4 col-lg-5">
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Sources de Réservation</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-pie pt-4 pb-2">
-                            <canvas id="myPieChart"></canvas>
-                        </div>
-                        <div class="mt-4 text-center small">
-                            <span class="mr-2"><i class="fas fa-circle text-info"></i> Véhicules</span>
-                            <span class="mr-2"><i class="fas fa-circle text-primary"></i> Matériel informatique</span>
-                            <span class="mr-2"><i class="fas fa-circle text-success"></i> Mobilier</span>
-                        </div>
-                    </div>
+    <div class="row">
+        <div class="col-xl-8 col-lg-7">
+            <div class="chart-container shadow mb-4">
+                <h6 class="text-uppercase text-primary mb-3 font-weight-bold">Évolution des Réservations</h6>
+                <div class="chart-area position-relative z-1">
+                    <canvas id="myAreaChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Ressource la plus demandée -->
-        <div class="row mt-4">
-            <div class="col">
-                <h5 class="text-primary">🔥 Ressource la plus demandée</h5>
-                {% if mostRequested %}
-                    <p><strong>{{ mostRequested.resourceName }}</strong> avec {{ mostRequested.reservationCount }} réservations.</p>
-                {% else %}
-                    <p>Aucune donnée disponible.</p>
-                {% endif %}
+        <div class="col-xl-4 col-lg-5">
+            <div class="chart-container shadow mb-4">
+                <h6 class="text-uppercase text-primary mb-3 font-weight-bold">Sources de Réservation</h6>
+                <div class="chart-pie pt-4 pb-2 position-relative z-1">
+                    <canvas id="myPieChart"></canvas>
+                </div>
+                <div class="legend-box mt-4 text-center small">
+                    {% for label in pieLabels %}
+                    <span class="badge badge-pill bg-gradient-{{ loop.index }} mr-2 mb-2 px-3 py-1">
+                        {{ label }}
+                    </span>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
+
+        <!-- Ressource la plus demandée -->
+    <div class="highlight-section mb-4">
+        <h5 class="text-primary mb-0">
+            <i class="fas fa-fire-alt mr-2"></i>Ressource la plus demandée
+        </h5>
+        <div class="mt-2">
+            {% if mostRequested %}
+            <span class="h4 font-weight-bold">{{ mostRequested.resourceName }}</span>
+            <span class="badge bg-primary-gradient text-white ml-2">{{ mostRequested.reservationCount }} réservations</span>
+            {% else %}
+            <p class="text-muted mb-0">Aucune donnée disponible</p>
+            {% endif %}
+        </div>
+    </div>
+
+
+        <!-- Calendrier des Réservations -->
+<div class="chart-container shadow mb-4">
+    <h6 class="text-uppercase text-primary mb-3 font-weight-bold">
+        <i class="far fa-calendar-alt mr-2"></i>Calendrier des Réservations
+        <button id="refreshCalendar" class="btn btn-sm btn-outline-primary float-right">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+    </h6>
+    <div id="calendar" class="position-relative z-1"></div>
+</div>
+
+
+{# Modale pour les détails #}
+<div class="modal fade" id="eventModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="eventDates"></p>
+                <p id="eventStatus" class="badge"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    <!-- fullCalendar CSS et JS -->
+    <link rel="stylesheet" href="{{ asset('assets/fullcalendar/fullcalendar.min.css') }}">
+<script src="{{ asset('assets/fullcalendar/jquery.min.js') }}"></script>
+<script src="{{ asset('assets/fullcalendar/moment.min.js') }}"></script>
+<script src="{{ asset('assets/fullcalendar/fullcalendar.min.js') }}"></script>
+<script src="{{ asset('assets/fullcalendar/locales/fr.js') }}"></script> <!-- Si nécessaire -->
+{# Dans votre template Twig #}
+{# Utilisez la dernière version v6 #}
+<!-- Ordre correct des imports -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/fr.global.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.min.js'></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+
 
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -162,6 +281,125 @@
 </script>
 
     <script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarEl = document.getElementById('calendar');
+    let calendar;
+
+    // Configuration du calendrier
+    function initCalendar() {
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: {
+                url: "{{ path('app_dashboard_events') }}",
+                failure: function() {
+                    toastr.error('Erreur de chargement des réservations');
+                }
+            },
+            eventDidMount: function(info) {
+                // Style dynamique selon le type de ressource
+                const typeColor = {
+                    'Véhicule': '#4e73df',
+                    'Matériel': '#1cc88a',
+                    'Mobilier': '#36b9cc'
+                };
+                
+                info.el.style.backgroundColor = typeColor[info.event.extendedProps.resourceType] || '#666';
+                info.el.style.borderColor = info.el.style.backgroundColor;
+                info.el.style.cursor = 'pointer';
+                
+                // Tooltip
+                new bootstrap.Tooltip(info.el, {
+                    title: `${info.event.title}\n${info.event.extendedProps.description || ''}`,
+                    placement: 'top',
+                    trigger: 'hover',
+                    container: 'body'
+                });
+            },
+            eventClick: function(info) {
+                const event = info.event;
+                $('#eventTitle').text(event.title);
+                $('#eventDates').html(`
+                    <i class="fas fa-clock mr-2"></i>
+                    ${event.start.toLocaleDateString()} - ${event.end?.toLocaleDateString() || ''}
+                `);
+                $('#eventResource').html(`
+                    <i class="fas fa-cube mr-2"></i>
+                    Type: ${event.extendedProps.resourceType}
+                `);
+                $('#eventStatus').text(event.extendedProps.status).addClass(
+                    event.extendedProps.status === 'Confirmé' ? 'bg-success' : 'bg-warning'
+                );
+                $('#eventModal').modal('show');
+            },
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay listMonth'
+            },
+            locale: 'fr',
+            height: 650,
+            navLinks: true,
+            editable: true,
+            eventResizableFromStart: true,
+            eventDrop: function(info) {
+                updateEvent(info.event);
+            },
+            eventResize: function(info) {
+                updateEvent(info.event);
+            }
+        });
+        calendar.render();
+    }
+
+    // Rafraîchissement manuel
+    $('#refreshCalendar').click(function() {
+        calendar.refetchEvents();
+        toastr.success('Calendrier actualisé');
+    });
+
+    // Mise à jour des événements
+    function updateEvent(event) {
+        $.ajax({
+            url: `/reservations/update/${event.id}`,
+            method: 'PUT',
+            data: {
+                start: event.start.toISOString(),
+                end: event.end ? event.end.toISOString() : null
+            },
+            success: function() {
+                toastr.success('Réservation mise à jour');
+            },
+            error: function() {
+                toastr.error('Erreur de mise à jour');
+                calendar.refetchEvents();
+            }
+        });
+    }
+
+    // Initialisation
+    initCalendar();
+
+    // Légende dynamique
+    const legendHtml = `
+        <div class="fc-legend mt-3">
+            ${Object.entries({
+                'Véhicule': '#4e73df',
+                'Matériel': '#1cc88a',
+                'Mobilier': '#36b9cc'
+            }).map(([label, color]) => `
+                <span class="legend-item mr-3">
+                    <i class="fas fa-square mr-1" style="color:${color}"></i>${label}
+                </span>
+            `).join('')}
+        </div>
+    `;
+    $('#calendar').append(legendHtml);
+});
+
+
+
+
         const ctx = document.getElementById('myAreaChart').getContext('2d');
         const myChart = new Chart(ctx, {
             type: 'line',
@@ -189,5 +427,9 @@
                 }
             }
         });
+
+
+
+        
     </script>
 {% endblock %}
