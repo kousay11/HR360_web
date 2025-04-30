@@ -254,16 +254,37 @@ public function edit(Request $request, Reservation $reservation, EntityManagerIn
 }
 
 
-    #[Route('/{id}', name: 'app_reservation_delete', methods: ['POST'])]
-    public function delete(Request $request, Reservation $reservation, EntityManagerInterface $entityManager, QRCodeService $qrCodeService): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$reservation->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($reservation);
-            $entityManager->flush();
-        }
+#[Route('/{id}', name: 'app_reservation_delete', methods: ['POST'])]
+public function delete(
+    Request $request,
+    Reservation $reservation,
+    EntityManagerInterface $entityManager,
+    QRCodeService $qrCodeService
+): Response {
+    // Vérifie le token CSRF
+    if ($this->isCsrfTokenValid('delete' . $reservation->getId(), $request->getPayload()->getString('_token'))) {
         
-        return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
+        // Vérifie si la réservation commence dans moins de 24h
+        $now = new \DateTime();
+        $debut = $reservation->getDateDebut(); // Assure-toi que c’est bien le champ datetime
+
+        $intervalSeconds = $debut->getTimestamp() - $now->getTimestamp();
+
+        if ($intervalSeconds < 86400) {
+            $this->addFlash('warning', 'Vous ne pouvez pas annuler une réservation qui commence dans moins de 24 heures.');
+            return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        // Supprimer la réservation
+        $entityManager->remove($reservation);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Réservation annulée avec succès.');
     }
+
+    return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
+}
+
 
 
     

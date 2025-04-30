@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use App\Service\RessourceSimilarityService;
+use App\Entity\Notification;
+use App\Entity\Reservation;
 #[Route('/ressource')]
 final class RessourceController extends AbstractController
 {
@@ -179,16 +181,38 @@ public function edit(Request $request, Ressource $ressource, EntityManagerInterf
 }
 
 
-    #[Route('/{id}', name: 'app_ressource_delete', methods: ['POST'])]
-    public function delete(Request $request, Ressource $ressource, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$ressource->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($ressource);
-            $entityManager->flush();
+#[Route('/{id}', name: 'app_ressource_delete', methods: ['POST'])]
+public function delete(Request $request, Ressource $ressource, EntityManagerInterface $entityManager, ReservationRepository $reservationRepository): Response
+{
+    // Vérification du token CSRF
+    if ($this->isCsrfTokenValid('delete'.$ressource->getId(), $request->request->get('_token'))) {
+        
+        // Récupérer toutes les réservations liées à cette ressource
+        $reservations = $reservationRepository->findBy(['ressource' => $ressource]);
+
+        // Créer des notifications pour chaque utilisateur ayant réservé la ressource
+        foreach ($reservations as $reservation) {
+            $notification = new Notification();
+            $notification->setReservationid($reservation->getId());
+            $notification->setUtilisateur($reservation->getUtilisateur()); // Associer l'utilisateur
+            $notification->setMessage('La ressource "' . $ressource->getNom() . '" que vous avez réservée a été supprimée.');
+            $notification->setDate(new \DateTime());
+
+            // Persister la notification
+            $entityManager->persist($notification);
         }
 
-        return $this->redirectToRoute('app_ressource_index', [], Response::HTTP_SEE_OTHER);
+        // Supprimer la ressource
+        $entityManager->remove($ressource);
+        $entityManager->flush();
+
+        // Rediriger après la suppression
+        $this->addFlash('success', 'La ressource a été supprimée avec succès, et les utilisateurs ont été notifiés.');
     }
+
+    return $this->redirectToRoute('app_ressource_index', [], Response::HTTP_SEE_OTHER);
+}
+
 
 
     private function findSimilarResources(Ressource $ressource, array $allResources, int $limit = 5): array
