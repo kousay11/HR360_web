@@ -90,8 +90,8 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
-    #[Assert\NotBlank(message: 'L\'email est obligatoire')]
-    #[Assert\Email(message: 'L\'email {{ value }} n\'est pas valide')]
+    #[Assert\NotBlank(message: "L'email est obligatoire")]
+    #[Assert\Email(message: "L'email {{ value }} n'est pas valide")]
     private ?string $email = null;
     public function getEmail(): ?string
     {
@@ -106,15 +106,13 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
 
 
-    #[ORM\Column]
-    private ?string $password = null;
-
-    #[Assert\NotBlank(message: 'Le mot de passe est obligatoire')]
+    #[ORM\Column(type: 'string')]
     #[Assert\Length(
-        min: 6,
-        minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères'
+        min: 8,
+        minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractères",
+        max: 4096
     )]
-    private ?string $plainPassword = null;
+    private ?string $password = null;
 
 
     public function getPassword(): ?string

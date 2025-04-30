@@ -47,7 +47,6 @@ class RegistrationFormType extends AbstractType
                 'first_options' => [
                     'label' => 'Mot de passe',
                     'constraints' => [
-                        new Assert\NotBlank(['message' => 'Le mot de passe est obligatoire']),
                         new Assert\Length([
                             'min' => 6,
                             'minMessage' => 'Le mot de passe doit faire au moins {{ limit }} caractères'
