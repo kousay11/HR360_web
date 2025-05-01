@@ -4,6 +4,9 @@ parameters:
     cvs_directory: '%kernel.project_dir%/public/uploads/cvs'
     lettres_directory: '%kernel.project_dir%/public/uploads/lettres'
     images_directory: '%kernel.project_dir%/public/uploads/images'
+    recaptcha3_key: '%env(RECAPTCHA3_KEY)%'
+    recaptcha3_secret: '%env(RECAPTCHA3_SECRET)%'
+    env(ABSTRACT_API_KEY): '%env(ABSTRACT_API_KEY)%'
     qrcodes_directory: '%kernel.project_dir%/public/uploads/qrcodes'
     trello_api_key: '6a7939bb3380aa7016622f79c58cde16'
     trello_api_token: 'ATTAd882eb46ac7c80931df7f18f18b551431470e527c82fce94673498351e59116b1A7DD9EE'
@@ -47,6 +50,12 @@ services:
         arguments:
             $accountSid: '%env(twilio_account_sid)%'
             $authToken: '%env(twilio_auth_token)%'
-
+    App\Bundle\EmailVerifierBundle\Service\EmailVerifier:
+        arguments:
+            $apiKey: '%env(ABSTRACT_API_KEY)%'
+        tags:
+            - { name: 'container.service_subscriber' }
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    

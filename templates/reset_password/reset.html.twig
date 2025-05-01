@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouveau mot de passe - HR360</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('front/css/login.css') }}">
+    <style>
+        .password-strength {
+            height: 5px;
+            background: #ddd;
+            margin-top: 5px;
+            border-radius: 3px;
+        }
+        .password-strength-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="auth-form-container">
+                    {{ form_start(resetForm, {'attr': {'class': 'auth-form'}}) }}
+                        <div class="auth-header">
+                            <h2 class="auth-title">Nouveau mot de passe</h2>
+                            <div class="auth-subtitle">Créez un nouveau mot de passe sécurisé</div>
+                        </div>
+
+                        {% if form_errors(resetForm) %}
+                            <div class="auth-alert alert-danger">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form_errors(resetForm) }}
+                            </div>
+                        {% endif %}
+
+                        <div class="form-group">
+                            {{ form_label(resetForm.plainPassword.first, null, {'label_attr': {'class': 'form-label'}}) }}
+                            <div class="input-wrapper">
+                                {{ form_widget(resetForm.plainPassword.first, {'attr': {
+                                    'class': 'form-input',
+                                    'placeholder': '••••••••',
+                                    'data-password-strength': ''
+                                }}) }}
+                                <i class="input-icon fas fa-lock"></i>
+                            </div>
+                            <div class="password-strength">
+                                <div class="password-strength-bar"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form_label(resetForm.plainPassword.second, null, {'label_attr': {'class': 'form-label'}}) }}
+                            <div class="input-wrapper">
+                                {{ form_widget(resetForm.plainPassword.second, {'attr': {
+                                    'class': 'form-input',
+                                    'placeholder': 'Confirmez le mot de passe'
+                                }}) }}
+                                <i class="input-icon fas fa-lock"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="auth-button">
+                                <span class="button-text">Réinitialiser</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    {{ form_end(resetForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Indicateur de force du mot de passe
+        document.querySelector('[data-password-strength]').addEventListener('input', function(e) {
+            const password = e.target.value;
+            const strengthBar = document.querySelector('.password-strength-bar');
+            let strength = 0;
+            
+            if (password.length > 0) strength += 20;
+            if (password.length >= 8) strength += 30;
+            if (/[A-Z]/.test(password)) strength += 20;
+            if (/[0-9]/.test(password)) strength += 20;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 10;
+            
+            strengthBar.style.width = strength + '%';
+            strengthBar.style.background = strength < 50 ? '#dc3545' : strength < 80 ? '#ffc107' : '#28a745';
+        });
+    </script>
+</body>
+</html>
