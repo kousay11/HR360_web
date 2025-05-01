@@ -19,26 +19,26 @@ final class FormationController extends AbstractController
     #[Route('/back', name: 'app_formation_index', methods: ['GET'])]
     public function index(Request $request, FormationRepository $formationRepository): Response
     {
-        $search = $request->query->get('search');
         $page = max(1, (int) $request->query->get('page', 1));
         $limit = 5;
 
-        $formations = $search
-            ? $formationRepository->createQueryBuilder('f')
-            ->where('f.titre LIKE :search')
-            ->setParameter('search', '%' . $search . '%')
-            ->getQuery()
-            ->getResult()
-            : $formationRepository->findAll();
+        $criteria = [
+            'search' => $request->query->get('search'),
+            'min_duration' => $request->query->get('min_duration'),
+            'max_duration' => $request->query->get('max_duration'),
+            'date_from' => $request->query->get('date_from'),
+            'date_to' => $request->query->get('date_to'),
+            'sort' => $request->query->get('sort', 'titre'),
+            'direction' => $request->query->get('direction', 'ASC'),
+        ];
 
-        $total = count($formations);
-        $formations = array_slice($formations, ($page - 1) * $limit, $limit);
+        $result = $formationRepository->searchFormations($criteria, true, $page, $limit);
 
         return $this->render('formation/back/index.html.twig', [
-            'formations' => $formations,
-            'search' => $search,
+            'formations' => $result['results'],
+            'search_params' => $criteria,
             'page' => $page,
-            'total' => $total,
+            'total' => $result['total'],
             'limit' => $limit,
         ]);
     }

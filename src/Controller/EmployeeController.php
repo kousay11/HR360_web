@@ -23,31 +23,29 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 #[Route('/employe')]
 final class EmployeeController extends AbstractController
 {
+    // EmployeeController.php (juste la méthode index)
     #[Route('/', name: 'app_utilisateur_index', methods: ['GET'])]
     public function index(UtilisateurRepository $utilisateurRepository, Request $request): Response
     {
-        $search = $request->query->get('search');
+        $criteria = [
+            'search' => $request->query->get('search'),
+            'min_salary' => $request->query->get('min_salary'),
+            'max_salary' => $request->query->get('max_salary'),
+            'poste' => $request->query->get('poste'),
+            'sort' => $request->query->get('sort', 'nom'),
+            'direction' => $request->query->get('direction', 'ASC'),
+        ];
 
-        $queryBuilder = $utilisateurRepository->createQueryBuilder('u')
-            ->where('u.role = :role')
-            ->setParameter('role', 'Employe'); // ✅ on filtre que les employés
-
-        if ($search) {
-            $queryBuilder
-                ->andWhere('u.nom LIKE :search OR u.prenom LIKE :search OR u.email LIKE :search')
-                ->setParameter('search', '%' . $search . '%');
-        }
-
-        $utilisateurs = $queryBuilder
-            ->orderBy('u.nom', 'ASC')
-            ->getQuery()
-            ->getResult();
+        $utilisateurs = $utilisateurRepository->searchEmployees($criteria);
+        $postes = $utilisateurRepository->findDistinctPostes();
 
         return $this->render('utilisateur/index.html.twig', [
             'utilisateurs' => $utilisateurs,
-            'search' => $search,
+            'postes' => $postes,
+            'search_params' => $criteria,
         ]);
     }
+
 
 
 
@@ -260,3 +258,8 @@ final class EmployeeController extends AbstractController
         return $this->redirectToRoute('app_utilisateur_index');
     }
 }
+
+
+
+
+
