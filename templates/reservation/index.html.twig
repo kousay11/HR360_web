@@ -8,6 +8,57 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('front/css/project-card.css')}}" rel="stylesheet" >
     <style>
+
+        /* Style pour les boutons principaux */
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+
+    .action-buttons .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        padding: 10px 20px;
+    }
+
+    .action-buttons .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    .action-buttons .btn-secondary:hover {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-new-reservation {
+        background-color: #dc3545;
+        color: white;
+        font-weight: 500;
+        padding: 10px 20px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        border: none;
+    }
+
+    .btn-new-reservation:hover {
+        background-color: #bb2d3b;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    }
+
+
         /* Style personnalisé pour les réservations */
         .reservation-card {
             background: #fff;
@@ -160,7 +211,33 @@
         <p>Gérez vos réservations de ressources</p>
     </div>
 
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+
+
+
     <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+            <div>
+    <a href="{{ path('generate_pdf') }}" class="btn btn-outline-primary mb-4">
+        <i class="fas fa-file-pdf"></i> Télécharger PDF
+    </a>
+
+
+
+    <a href="{{ path('app_reservation_history') }}" class="btn btn-outline-primary mb-4">
+     Voir l'historique complet
+    </a>
+    </div>
+
         <a href="{{ path('app_ressource_index_employee') }}" class="btn btn-outline-danger">
             <i class="bi bi-plus-circle"></i> Nouvelle réservation
         </a>
@@ -232,9 +309,6 @@
                 <i class="bi bi-calendar-x" style="font-size: 3rem; color: #ddd;"></i>
                 <h3>Aucune réservation trouvée</h3>
                 <p>Vous n'avez pas encore fait de réservation.</p>
-                <a href="{{ path('app_reservation_new') }}" class="btn-new-reservation">
-                    <i class="bi bi-plus-circle"></i> Créer une première réservation
-                </a>
             </div>
         {% endif %}
     </div>

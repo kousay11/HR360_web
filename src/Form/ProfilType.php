@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Form;
 
 use App\Entity\User;
@@ -36,7 +35,6 @@ class ProfilType extends AbstractType
                 'empty_data' => '',
                 'attr' => ['class' => 'form-control']
             ])
-
             ->add('competence', TextareaType::class, [
                 'label' => 'Compétences',
                 'required' => true,
@@ -51,7 +49,6 @@ class ProfilType extends AbstractType
                     ]),
                 ],
             ])
-
             ->add('image', FileType::class, [
                 'label' => 'Photo de profil',
                 'required' => true,

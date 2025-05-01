@@ -6,9 +6,68 @@
     {{ parent() }}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="{{ asset('front/css/project-card.css') }}" rel="stylesheet" >
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
+
+        /* Style des cartes pour les ressources recommandées */
+        .card-recommendation {
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card-recommendation:hover {
+            transform: translateY(-10px);
+        }
+
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .btn-recommendation {
+            background-color: #198754;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-recommendation:hover {
+            background-color: #157347;
+        }
+
+        .recommendation-card-body {
+            padding: 15px;
+        }
+
+        .resource-title {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .resource-info {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .resource-price {
+            font-size: 1.1em;
+            color: #198754;
+        }
+
+        .resource-status {
+            font-size: 0.9em;
+        }
+
+
+        /* Couleur rouge pour les dates désactivées */
+        .flatpickr-day.disabled {
+            background-color: #ff6b6b !important;
+            color: white !important;
+            cursor: not-allowed !important;
+        }
         .status-form-container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
         }
 
@@ -54,6 +113,23 @@
         .btn-delete:hover {
             background-color: #c82333;
         }
+
+        .card-recommendation img {
+    transition: transform 0.3s ease;
+    border-top-left-radius: .5rem;
+    border-top-right-radius: .5rem;
+}
+
+.card-recommendation:hover img {
+    transform: scale(1.05);
+}
+
+.badge {
+    padding: 0.5em 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
     </style>
 {% endblock %}
 
@@ -112,6 +188,57 @@
                 </div>
             {{ form_end(form) }}
 
+            {% if recommendations is not empty %}
+    <div class="mt-5">
+        <h4 class="mb-4">Ressources recommandées :</h4>
+        <div class="row">
+            {% for ressource in recommendations %}
+                <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+                    <div class="card card-recommendation mb-4">
+                        <div class="position-relative">
+                            <img src="{{ asset('uploads/images/' ~ ressource.image) }}" class="card-img-top" alt="{{ ressource.nom }}">
+                            <span class="badge 
+                                {% if ressource.etat == 'Disponible' %}
+                                    bg-success
+                                {% else %}
+                                    bg-secondary
+                                {% endif %}
+                                position-absolute top-0 end-0 m-2"
+                                style="font-size: 0.8em;">
+                                {{ ressource.etat }}
+                            </span>
+                        </div>
+
+                        <div class="card-body recommendation-card-body d-flex flex-column">
+                            <h5 class="resource-title mb-2">{{ ressource.nom }}</h5>
+
+                            <p class="resource-info mb-2">
+                                Type : {{ ressource.type }}
+                            </p>
+
+                            <p class="resource-price mb-3">
+                                {{ ressource.prix | number_format(2, '.', ' ') }} DT
+                            </p>
+
+                            <a href="{{ path('app_reservation_new', {'ressourceId': ressource.id}) }}" class="btn btn-recommendation mt-auto">
+                                <i class="fas fa-check"></i> Réserver cette ressource
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+
+
+
+
+
+
+
+
             <div class="d-flex justify-content-between mt-4">
                 {{ include('reservation/_delete_form.html.twig', {
                     'button_label': '<i class="fas fa-trash"></i> Supprimer',
@@ -121,4 +248,29 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+
+
+{% block js %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const reservedDates = {{ reservedDates|json_encode()|raw }};
+            
+            flatpickr("#{{ form.datedebut.vars.id }}", {
+                dateFormat: "Y-m-d",
+                disable: reservedDates,
+                locale: "fr"
+            });
+
+            flatpickr("#{{ form.datefin.vars.id }}", {
+                dateFormat: "Y-m-d",
+                disable: reservedDates,
+                locale: "fr"
+            });
+        });
+    </script>
 {% endblock %}
