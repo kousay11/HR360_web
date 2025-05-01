@@ -66,6 +66,30 @@ final class ParticipationController extends AbstractController
         return $this->redirectToRoute('app_formation_front_index');
     }
 
+
+    #[Route('/front/{id}/cancel', name: 'app_participation_front_cancel', methods: ['POST'])]
+    public function cancelFront(Request $request, Participation $participation, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+
+        // Vérification que l'utilisateur est bien le participant
+        if ($participation->getIdUser() !== $user) {
+            throw $this->createAccessDeniedException("Vous ne pouvez pas annuler cette participation.");
+        }
+
+        // Vérification du token CSRF
+        if ($this->isCsrfTokenValid('cancel' . $participation->getId(), $request->request->get('_token'))) {
+            $entityManager->remove($participation);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre participation a été annulée avec succès.');
+        } else {
+            $this->addFlash('error', 'Token invalide, veuillez réessayer.');
+        }
+
+        return $this->redirectToRoute('app_participation_front_index');
+    }
+
     // ----------------- BACK -----------------
 
     /*#[Route('/back', name: 'app_participation_back_index', methods: ['GET'])]

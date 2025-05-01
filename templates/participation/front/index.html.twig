@@ -1,6 +1,7 @@
 {% extends 'baseEMP.html.twig' %}
 
-{% block title %}Mes Participations - HR360{% endblock %}
+{% block title %}Mes Participations - HR360
+{% endblock %}
 
 {% block css %}
 	{{ parent() }}
@@ -8,51 +9,154 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="{{ asset('front/css/project-card.css') }}">
 	<link href="{{ asset('back/css/buttons.css') }}" rel="stylesheet">
-
+	<style>
+		.cancel-btn {
+			transition: all 0.3s ease;
+			background-color: #ff4444;
+			color: white;
+			border: none;
+			padding: 8px 15px;
+			border-radius: 5px;
+			font-size: 14px;
+		}
+		.cancel-btn:hover {
+			background-color: #cc0000;
+			transform: translateY(-2px);
+		}
+		.entity-footer {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 15px;
+			border-top: 1px solid rgba(0, 0, 0, 0.1);
+		}
+		.status-badge {
+			padding: 5px 10px;
+			border-radius: 20px;
+			font-size: 12px;
+			font-weight: bold;
+		}
+		.status-upcoming {
+			background-color: #ffc107;
+			color: #000;
+		}
+		.status-completed {
+			background-color: #28a745;
+			color: white;
+		}
+	</style>
 {% endblock %}
 
 {% block index %}
-<section id="participations" class="section">
-	<div class="container section-title" data-aos="fade-up">
-		<h2>Mes Participations</h2>
-		<p>Liste des formations auxquelles vous avez participé</p>
-	</div>
-
-	<div class="container">
-		<div class="row">
-			{% for participation in participations %}
-				<div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
-					<div class="card entity-card">
-						<div class="card-header entity-header">
-							<i class="fas fa-user-check entity-icon"></i>
-							<h5 class="entity-title">{{ participation.idFormation.titre }}</h5>
-						</div>
-
-						<div class="card-body entity-body">
-							<p><i class="fas fa-user"></i> {{ participation.idUser.nom }} {{ participation.idUser.prenom }}</p>
-						</div>
-					</div>
-				</div>
-			{% else %}
-				<div class="col-12" data-aos="fade-up">
-					<div class="alert alert-info text-center">
-						<i class="fas fa-info-circle"></i> Vous n'avez participé à aucune formation pour le moment.
-					</div>
-				</div>
-			{% endfor %}
+	<section id="participations" class="section">
+		<div class="container section-title" data-aos="fade-up">
+			<h2>Mes Participations</h2>
+			<p>Liste des formations auxquelles vous avez participé</p>
 		</div>
-	</div>
-</section>
+
+		<div class="container">
+			<div class="row">
+				{% for participation in participations %}
+					<div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+						<div class="card entity-card">
+							<div class="card-header entity-header">
+								<i class="fas fa-user-check entity-icon"></i>
+								<h5 class="entity-title">{{ participation.idFormation.titre }}</h5>
+							</div>
+
+							<div class="card-body entity-body">
+								<p>
+									<i class="fas fa-user"></i>
+									{{ participation.idUser.nom }}
+									{{ participation.idUser.prenom }}</p>
+								<p>
+									<i class="fas fa-calendar-day"></i>
+									<strong>Date de la formation:</strong>
+									{{ participation.idFormation.dateFormation|date('d/m/Y') }}</p>
+
+								{% set formationStatus = participation.idFormation.dateFormation > date() ? 'upcoming' : 'completed' %}
+								<span class="status-badge status-{{ formationStatus }}">
+									{{ formationStatus == 'upcoming' ? 'À venir' : 'Terminée' }}
+								</span>
+							</div>
+
+							<div
+								class="entity-footer">
+								{# Conversion de la date string en objet DateTime pour comparaison #}
+								{% set formationDate = participation.idFormation.dateFormation|date('Y-m-d') %}
+								{% set currentDate = "now"|date('Y-m-d') %}
+
+								{# Debug: Afficher les dates pour vérification #}
+								{# <small class="text-muted d-block">
+								        Debug: Date formation: {{ formationDate }}, Date actuelle: {{ currentDate }}
+								    </small> #}
+
+									{% if formationDate > currentDate %}
+										<form method="post" action="{{ path('app_participation_front_cancel', {'id': participation.id}) }}" class="d-inline" onsubmit="return confirmParticipationCancellation(event)"> <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ participation.id) }}">
+
+										<button type="submit" class="cancel-btn" title="Annuler ma participation">
+											<i class="fas fa-times-circle"></i>
+											Annuler
+										</button>
+									</form>
+								{% else %}
+									<div class="participation-status">
+										<span class="text-muted">
+											<i class="fas fa-check-circle text-success"></i>
+											Participation confirmée
+										</span>
+									</div>
+								{% endif %}
+
+								<a href="{{ path('app_participation_front_index', {'id': participation.idFormation.id}) }}" class="btn btn-sm btn-outline-primary" title="Voir les détails de la formation">
+									<i class="fas fa-info-circle"></i>
+									Détails
+								</a>
+							</div>
+
+							  <script>
+									function confirmParticipationCancellation(event) {
+									if (!confirm("Êtes-vous certain de vouloir annuler votre participation ?\n\nCette action est irréversible.")) {
+									event.preventDefault();
+									return false;
+									}
+									return true;
+									}
+								</script>
+						</div>
+					</div>
+				{% else %}
+					<div class="col-12" data-aos="fade-up">
+						<div class="alert alert-info text-center">
+							<i class="fas fa-info-circle"></i>
+							Vous n'avez participé à aucune formation pour le moment.
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	</section>
 {% endblock %}
 
 {% block js %}
 	{{ parent() }}
 	<script>
 		document.addEventListener('DOMContentLoaded', function () {
-			const cards = document.querySelectorAll('.entity-card');
-			cards.forEach((card, index) => {
-				card.style.animationDelay = `${index * 0.1}s`;
-			});
-		});
+const cards = document.querySelectorAll('.entity-card');
+cards.forEach((card, index) => {
+card.style.animationDelay = `${
+index * 0.1
+}s`;
+});
+
+// Ajout d'une confirmation supplémentaire pour l'annulation
+document.querySelectorAll('.cancel-btn').forEach(button => {
+button.addEventListener('click', function (e) {
+if (!confirm('Cette action est irréversible. Confirmez-vous l\'annulation de votre participation ?')) {
+e.preventDefault();
+}
+});
+});
+});
 	</script>
 {% endblock %}

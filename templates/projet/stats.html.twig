@@ -1,0 +1,205 @@
+{% extends 'baseRH.html.twig' %}
+
+{% block title %}Project Statistics{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.css">
+    <link rel="stylesheet" href="{{ asset('front/css/styleStats.css') }}">
+{% endblock %}
+
+{% block heading %}
+    
+
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <i class="fas fa-chart-pie fa-2x text-primary"></i>
+                <h2 class="mb-0">Project Statistics</h2>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ path('app_projet_stats_export') }}" class="btn btn-success">
+                    <i class="fas fa-file-excel"></i> Export to Excel
+                </a>
+                <a href="{{ path('app_projet_index') }}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i> Back to Projects
+                </a>
+            </div>
+        </div>
+    </div>
+<div class="container stats-container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title"><i class="fas fa-users"></i> Projects per Team</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="projetsParEquipeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-info text-white">
+                    <h3 class="card-title"><i class="fas fa-tasks"></i> Tasks per Project (Top 6)</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="tachesParProjetChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-success text-white">
+                    <h3 class="card-title"><i class="fas fa-chart-line"></i> Projects Timeline</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="evolutionProjetsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Chart 1: Projets par équipe
+    const ctx1 = document.getElementById('projetsParEquipeChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: {{ projetsParEquipe|map(p => p.equipe_nom)|json_encode|raw }},
+            datasets: [{
+                label: 'Number of Projects',
+                data: {{ projetsParEquipe|map(p => p.count)|json_encode|raw }},
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(255, 206, 86, 0.7)',
+                    'rgba(153, 102, 255, 0.7)',
+                    'rgba(255, 159, 64, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // Chart 2: Tâches par projet
+    const ctx2 = document.getElementById('tachesParProjetChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: {{ topProjetsParTaches|map(p => p.projet_nom)|json_encode|raw }},
+            datasets: [{
+                label: 'Number of Tasks',
+                data: {{ topProjetsParTaches|map(p => p.count)|json_encode|raw }},
+                backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // Chart 3: Évolution des projets
+    const ctx3 = document.getElementById('evolutionProjetsChart').getContext('2d');
+    const evolutionData = {{ evolutionProjets|json_encode|raw }};
+    
+    // Préparer les données pour le graphique
+    const labels = evolutionData.map(item => item.mois);
+    const startedData = evolutionData.map(item => item.debut);
+    const endedData = evolutionData.map(item => item.fin);
+
+    new Chart(ctx3, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Projets Démarrés',
+                    data: startedData,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                },
+                {
+                    label: 'Projets Terminés', 
+                    data: endedData,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
