@@ -104,4 +104,33 @@ class TacheRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getDelayedTasksPercentage(Projet $projet): array
+    {
+        $now = new \DateTime();
+        
+        $totalTasks = $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->where('t.projet = :projet')
+            ->setParameter('projet', $projet)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $delayedTasks = $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->where('t.projet = :projet')
+            ->andWhere('t.statut != :status')
+            ->andWhere('t.dateFin < :now')
+            ->setParameter('projet', $projet)
+            ->setParameter('status', 'Terminée')
+            ->setParameter('now', $now)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return [
+            'total' => (int)$totalTasks,
+            'delayed' => (int)$delayedTasks,
+            'percentage' => $totalTasks > 0 ? round(($delayedTasks / $totalTasks) * 100) : 0
+        ];
+    }
 }

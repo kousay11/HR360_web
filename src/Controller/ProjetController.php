@@ -178,11 +178,15 @@ final class ProjetController extends AbstractController
             : 0;
         $completionPercentage = round($completionPercentage, 2);
 
+        // Get delayed tasks percentage
+        $delayedTasks = $tacheRepository->getDelayedTasksPercentage($projet);
+
         return $this->render('projet/show.html.twig', [
             'projet' => $projet,
             'taches' => $taches,
             'counts' => $counts,
-            'completionPercentage' => $completionPercentage
+            'completionPercentage' => $completionPercentage,
+            'delayedTasks' => $delayedTasks
         ]);
     }
 
