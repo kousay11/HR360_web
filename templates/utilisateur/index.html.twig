@@ -1,233 +1,299 @@
 {% extends 'baseRH.html.twig' %}
 
-{% block title %}Gestion des Employés - HR360{% endblock %}
+{% block title %}Gestion des Employés - HR360
+{% endblock %}
 
-{% block heading %}Gestion des Employés{% endblock %}
+{% block heading %}Gestion des Employés
+{% endblock %}
 {% block css %}
-    {{ parent() }}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('back/css/project-card.css') }}">
-    <link href="{{ asset('back/css/buttons.css') }}" rel="stylesheet">
-    <style>
-        .entity-card {
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-            height: 100%;
-        }
-        
-        .entity-card:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-            transform: translateY(-2px);
-        }
-        
-        .entity-header {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-        }
-        
-        .employee-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 15px;
-            border: 2px solid #4e73df;
-        }
-        
-        .entity-title {
-            margin: 0;
-            font-size: 1.1rem;
-            color: #2c3e50;
-            flex-grow: 1;
-        }
-        
-        .employee-role {
-            font-size: 0.8rem;
-            color: #6c757d;
-        }
-        
-        .entity-body {
-            padding: 15px;
-        }
-        
-        .employee-meta {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-        }
-        
-        .employee-meta i {
-            margin-right: 8px;
-            color: #6c757d;
-            width: 20px;
-            text-align: center;
-        }
-        
-        .entity-footer {
-            padding: 15px;
-            border-top: 1px solid #eee;
-            background-color: #f8f9fa;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .btn-view {
-            background-color: #36b9cc;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-        
-        .btn-modify {
-            background-color: #f6c23e;
-            color: #2c3e50;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-        
-        .btn-delete {
-            background-color: #e74a3b;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-        
-        .search-container {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-        }
-        
-        .search-container input {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            flex-grow: 1;
-        }
-        
-        .search-container button {
-            background-color: #4e73df;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-        }
-        
-        .add-btn {
-            background-color: #1cc88a;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            display: inline-block;
-        }
-        
-        @media (max-width: 768px) {
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .employee-meta {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .employee-meta i {
-                margin-bottom: 5px;
-            }
-        }
-    </style>
+	{{ parent() }}
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="{{ asset('back/css/project-card.css') }}">
+	<link href="{{ asset('back/css/buttons.css') }}" rel="stylesheet">
+	<style>
+		.entity-card {
+			border: 1px solid #e0e0e0;
+			border-radius: 8px;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			margin-bottom: 20px;
+			transition: all 0.3s ease;
+			height: 100%;
+		}
+
+		.entity-card:hover {
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+			transform: translateY(-2px);
+		}
+
+		.entity-header {
+			padding: 15px;
+			border-bottom: 1px solid #eee;
+			display: flex;
+			align-items: center;
+		}
+
+		.employee-image {
+			width: 60px;
+			height: 60px;
+			border-radius: 50%;
+			object-fit: cover;
+			margin-right: 15px;
+			border: 2px solid #4e73df;
+		}
+
+		.entity-title {
+			margin: 0;
+			font-size: 1.1rem;
+			color: #2c3e50;
+			flex-grow: 1;
+		}
+
+		.employee-role {
+			font-size: 0.8rem;
+			color: #6c757d;
+		}
+
+		.entity-body {
+			padding: 15px;
+		}
+
+		.employee-meta {
+			display: flex;
+			align-items: center;
+			margin-bottom: 10px;
+			font-size: 0.9rem;
+		}
+
+		.employee-meta i {
+			margin-right: 8px;
+			color: #6c757d;
+			width: 20px;
+			text-align: center;
+		}
+
+		.entity-footer {
+			padding: 15px;
+			border-top: 1px solid #eee;
+			background-color: #f8f9fa;
+		}
+
+		.action-buttons {
+			display: flex;
+			gap: 8px;
+		}
+
+		.btn-view {
+			background-color: #36b9cc;
+			color: white;
+			border: none;
+			padding: 6px 12px;
+			border-radius: 4px;
+			font-size: 0.85rem;
+		}
+
+		.btn-modify {
+			background-color: #f6c23e;
+			color: #2c3e50;
+			border: none;
+			padding: 6px 12px;
+			border-radius: 4px;
+			font-size: 0.85rem;
+		}
+
+		.btn-delete {
+			background-color: #e74a3b;
+			color: white;
+			border: none;
+			padding: 6px 12px;
+			border-radius: 4px;
+			font-size: 0.85rem;
+		}
+
+		.search-container {
+			margin-bottom: 20px;
+			display: flex;
+			gap: 10px;
+		}
+
+		.search-container input {
+			padding: 8px 12px;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			flex-grow: 1;
+		}
+
+		.search-container button {
+			background-color: #4e73df;
+			color: white;
+			border: none;
+			padding: 8px 16px;
+			border-radius: 4px;
+		}
+
+		/* Ajouter dans la section style */
+		.search-container .form-label {
+			font-size: 0.85rem;
+			margin-bottom: 0.3rem;
+			color: #6c757d;
+		}
+
+		.search-container .form-select {
+			padding: 8px 12px;
+		}
+
+		.search-container .row {
+			margin-bottom: 10px;
+		}
+
+		.add-btn {
+			background-color: #1cc88a;
+			color: white;
+			border: none;
+			padding: 8px 16px;
+			border-radius: 4px;
+			margin-bottom: 20px;
+			display: inline-block;
+		}
+
+		@media(max-width: 768px) {
+			.action-buttons {
+				flex-direction: column;
+			}
+
+			.employee-meta {
+				flex-direction: column;
+				align-items: flex-start;
+			}
+
+			.employee-meta i {
+				margin-bottom: 5px;
+			}
+		}
+	</style>
 {% endblock %}
 
 {% block body %}
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">    
-        <a href="{{ path('app_utilisateur_new') }}" class="add-btn">
-            <i class="fas fa-plus"></i> Ajouter un employé
-        </a>
-    </div>
+	<div class="container">
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<a href="{{ path('app_utilisateur_new') }}" class="add-btn">
+				<i class="fas fa-plus"></i>
+				Ajouter un employé
+			</a>
+		</div>
 
-    <div class="search-container">
-        <form method="get" action="{{ path('app_utilisateur_index') }}" class="d-flex w-100" style="gap: 10px;">
-            <input type="text" name="search" placeholder="Rechercher par nom..." value="{{ app.request.query.get('search') ?? '' }}">
-            <button type="submit">
-                <i class="fas fa-search"></i> Rechercher
-            </button>
-            <a href="{{ path('app_utilisateur_index') }}" class="btn btn-secondary">
-                <i class="fas fa-sync-alt"></i> Réinitialiser
-            </a>
-        </form>
-    </div>
+		<div class="search-container">
+			<form method="get" action="{{ path('app_utilisateur_index') }}" class="d-flex flex-column w-100" style="gap: 15px;">
+				<div class="row">
+					<div class="col-md-6">
+						<input type="text" name="search" placeholder="Rechercher par nom, prénom, email ou poste..." value="{{ search_params.search ?? '' }}" class="form-control">
+					</div>
+					<div class="col-md-3">
+						<select name="poste" class="form-select">
+							<option value="">Tous les postes</option>
+							{% for poste in postes %}
+								<option value="{{ poste }}" {{ search_params.poste == poste ? 'selected' : '' }}>
+									{{ poste }}
+								</option>
+							{% endfor %}
+						</select>
+					</div>
+					<div class="col-md-3 d-flex" style="gap: 10px;">
+						<button type="submit" class="btn btn-primary flex-grow-1">
+							<i class="fas fa-search"></i>
+							Appliquer
+						</button>
+						<a href="{{ path('app_utilisateur_index') }}" class="btn btn-secondary">
+							<i class="fas fa-sync-alt"></i>
+						</a>
+					</div>
+				</div>
 
-    <div class="row">
-        {% for utilisateur in utilisateurs %}
-        <div class="col-md-4 mb-4">
-            <div class="entity-card">
-                <div class="entity-header">
-                    {% if utilisateur.image %}
-                        <img src="{{ asset('uploads/images/' ~ utilisateur.image) }}" class="employee-image" alt="{{ utilisateur.prenom }} {{ utilisateur.nom }}">
-                    {% else %}
-                        <img src="{{ asset('back/img/undraw_profile.svg') }}" class="employee-image" alt="Photo par défaut">
-                    {% endif %}
-                    <div>
-                        <h5 class="entity-title">{{ utilisateur.prenom }} {{ utilisateur.nom }}</h5>
-                        <span class="employee-role">{{ utilisateur.role }}</span>
-                    </div>
-                </div>
-                <div class="entity-body">
-                    <div class="employee-meta">
-                        <i class="fas fa-envelope"></i>
-                        <span>{{ utilisateur.email }}</span>
-                    </div>
-                    <div class="employee-meta">
-                        <i class="fas fa-user-tag"></i>
-                        <span>{{ utilisateur.poste ?? 'Non spécifié' }}</span>
-                    </div>
-                    <div class="employee-meta">
-                        <i class="fas fa-money-bill-wave"></i>
-                        <span>Salaire: {{ utilisateur.salaire ? utilisateur.salaire ~ '€' : 'Non spécifié' }}</span>
-                    </div>
-                </div>
-                <div class="entity-footer">
-                    <div class="action-buttons">
-                        <a href="{{ path('app_utilisateur_show', {'id': utilisateur.id}) }}" class="btn btn-view">
-                            <i class="fas fa-eye"></i> Voir
-                        </a>
-                        <a href="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" class="btn btn-modify">
-                            <i class="fas fa-edit"></i> Modifier
-                        </a>
-                        <form method="post" action="{{ path('app_utilisateur_delete', {'id': utilisateur.id}) }}" style="display: inline;">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ utilisateur.id) }}">
-                            <button type="submit" class="btn btn-delete" onclick="return confirm('Confirmer la suppression ?')">
-                                <i class="fas fa-trash"></i> Supprimer
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% else %}
-        <div class="col-12">
-            <div class="alert alert-info">Aucun employé trouvé</div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
+				<div class="row">
+					<div class="col-md-3">
+						<label for="min_salary" class="form-label">Salaire min</label>
+						<input type="number" name="min_salary" id="min_salary" value="{{ search_params.min_salary ?? '' }}" class="form-control" placeholder="€">
+					</div>
+					<div class="col-md-3">
+						<label for="max_salary" class="form-label">Salaire max</label>
+						<input type="number" name="max_salary" id="max_salary" value="{{ search_params.max_salary ?? '' }}" class="form-control" placeholder="€">
+					</div>
+					<div class="col-md-6">
+						<label class="form-label">Trier par</label>
+						<div class="d-flex" style="gap: 10px;">
+							<select name="sort" class="form-select">
+								<option value="nom" {{ search_params.sort == 'nom' ? 'selected' : '' }}>Nom</option>
+								<option value="prenom" {{ search_params.sort == 'prenom' ? 'selected' : '' }}>Prénom</option>
+								<option value="salaire" {{ search_params.sort == 'salaire' ? 'selected' : '' }}>Salaire</option>
+								<option value="dateEmbauche" {{ search_params.sort == 'dateEmbauche' ? 'selected' : '' }}>Date d'embauche</option>
+							</select>
+							<select name="direction" class="form-select">
+								<option value="ASC" {{ search_params.direction == 'ASC' ? 'selected' : '' }}>Croissant</option>
+								<option value="DESC" {{ search_params.direction == 'DESC' ? 'selected' : '' }}>Décroissant</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<div class="row">
+			{% for utilisateur in utilisateurs %}
+				<div class="col-md-4 mb-4">
+					<div class="entity-card">
+						<div class="entity-header">
+							{% if utilisateur.image %}
+								<img src="{{ asset('uploads/images/' ~ utilisateur.image) }}" class="employee-image" alt="{{ utilisateur.prenom }} {{ utilisateur.nom }}">
+							{% else %}
+								<img src="{{ asset('back/img/undraw_profile.svg') }}" class="employee-image" alt="Photo par défaut">
+							{% endif %}
+							<div>
+								<h5 class="entity-title">{{ utilisateur.prenom }}
+									{{ utilisateur.nom }}</h5>
+								<span class="employee-role">{{ utilisateur.role }}</span>
+							</div>
+						</div>
+						<div class="entity-body">
+							<div class="employee-meta">
+								<i class="fas fa-envelope"></i>
+								<span>{{ utilisateur.email }}</span>
+							</div>
+							<div class="employee-meta">
+								<i class="fas fa-user-tag"></i>
+								<span>{{ utilisateur.poste ?? 'Non spécifié' }}</span>
+							</div>
+							<div class="employee-meta">
+								<i class="fas fa-money-bill-wave"></i>
+								<span>Salaire:
+									{{ utilisateur.salaire ? utilisateur.salaire ~ '€' : 'Non spécifié' }}</span>
+							</div>
+						</div>
+						<div class="entity-footer">
+							<div class="action-buttons">
+								<a href="{{ path('app_utilisateur_show', {'id': utilisateur.id}) }}" class="btn btn-view">
+									<i class="fas fa-eye"></i>
+									Voir
+								</a>
+								<a href="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" class="btn btn-modify">
+									<i class="fas fa-edit"></i>
+									Modifier
+								</a>
+								<form method="post" action="{{ path('app_utilisateur_delete', {'id': utilisateur.id}) }}" style="display: inline;">
+									<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ utilisateur.id) }}">
+									<button type="submit" class="btn btn-delete" onclick="return confirm('Confirmer la suppression ?')">
+										<i class="fas fa-trash"></i>
+										Supprimer
+									</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			{% else %}
+				<div class="col-12">
+					<div class="alert alert-info">Aucun employé trouvé</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
 {% endblock %}

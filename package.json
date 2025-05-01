@@ -1,0 +1,40 @@
+{
+  "name": "hr360-web",
+  "version": "1.0.0",
+  "devDependencies": {
+    "@babel/core": "^7.27.1",
+    "@babel/preset-env": "^7.27.1",
+    "@symfony/webpack-encore": "^4.7.0",
+    "babel-loader": "^10.0.0",
+    "css-loader": "^6.11.0",
+    "file-loader": "^6.2.0",
+    "postcss-loader": "^7.3.4",
+    "sass": "^1.87.0",
+    "sass-loader": "^13.3.3",
+    "style-loader": "^3.3.4",
+    "webpack-notifier": "^1.15.0"
+  },
+  "dependencies": {
+    "@fullcalendar/core": "^6.1.17",
+    "@fullcalendar/interaction": "^6.1.17",
+    "@fullcalendar/resource-timeline": "^6.1.17",
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.2",
+    "chart.js": "^4.4.1",
+    "jspdf": "^3.0.1",
+    "toastr": "^2.1.4"
+  },
+  "scripts": {
+    "dev": "encore dev",
+    "watch": "encore dev --watch",
+    "build": "encore production"
+  },
+  "main": "webpack.config.js",
+  "directories": {
+    "test": "tests"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

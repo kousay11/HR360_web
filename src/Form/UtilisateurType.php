@@ -71,6 +71,9 @@ class UtilisateurType extends AbstractType
                     new Assert\NotBlank([
                         'message' => 'Veuillez sélectionner une image'
                     ]),
+                    new NotBlank([
+                        'message' => 'Veuillez sélectionner une image'
+                    ]),
                     new Assert\File([
                         'maxSize' => '2M',
                         'mimeTypes' => [

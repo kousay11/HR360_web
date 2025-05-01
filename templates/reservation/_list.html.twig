@@ -1,0 +1,77 @@
+{% block stylesheets %}
+    <style>
+        .reservation-list {
+            margin-top: 20px;
+        }
+
+        .reservation-list .card {
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .reservation-list .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        .text-muted {
+            font-size: 0.95rem;
+            color: #6c757d;
+        }
+
+        .btn-outline-danger {
+            border: 1px solid #dc3545;
+            color: #dc3545;
+        }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .alert-info {
+            background-color: #e9f7fc;
+            color: #0c5460;
+            border-color: #bee5eb;
+        }
+    </style>
+{% endblock %}
+
+<div class="reservation-list">
+    {% for reservation in reservations %}
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">{{ reservation.ressource.nom }}</h5>
+                <div class="text-muted mb-2">
+                    <strong>{{ reservation.datedebut|date('d/m/Y') }}</strong> 
+                    → 
+                    <strong>{{ reservation.datefin|date('d/m/Y') }}</strong>
+                </div>
+                
+                {% if can_cancel|default(false) %}
+                    <form method="post" 
+                          action="{{ path('app_reservation_delete', {'id': reservation.id}) }}" 
+                          onsubmit="return confirm('Confirmer l\'annulation ?')">
+                        <input type="hidden" name="_token" 
+                               value="{{ csrf_token('delete' ~ reservation.id) }}">
+                        <button class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-times"></i> Annuler
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">Aucune réservation</div>
+    {% endfor %}
+</div>
