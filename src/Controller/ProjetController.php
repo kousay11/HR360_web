@@ -17,6 +17,7 @@ use App\Repository\ProjetequipeRepository;
 use App\Repository\EquipeRepository;
 use App\Entity\Tache;
 use App\Service\TrelloApiService;
+use App\Service\WorkloadGenerator;
 
 #[Route('/projet')]
 final class ProjetController extends AbstractController
@@ -60,7 +61,7 @@ final class ProjetController extends AbstractController
     }
 
     #[Route('/projet/{id}/associate-team', name: 'app_projet_associate_team', methods: ['GET', 'POST'])]
-    public function associateTeam(Request $request, Projet $projet, EntityManagerInterface $entityManager): Response
+    public function associateTeam(Request $request, Projet $projet, EntityManagerInterface $entityManager, WorkloadGenerator $workloadGenerator): Response
     {
         $equipes = $entityManager->getRepository(Equipe::class)->findAll();
 
@@ -68,6 +69,7 @@ final class ProjetController extends AbstractController
             $equipeId = $request->request->get('equipe');
             $equipe = $entityManager->getRepository(Equipe::class)->find($equipeId);
 
+            // Create new project-team association
             $projetEquipe = new Projetequipe();
             $projetEquipe->setProjet($projet);
             $projetEquipe->setEquipe($equipe);
@@ -75,12 +77,24 @@ final class ProjetController extends AbstractController
             $entityManager->persist($projetEquipe);
             $entityManager->flush();
 
+            $this->addFlash('success', 'Team successfully associated with project.');
             return $this->redirectToRoute('app_projet_show', ['id' => $projet->getId()]);
+        }
+
+        // Calculate workload for each team using the existing WorkloadGenerator
+        $workloads = [];
+        foreach ($equipes as $equipe) {
+            $workloadStats = $workloadGenerator->calculateWorkloadDuringPeriod($equipe, $projet->getDateDebut(), $projet->getDateFin());
+            $workloads[$equipe->getId()] = [
+                'totalProjects' => $workloadStats['totalProjects'],
+                'averageProjectsPerDay' => $workloadStats['averageProjectsPerDay']
+            ];
         }
 
         return $this->render('projet/associate_team.html.twig', [
             'projet' => $projet,
             'equipes' => $equipes,
+            'workloads' => $workloads
         ]);
     }
 

@@ -16,14 +16,16 @@
 {% block body %}
 <div class="equipe-container">
     <!-- Top Controls -->
-    <div class="top-controls">
-        <input type="text" class="form-control search-box" placeholder="Search teams..." id="searchInput">
-        <a href="{{ path('app_equipe_new') }}" class="btn btn-add">
-            <i class="fas fa-plus me-2"></i> Add Team
-        </a>
-        <button class="btn btn-report" id="sendReportBtn">
-            <i class="fas fa-paper-plane me-2"></i> Send Report
-        </button>
+    <div class="top-controls" style="display: flex; justify-content: space-between; align-items: center;">
+        <input type="text" class="form-control search-box" placeholder="Search teams..." id="searchInput" style="flex: 1;">
+        <div style="display: flex; gap: 10px; margin-left: 10px;">
+            <a href="{{ path('app_equipe_new') }}" class="btn btn-add">
+                <i class="fas fa-plus me-2"></i> Add Team
+            </a>
+            <button class="btn btn-back" id="sendReportBtn">
+                <i class="fas fa-paper-plane me-2"></i> Send Report
+            </button>
+        </div>
     </div>
     {{ include('equipe/_grid.html.twig') }}
 
