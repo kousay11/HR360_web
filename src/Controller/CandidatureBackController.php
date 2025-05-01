@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Candidature;
 use App\Entity\Offre;
+use App\Entity\Utilisateur;
 use App\Form\CandidatureOtherType;
 use App\Service\CvParserService;
 use App\Repository\CandidatureRepository;
@@ -21,6 +22,9 @@ use Symfony\Component\Routing\Annotation\Route; // ou Symfony\Component\Routing\
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 
 #[Route('/candidatureBack')]
@@ -114,55 +118,53 @@ public function exportPdf(
     }
 
     #[Route('/{idCandidature}/edit', name: 'app_candidatureBack_edit', methods: ['GET', 'POST'])]
-public function edit(
-    Request $request, 
-    Candidature $candidature, 
-    EntityManagerInterface $entityManager,
-    EmailService $emailService
-): Response {
-    // Avant de traiter le formulaire, on garde le statut initial
-    $ancienStatut = $candidature->getStatut();
+    public function edit(Request $request, Candidature $candidature, EntityManagerInterface $entityManager, MailerInterface $mailer): Response
+    {
+        $form = $this->createForm(CandidatureOtherType::class, $candidature);
+        $form->handleRequest($request);
 
-    // Création et traitement du formulaire
-    $form = $this->createForm(CandidatureOtherType::class, $candidature);
-    $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Récupérer l'utilisateur connecté
+            $user = $this->getUser();
+            
+            if (!$user) {
+                $this->addFlash('error', 'Utilisateur non connecté');
+                return $this->redirectToRoute('app_candidatureBack_index');
+            }
+            if (!$user instanceof \App\Entity\Utilisateur) {
+    throw new \LogicException('L\'utilisateur connecté n\'est pas valide.');
+}
 
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Nouveau statut après soumission
-        $nouveauStatut = $candidature->getStatut();
+            // Envoyer l'email à l'utilisateur connecté
+            $email = (new Email())
+            ->from('kousaynajar147@gmail.com')
+            ->to($user->getEmail()) // Utiliser l'email de l'utilisateur connecté
+                ->subject('Mise à jour du statut de votre candidature')
+                ->html($this->renderView(
+                    'candidatureBack/email/statut_update.html.twig',
+                    [
+                        'candidature' => $candidature,
+                        'user' => $user
+                    ]
+                ));
 
-        // Mettre à jour la date de modification
-        $candidature->setDateModification(new \DateTime());
+            try {
+                $mailer->send($email);
+                $this->addFlash('success', 'Email envoyé avec succès');
+            } catch (TransportExceptionInterface $e) {
+                $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email');
+            }
 
-        // Sauvegarder dans la base de données
-        $entityManager->flush();
-
-        // Si le statut a changé, on envoie l'email
-        if ($ancienStatut !== $nouveauStatut) {
-            $emailSent = $emailService->sendStatusUpdateEmail(
-                'kousay.najar@esprit.tn',  // À remplacer plus tard par $candidature->getEmail()
-                $nouveauStatut
-            );
-
-            // Afficher une notification dans l'interface
-            $this->addFlash(
-                $emailSent ? 'success' : 'warning',
-                $emailSent 
-                    ? 'Statut mis à jour et email envoyé'
-                    : 'Statut mis à jour mais échec d\'envoi d\'email'
-            );
+            $entityManager->flush();
+            return $this->redirectToRoute('app_candidatureBack_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        // Redirection après traitement
-        return $this->redirectToRoute('app_candidatureBack_index');
+        return $this->render('candidatureBack/edit.html.twig', [
+            'candidature' => $candidature,
+            'form' => $form,
+        ]);
     }
 
-    // Affichage du formulaire si non soumis ou invalide
-    return $this->render('candidatureBack/edit.html.twig', [
-        'candidature' => $candidature,
-        'form' => $form->createView(),
-    ]);
-}
 #[Route('/analyse', name: 'app_analyse_candidature', methods: ['POST'])]
 public function analyseCandidature(Request $request, LoggerInterface $logger): JsonResponse
 {
