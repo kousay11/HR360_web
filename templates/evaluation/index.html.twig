@@ -5,6 +5,8 @@
 
 {% block css %}
     {{ parent() }}
+    {% import "evaluation/star_rating.html.twig" as starRating %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="{{ asset('back/css/project-card.css') }}" rel="stylesheet">
     <style>
        /* Modifiez ou ajoutez ces styles dans votre bloc CSS */
@@ -93,6 +95,8 @@
 {% endblock %}
 
 {% block body %}
+{% import "evaluation/star_rating.html.twig" as starRating %}
+
     <!-- Begin Page Content -->
     <div class="container-fluid">
 
@@ -185,6 +189,9 @@
                                 <span class="badge badge-{{ evaluation.scorequiz > 7 ? 'success' : 'danger' }}">
                                     {{ evaluation.scorequiz }}/10
                                 </span>
+                            </div>
+                            <div class="mt-2">
+                                {{ starRating.displayStars(evaluation.scorequiz, 10, 5) }}
                             </div>
                         </div>
                        <div class="project-card-footer">

@@ -4,6 +4,7 @@
 
 {% block css %}
 {{ parent() }}
+{% import "evaluation/star_rating.html.twig" as starRating %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="{{ asset('front/css/project-card.css') }}" rel="stylesheet">
 <style>
@@ -111,6 +112,7 @@
 {% endblock %}
 
 {% block index %}
+{% import "evaluation/star_rating.html.twig" as starRating %}
 <!-- Evaluations Section -->
 <div class="evaluations-container">
   <div class="container">
@@ -173,6 +175,9 @@
                          style="width: {{ (evaluation.scorequiz/10)*100 }}%"></div>
                   </div>
                 </div>
+              </div>
+              <div class="mt-2">
+                  {{ starRating.displayStars(evaluation.scorequiz, 10, 5) }}
               </div>
             </div>
             <div class="entity-footer d-flex justify-content-between">

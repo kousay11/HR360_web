@@ -14,4 +14,52 @@ class EntretienRepository extends ServiceEntityRepository
     }
 
     // Add custom methods as needed
+
+
+    public function findByLocalisation(int $idCandidature, ?string $localisation = null): array
+{
+    $qb = $this->createQueryBuilder('e')
+        ->andWhere('e.candidature = :candidature')
+        ->setParameter('candidature', $idCandidature);
+
+    if ($localisation !== null && $localisation !== '') {
+        $qb->andWhere('LOWER(e.localisation) LIKE LOWER(:localisation)')
+            ->setParameter('localisation', '%' . $localisation . '%');
+    }
+
+    return $qb
+        ->orderBy('e.date', 'ASC')
+        ->addOrderBy('e.heure', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
+
+public function findByType(int $idCandidature, ?string $type = null, string $order = 'ASC'): array
+{
+    $qb = $this->createQueryBuilder('e')
+        ->andWhere('e.candidature = :candidature')
+        ->setParameter('candidature', $idCandidature);
+
+    if ($type !== null && $type !== '') {
+        $qb->andWhere('e.type = :type')
+            ->setParameter('type', $type);
+    }
+
+    return $qb
+        ->orderBy('e.date', $order)
+        ->addOrderBy('e.heure', $order)
+        ->getQuery()
+        ->getResult();
+}
+
+public function findAllOrderedByDateAndTime(int $idCandidature, string $order = 'ASC'): array
+{
+    return $this->createQueryBuilder('e')
+        ->andWhere('e.candidature = :candidature')
+        ->setParameter('candidature', $idCandidature)
+        ->orderBy('e.date', $order)
+        ->addOrderBy('e.heure', $order)
+        ->getQuery()
+        ->getResult();
+}
 }
