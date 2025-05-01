@@ -1,45 +1,175 @@
-<!DOCTYPE html>
+{% extends 'baseRH.html.twig' %}
 
-<title>Entretien index</title>
+{% block title %}Liste des Entretiens{% endblock %}
+{% block heading %}Gestion des Entretiens{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    <link href="{{ asset('back/css/project-card.css') }}" rel="stylesheet">
+    <style>
+        /* Styles supplémentaires pour les boutons */
+        .action-buttons .btn {
+            padding: 5px 8px;
+            font-size: 0.75rem;
+            min-width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .action-buttons .btn i {
+            margin-right: 3px;
+            font-size: 0.7rem;
+        }
+        .btn-info {
+            background-color: var(--info) !important;
+            color: white !important;
+        }
+        .btn-info:hover {
+            background-color: #3a7bd0 !important;
+        }
+        .search-form {
+            margin-left: 15px;
+        }
+        .search-form .form-control {
+            width: 200px;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-    <h1>Entretien index</h1>
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>IdEntretien</th>
-                <th>Date</th>
-                <th>Heure</th>
-                <th>Type</th>
-                <th>Statut</th>
-                <th>Lienmeet</th>
-                <th>Localisation</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for entretien in entretiens %}
-            <tr>
-                <td>{{ entretien.idEntretien }}</td>
-                <td>{{ entretien.date ? entretien.date|date('Y-m-d') : '' }}</td>
-                <td>{{ entretien.heure }}</td>
-                <td>{{ entretien.type }}</td>
-                <td>{{ entretien.statut }}</td>
-                <td>{{ entretien.lienmeet }}</td>
-                <td>{{ entretien.localisation }}</td>
-                <td>
-                    <a href="{{ path('app_entretien_show', {'idEntretien': entretien.idEntretien}) }}">show</a>
-                    <a href="{{ path('app_entretien_edit', {'idEntretien': entretien.idEntretien}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="8">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <a href="{{ path('app_entretien_new_for_candidature', {'idCandidature': candidature.idCandidature}) }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
 
-    <a href="{{ path('app_entretien_new') }}">Create new</a>
+                <i class="fas fa-plus fa-sm text-white-50 mr-2"></i>Créer un nouvel entretien
+            </a>
+            <form method="get" action="{{ path('app_entretien_index', {'idCandidature': candidature.idCandidature}) }}" class="search-form ml-3">
+            <div class="input-group">
+                <input type="text" name="localisation" class="form-control bg-light border-0 small" placeholder="Rechercher par localisation..." value="{{ app.request.query.get('localisation') }}">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search fa-sm"></i>
+                    </button>
+                </div>
+                <a href="{{ path('app_entretien_index', {'idCandidature': candidature.idCandidature, 'order': order == 'ASC' ? 'DESC' : 'ASC', 'localisation': app.request.query.get('localisation')}) }}" 
+                    class="btn btn-outline-primary btn-sm ml-3">
+                    <i class="fas fa-sort-amount-{{ order == 'ASC' ? 'down' : 'up' }}"></i>Trier par date
+                </a>
+                <div class="btn-group ml-3" role="group">
+    <a href="{{ path('app_entretien_index', {'idCandidature': candidature.idCandidature, 'type': selectedType == 'En_ligne' ? '' : 'En_ligne', 'order': order, 'localisation': app.request.query.get('localisation')}) }}" 
+       class="btn btn-outline-primary btn-sm {{ selectedType == 'En_ligne' ? 'active' : '' }}">
+        <i class="fas fa-video"></i> En ligne
+    </a>
+    <a href="{{ path('app_entretien_index', {'idCandidature': candidature.idCandidature, 'type': selectedType == 'Presentiel' ? '' : 'Presentiel', 'order': order, 'localisation': app.request.query.get('localisation')}) }}" 
+       class="btn btn-outline-primary btn-sm {{ selectedType == 'Presentiel' ? 'active' : '' }}">
+        <i class="fas fa-map-marker-alt"></i> Présentiel
+    </a>
+</div>
+            </div>
+        </form>
+    </div>
+        </div>
+
+        <!-- Cards Section -->
+        <div class="row">
+            {% for entretien in entretiens %}
+                <div class="col-md-4 mb-4">
+                <div class="project-card">
+                    <div class="project-card clickable-card" >
+                        <div class="project-card-header" onclick="window.location='{{ path('app_entretien_show', {'idEntretien': entretien.idEntretien}) }}'">
+                            <div class="project-icon">
+                                <i class="fas fa-handshake"></i>
+                            </div>
+                            <h5 class="project-title">Entretien {{ entretien.type.value }}</h5>
+                        </div>
+                        <div class="project-card-body">
+                            <div class="project-meta">
+                                <i class="fas fa-calendar-day"></i>
+                                <span>{{ entretien.date ? entretien.date|date('d/m/Y') : '' }} à {{ entretien.heure|date('H:i') }}</span>
+                            </div>
+                            <div class="project-meta">
+                                <i class="fas fa-tag"></i>
+                                <span>Type: {{ entretien.type.value }}</span>
+                            </div>
+                            <div class="project-meta">
+                                <i class="fas fa-info-circle"></i>
+                                <span class="status-badge 
+                                    {% if entretien.statut.value == 'Planifié' %}status-pending
+                                    {% elseif entretien.statut.value == 'Terminé' %}status-active
+                                    {% elseif entretien.statut.value == 'Annulé' %}status-expired
+                                    {% endif %}">
+                                    {{ entretien.statut.value }}
+                                </span>
+                            </div>
+                            {% if entretien.type.value == 'En_ligne' %}
+        <div class="project-meta">
+            <i class="fas fa-video"></i>
+            {% if entretien.lienmeet %}
+                <a href="{{ entretien.lienmeet }}" target="_blank">Lien Meet</a>
+            {% else %}
+                <span>N/A</span>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="project-meta">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>{{ entretien.localisation ?? 'Non spécifié' }}</span>
+        </div>
+    {% endif %}
+                        </div>
+                        <div class="project-card-footer">
+                            <div class="action-buttons">
+                                <a href="{{ path('app_entretien_edit', {'idEntretien': entretien.idEntretien}) }}" 
+                                   class="btn btn-sm btn-modify" title="Modifier">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </a>
+                                <a href="{{ path('app_evaluation_index_for_entretien', {'idEntretien': entretien.idEntretien}) }}" 
+                                   class="btn btn-sm btn-info" title="Évaluations">
+                                    <i class="fas fa-clipboard-check"></i> Éval.
+                                </a>
+                                <form method="post" action="{{ path('app_entretien_delete', {'idEntretien': entretien.idEntretien}) }}" 
+                                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet entretien ?');"
+                                      class="d-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ entretien.idEntretien) }}">
+                                    <button class="btn btn-sm btn-delete" title="Supprimer">
+                                        <i class="fas fa-trash"></i> Suppr.
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info">Aucun entretien trouvé</div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+    <!-- /.container-fluid -->
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <!-- Page level plugins -->
+    <script src="{{ asset('back/vendor/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('back/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+
+    <!-- Page level custom scripts -->
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/French.json"
+                }
+            });
+        });
+
+        
+    </script>
 {% endblock %}

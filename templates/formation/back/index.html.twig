@@ -1,0 +1,363 @@
+{# formation/back/index.html.twig #}
+{% extends 'baseRH.html.twig' %}
+
+{% block title %}Liste des Formations - HR360{% endblock %}
+
+{% block heading %}Gestion des Formations{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('back/css/project-card.css') }}">
+    <link href="{{ asset('back/css/buttons.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        /* Container et espacement */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Cartes de formation */
+        .entity-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .entity-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .entity-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+
+        .entity-icon {
+            margin-right: 10px;
+            color: #4e73df;
+            font-size: 1.5rem;
+        }
+
+        .entity-title {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .entity-body {
+            padding: 15px;
+        }
+
+        .project-meta {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .project-meta i {
+            margin-right: 8px;
+            color: #6c757d;
+            width: 20px;
+            text-align: center;
+        }
+
+        .entity-footer {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            background-color: #f8f9fa;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        /* Boutons d'action */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Barre de recherche et filtres */
+        .search-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .search-container .form-label {
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .search-container .form-select, 
+        .search-container .form-control {
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+        }
+        
+        .search-container .row {
+            margin-bottom: 15px;
+        }
+        
+        .date-picker {
+            background-color: white;
+        }
+
+        /* Bouton Ajouter */
+        .add-btn-container {
+            margin-bottom: 25px;
+        }
+
+        .add-btn {
+            background-color: #1cc88a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-btn:hover {
+            background-color: #17a673;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Pagination */
+        .pagination {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .pagination a,
+        .pagination strong {
+            padding: 8px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .pagination a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .pagination strong {
+            background-color: #4e73df;
+            color: white;
+            border-color: #4e73df;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .search-container .col-md-3, 
+            .search-container .col-md-6 {
+                margin-bottom: 15px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="main-container">
+    <div class="search-section">
+        <div class="search-container">
+            <form method="get" action="{{ path('app_formation_index') }}" class="d-flex flex-column w-100" style="gap: 15px;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="search" class="form-label">Recherche</label>
+                        <input type="text" name="search" id="search" placeholder="Rechercher par titre ou description..." 
+                               value="{{ search_params.search ?? '' }}" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="sort" class="form-label">Trier par</label>
+                        <select name="sort" class="form-select">
+                            <option value="titre" {{ search_params.sort == 'titre' ? 'selected' : '' }}>Titre</option>
+                            <option value="dateFormation" {{ search_params.sort == 'dateFormation' ? 'selected' : '' }}>Date</option>
+                            <option value="duree" {{ search_params.sort == 'duree' ? 'selected' : '' }}>Durée</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end" style="gap: 10px;">
+                        <button type="submit" class="btn btn-primary flex-grow-1">
+                            <i class="fas fa-search"></i> Appliquer
+                        </button>
+                        <a href="{{ path('app_formation_index') }}" class="btn btn-secondary">
+                            <i class="fas fa-sync-alt"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="min_duration" class="form-label">Durée min (jours)</label>
+                        <input type="number" name="min_duration" id="min_duration" 
+                               value="{{ search_params.min_duration ?? '' }}" class="form-control" min="1">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="max_duration" class="form-label">Durée max (jours)</label>
+                        <input type="number" name="max_duration" id="max_duration" 
+                               value="{{ search_params.max_duration ?? '' }}" class="form-control" min="1">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="date_from" class="form-label">Date début</label>
+                        <input type="text" name="date_from" id="date_from" 
+                               value="{{ search_params.date_from ?? '' }}" class="form-control date-picker" placeholder="JJ/MM/AAAA">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="date_to" class="form-label">Date fin</label>
+                        <input type="text" name="date_to" id="date_to" 
+                               value="{{ search_params.date_to ?? '' }}" class="form-control date-picker" placeholder="JJ/MM/AAAA">
+                    </div>
+                </div>
+                
+                <input type="hidden" name="direction" value="{{ search_params.direction ?? 'ASC' }}">
+            </form>
+        </div>
+    </div>
+
+    <div class="add-btn-container">
+        <a href="{{ path('app_formation_new') }}" class="add-btn">
+            <i class="fas fa-plus"></i> Ajouter une formation
+        </a>
+    </div>
+
+    {% if formations|length > 0 %}
+        <div class="row">
+            {% for formation in formations %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="entity-card">
+                        <div class="entity-header">
+                            <div class="entity-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <h5 class="entity-title">{{ formation.titre }}</h5>
+                        </div>
+                        <div class="entity-body">
+                            <div class="project-meta">
+                                <i class="fas fa-align-left"></i>
+                                <span>{{ formation.description|u.truncate(50, '...') }}</span>
+                            </div>
+                            <div class="project-meta">
+                                <i class="fas fa-clock"></i>
+                                <span>Durée: {{ formation.duree }} jours</span>
+                            </div>
+                            <div class="project-meta">
+                                <i class="fas fa-calendar-day"></i>
+                                <span>Date: {{ formation.dateFormation}}</span>
+                            </div>
+                        </div>
+                        <div class="entity-footer">
+                            <div class="action-buttons">
+                                <a href="{{ path('app_formation_show', {'id': formation.id}) }}" class="btn btn-view">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                                <a href="{{ path('app_formation_edit', {'id': formation.id}) }}" class="btn btn-modify">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </a>
+                                <form method="post" action="{{ path('app_formation_delete', {'id': formation.id}) }}" style="display: inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ formation.id) }}">
+                                    <button type="submit" class="btn btn-delete" onclick="return confirm('Confirmer la suppression ?')">
+                                        <i class="fas fa-trash"></i> Supprimer
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> Aucune formation disponible avec ces critères de recherche.
+        </div>
+    {% endif %}
+
+    {% set totalPages = (total / limit)|round(0, 'ceil') %}
+    {% if totalPages > 1 %}
+        <div class="pagination">
+            {% for i in 1..totalPages %}
+                {% if i == page %}
+                    <strong>{{ i }}</strong>
+                {% else %}
+                    <a href="{{ path('app_formation_index', {
+                        'page': i,
+                        'search': search_params.search,
+                        'min_duration': search_params.min_duration,
+                        'max_duration': search_params.max_duration,
+                        'date_from': search_params.date_from,
+                        'date_to': search_params.date_to,
+                        'sort': search_params.sort,
+                        'direction': search_params.direction
+                    }) }}">{{ i }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuration du datepicker
+            flatpickr(".date-picker", {
+                dateFormat: "d/m/Y",
+                locale: "fr",
+                allowInput: true
+            });
+            
+            // Toggle pour le tri asc/desc
+            const sortSelect = document.querySelector('select[name="sort"]');
+            const directionInput = document.querySelector('input[name="direction"]');
+            
+            sortSelect.addEventListener('change', function() {
+                // Inverse la direction si on clique deux fois sur le même champ
+                if (sortSelect.value === '{{ search_params.sort ?? 'titre' }}') {
+                    directionInput.value = directionInput.value === 'ASC' ? 'DESC' : 'ASC';
+                } else {
+                    directionInput.value = 'ASC';
+                }
+            });
+        });
+    </script>
+{% endblock %}

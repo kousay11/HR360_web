@@ -27,9 +27,7 @@
                     'class': 'form-control' ~ (form.nom.vars.valid ? '' : ' is-invalid'),
                     'required': 'required'
                 }}) }}
-                <div class="invalid-feedback">
-                    {{ form_errors(form.nom) }}
-                </div>
+                
             </div>
 
             <!-- Champ Type -->
@@ -39,9 +37,7 @@
                     'class': 'form-control' ~ (form.type.vars.valid ? '' : ' is-invalid'),
                     'required': 'required'
                 }}) }}
-                <div class="invalid-feedback">
-                    {{ form_errors(form.type) }}
-                </div>
+                
             </div>
 
             <!-- Champ Etat -->
@@ -51,9 +47,7 @@
                     'class': 'form-control' ~ (form.etat.vars.valid ? '' : ' is-invalid'),
                     'required': 'required'
                 }}) }}
-                <div class="invalid-feedback">
-                    {{ form_errors(form.etat) }}
-                </div>
+                
             </div>
 
             <!-- Champ Prix -->
@@ -65,28 +59,22 @@
                     'min': '0.01',
                     'step': '0.01'
                 }}) }}
-                <div class="invalid-feedback">
-                    {{ form_errors(form.prix) }}
-                </div>
+                
             </div>
 
             <!-- Champ Image -->
             <div class="form-group">
                 {{ form_label(form.image, 'Image de la ressource', {'label_attr': {'class': 'form-label'}}) }}
                 {% if ressource.image %}
-                    <div>
-                        <p>Image actuelle :</p>
-                        <img src="{{ asset('uploads/' ~ ressource.image) }}" alt="Image actuelle" style="max-width: 200px;">
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="delete_image" id="delete_image">
-                        <label class="form-check-label" for="delete_image">Supprimer l'image actuelle</label>
-                    </div>
+                    <tr>
+                        
+                        <td>
+                            <img src="{{ asset('uploads/images/' ~ ressource.image) }}" alt="Image de la ressource" style="max-width: 300px; height: auto;">
+                        </td>
+                    </tr>
                 {% endif %}
                 {{ form_widget(form.image, {'attr': {'class': 'form-control' ~ (form.image.vars.valid ? '' : ' is-invalid')}}) }}
-                <div class="invalid-feedback">
-                    {{ form_errors(form.image) }}
-                </div>
+                
             </div>
 
             <!-- Bouton de soumission -->

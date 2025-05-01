@@ -135,6 +135,7 @@ class Candidature
         return $this->utilisateur;
     }
 
+
     public function setUtilisateur(?Utilisateur $utilisateur): self
     {
         $this->utilisateur = $utilisateur;

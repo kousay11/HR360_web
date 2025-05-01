@@ -1,47 +1,260 @@
-<!DOCTYPE html>
+{% extends 'baseRH.html.twig' %}
 
-<title>Evaluation index</title>
+{% block title %}Gestion des Évaluations{% endblock %}
+{% block heading %}Évaluations{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    {% import "evaluation/star_rating.html.twig" as starRating %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="{{ asset('back/css/project-card.css') }}" rel="stylesheet">
+    <style>
+       /* Modifiez ou ajoutez ces styles dans votre bloc CSS */
+
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap; /* Permet aux boutons de passer à la ligne si nécessaire */
+    gap: 5px; /* Espacement entre les boutons */
+    justify-content: center; /* Centre les boutons horizontalement */
+}
+
+.action-buttons .btn {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+    min-width: 80px; /* Largeur minimale au lieu de largeur fixe */
+    flex: 1 1 auto; /* Permet aux boutons de s'adapter */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap; /* Empêche le texte de passer à la ligne */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Ajoute des points de suspension si le texte est trop long */
+}
+
+/* Ajustez la taille des icônes si nécessaire */
+.action-buttons .btn i {
+    margin-right: 3px;
+    font-size: 0.7rem;
+}
+
+/* Ajustez la hauteur de la carte si nécessaire */
+.project-card {
+    min-height: 380px; /* Ajustez cette valeur selon vos besoins */
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card-footer {
+    margin-top: auto; /* Pousse le footer vers le bas */
+    padding: 10px;
+}
+        .btn-info {
+            background-color: var(--info) !important;
+            color: white !important;
+        }
+        .btn-info:hover {
+            background-color: #3a7bd0 !important;
+        }
+        .progress-container {
+            margin-top: 5px;
+        }
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+        }
+        .progress-bar {
+            border-radius: 4px;
+        }
+        .score-display {
+            font-size: 0.8rem;
+            margin-top: 2px;
+            font-weight: 500;
+        }
+        /* Centrer les cartes */
+        .evaluation-cards {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .evaluation-card {
+            width: 100%;
+            max-width: 400px;
+            margin: 10px;
+        }
+        /* Effet de clic sur la carte */
+        .clickable-card {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .clickable-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-    <h1>Evaluation index</h1>
+{% import "evaluation/star_rating.html.twig" as starRating %}
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>IdEvaluation</th>
-                <th>TitreEva</th>
-                <th>NoteTechnique</th>
-                <th>NoteSoftSkills</th>
-                <th>Commentaire</th>
-                <th>DateEvaluation</th>
-                <th>Scorequiz</th>
-                <th>Questions</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for evaluation in evaluations %}
-            <tr>
-                <td>{{ evaluation.idEvaluation }}</td>
-                <td>{{ evaluation.titreEva }}</td>
-                <td>{{ evaluation.noteTechnique }}</td>
-                <td>{{ evaluation.noteSoftSkills }}</td>
-                <td>{{ evaluation.commentaire }}</td>
-                <td>{{ evaluation.dateEvaluation ? evaluation.dateEvaluation|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ evaluation.scorequiz }}</td>
-                <td>{{ evaluation.questions }}</td>
-                <td>
-                    <a href="{{ path('app_evaluation_show', {'idEvaluation': evaluation.idEvaluation}) }}">show</a>
-                    <a href="{{ path('app_evaluation_edit', {'idEvaluation': evaluation.idEvaluation}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="9">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
 
-    <a href="{{ path('app_evaluation_new') }}">Create new</a>
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <div>
+                {% if entretien is defined %}
+                    <p class="mb-0 text-muted small">Pour l'entretien #{{ entretien.idEntretien }}</p>
+                {% endif %}
+            </div>
+            <div>
+                {% if entretien is defined %}
+                    <a href="{{ path('app_entretien_index', {'idCandidature': candidature.idCandidature}) }}" class="btn btn-secondary btn-sm mr-2">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </a>
+                {% endif %}
+                {% if entretien is defined and evaluations|length == 0 %}
+                    <a href="{{ path('app_evaluation_new_for_entretien', {'idEntretien': entretien.idEntretien}) }}" 
+                       class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Nouvelle Évaluation
+                    </a>
+                {% elseif entretien is not defined %}
+                    <a href="{{ path('app_evaluation_new') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Nouvelle Évaluation
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Cards Section Centered -->
+        <div class="row evaluation-cards">
+            {% for evaluation in evaluations %}
+                <div class="col-md-6 col-lg-4 evaluation-card">
+                    <div class="project-card clickable-card" >
+                        <div class="project-card-header" onclick="window.location='{{ path('app_evaluation_show', {'idEvaluation': evaluation.idEvaluation}) }}'">
+                            <div class="project-icon">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <h5 class="project-title">{{ evaluation.titreEva }}</h5>
+                        </div>
+                        <div class="project-card-body">
+                            <div class="project-meta">
+                                <i class="fas fa-calendar-day"></i>
+                                <span>{{ evaluation.dateEvaluation|date('d/m/Y H:i') }}</span>
+                            </div>
+                            
+                            <div class="project-meta">
+                                <i class="fas fa-comment"></i>
+                                <span class="status-badge 
+                                    {% if evaluation.commentaire.value == 'ACCEPTÉ' %}status-active
+                                    {% else %}status-expired
+                                    {% endif %}">
+                                    {{ evaluation.commentaire.value }}
+                                </span>
+                            </div>
+                            
+                            <div class="project-meta">
+                                <i class="fas fa-cogs"></i>
+                                <span>Note Technique</span>
+                                <div class="progress-container">
+                                    <div class="progress">
+                                        <div class="progress-bar bg-{{ evaluation.noteTechnique >= 10 ? 'success' : 'warning' }}" 
+                                             style="width: {{ (evaluation.noteTechnique/20)*100 }}%">
+                                        </div>
+                                    </div>
+                                    <div class="score-display text-{{ evaluation.noteTechnique >= 10 ? 'success' : 'warning' }}">
+                                        {{ evaluation.noteTechnique }}/20
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="project-meta">
+                                <i class="fas fa-users"></i>
+                                <span>Soft Skills</span>
+                                <div class="progress-container">
+                                    <div class="progress">
+                                        <div class="progress-bar bg-{{ evaluation.noteSoftSkills >= 10 ? 'success' : 'info' }}" 
+                                             style="width: {{ (evaluation.noteSoftSkills/20)*100 }}%">
+                                        </div>
+                                    </div>
+                                    <div class="score-display text-{{ evaluation.noteSoftSkills >= 10 ? 'success' : 'info' }}">
+                                        {{ evaluation.noteSoftSkills }}/20
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="project-meta">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Score Quiz</span>
+                                <span class="badge badge-{{ evaluation.scorequiz > 7 ? 'success' : 'danger' }}">
+                                    {{ evaluation.scorequiz }}/10
+                                </span>
+                            </div>
+                            <div class="mt-2">
+                                {{ starRating.displayStars(evaluation.scorequiz, 10, 5) }}
+                            </div>
+                        </div>
+                       <div class="project-card-footer">
+    <div class="action-buttons">
+        {% if evaluation.questions|length > 0 %}
+            <a href="{{ path('app_evaluation_quiz', {'idEvaluation': evaluation.idEvaluation}) }}" 
+               class="btn btn-success btn-sm">
+                <i class="fas fa-play"></i> Quiz
+            </a>
+        {% endif %}
+        
+        <a href="{{ path('app_evaluation_add_quiz', {'idEvaluation': evaluation.idEvaluation}) }}" 
+           class="btn btn-primary btn-sm">
+            <i class="fas fa-question-circle"></i> Ajout Quiz
+        </a>
+        
+        {% if evaluation.questions|length > 0 %}
+            <form method="post" action="{{ path('app_evaluation_clear_quiz', {'idEvaluation': evaluation.idEvaluation}) }}" 
+                  class="d-inline" 
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer le quiz ?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('clear_quiz' ~ evaluation.idEvaluation) }}">
+                <button class="btn btn-danger btn-sm">
+                    <i class="fas fa-trash"></i> Supp Quiz
+                </button>
+            </form>
+        {% endif %}
+        
+        <a href="{{ path('app_evaluation_edit', {'idEvaluation': evaluation.idEvaluation}) }}" 
+           class="btn btn-info btn-sm">
+            <i class="fas fa-edit"></i> Modifier
+        </a>
+        
+        <form method="post" action="{{ path('app_evaluation_delete', {'idEvaluation': evaluation.idEvaluation}) }}" 
+              class="d-inline"
+              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette évaluation ?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evaluation.idEvaluation) }}">
+            <button class="btn btn-danger btn-sm">
+                <i class="fas fa-trash-alt"></i> Supp Eva
+            </button>
+        </form>
+    </div>
+</div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info">Aucune évaluation trouvée</div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+    <!-- /.container-fluid -->
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Désactiver le clic sur les boutons pour éviter la double action
+        document.querySelectorAll('.action-buttons a, .action-buttons button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+    </script>
 {% endblock %}

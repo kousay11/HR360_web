@@ -1,12 +1,10 @@
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
+# config/services.yaml
 
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     cvs_directory: '%kernel.project_dir%/public/uploads/cvs'
     lettres_directory: '%kernel.project_dir%/public/uploads/lettres'
     images_directory: '%kernel.project_dir%/public/uploads/images'
+
     app.together_api_key: '%env(TOGETHER_API_KEY)%'
     app.deep_translate_api_key: '%env(DEEP_TRANSLATE_API_KEY)%'
     app.base_url: '%env(APP_BASE_URL)%'
@@ -14,22 +12,49 @@ parameters:
     # app.rapidapi_grammar_url: 'https://grammar-checker-api.p.rapidapi.com/v1/check'
     # app.rapidapi_grammar_host: 'grammar-checker-api.p.rapidapi.com'
 
+    recaptcha3_key: '%env(RECAPTCHA3_KEY)%'
+    recaptcha3_secret: '%env(RECAPTCHA3_SECRET)%'
+    env(ABSTRACT_API_KEY): '%env(ABSTRACT_API_KEY)%'
+    qrcodes_directory: '%kernel.project_dir%/public/uploads/qrcodes'
+    trello_api_key: '6a7939bb3380aa7016622f79c58cde16'
+    trello_api_token: 'ATTAd882eb46ac7c80931df7f18f18b551431470e527c82fce94673498351e59116b1A7DD9EE'
 
 services:
-    App\Twig\AppExtension:
-        tags: ['twig.extension']
-    # default configuration for services in *this* file
+    Knp\Component\Pager\PaginatorInterface: '@knp_paginator'
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
+        autowire: true
+        autoconfigure: true
+        public: false
+    # default configuration for services in *this* file
+    App\Form\DataTransformer\StringToDateTimeTransformer: ~        
+
+
+    
+    App\Service\GoogleOAuthService:
+        arguments:
+            $params: '@parameter_bag'
+
+    App\Service\GoogleMeetService:
+        arguments:
+            $googleOAuthService: '@App\Service\GoogleOAuthService'
+
     App\:
         resource: '../src/'
         exclude:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+
+    # Configuration explicite pour les services spéciaux
+    App\Twig\AppExtension:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+        tags: ['twig.extension']
+
+    App\Service\QRCodeService:
+        arguments:
+            $params: '@parameter_bag'
+
     App\Service\TwilioService:
         arguments:
             $accountSid: '%env(twilio_account_sid)%'
@@ -43,5 +68,12 @@ services:
             # $apiKey: '%app.rapidapi_grammar_key%'
             # $apiUrl: '%app.rapidapi_grammar_url%'
             # $apiHost: '%app.rapidapi_grammar_host%'
+    App\Bundle\EmailVerifierBundle\Service\EmailVerifier:
+        arguments:
+            $apiKey: '%env(ABSTRACT_API_KEY)%'
+        tags:
+            - { name: 'container.service_subscriber' }
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    

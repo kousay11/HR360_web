@@ -1,0 +1,229 @@
+{% extends 'baseCAN.html.twig' %}
+
+{% block title %}Mes Entretiens - HR360{% endblock %}
+
+{% block css %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="{{ asset('front/css/project-card.css') }}" rel="stylesheet">
+<style>
+  /* Styles complémentaires */
+  .entretiens-container {
+    padding: 30px 0;
+  }
+  
+  .section-title {
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  
+  .section-title h2 {
+    color: var(--dark);
+    position: relative;
+    display: inline-block;
+    padding-bottom: 10px;
+  }
+  
+  .section-title h2:after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 50px;
+    height: 3px;
+    background: var(--danger);
+    transform: translateX(-50%);
+  }
+  
+  .no-entretiens {
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  }
+  
+  .no-entretiens i {
+    font-size: 3rem;
+    color: var(--gray);
+    margin-bottom: 20px;
+  }
+  
+  .no-entretiens h4 {
+    color: var(--dark);
+    margin-bottom: 15px;
+  }
+  
+  .btn-meet {
+    background: #1a73e8;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+  }
+  
+  .btn-meet:hover {
+    background: #0d5bcd;
+    color: white;
+  }
+  
+  .btn-meet i {
+    margin-right: 5px;
+  }
+  
+  /* Pagination */
+  .pagination {
+    justify-content: center;
+    margin-top: 30px;
+  }
+  
+  .page-item.active .page-link {
+    background-color: var(--danger);
+    border-color: var(--danger);
+  }
+  
+  .page-link {
+    color: var(--danger);
+  }
+  
+  /* Badges */
+  .badge-primary {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+  }
+  
+  .badge-success {
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+  }
+  
+  .badge-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #bd2130 100%);
+  }
+  
+  .badge-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+  }
+  
+  /* Titre cliquable */
+  .clickable-title {
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  
+  .clickable-title:hover {
+    color: var(--danger);
+  }
+</style>
+{% endblock %}
+
+{% block index %}
+<!-- Entretiens Section -->
+<div class="entretiens-container">
+  <div class="container">
+    <div class="section-title">
+      <h2>Mes Entretiens</h2>
+      <p class="text-muted">Retrouvez ici tous vos entretiens programmés</p>
+    </div>
+
+    <div class="row">
+      {% if entretiens|length > 0 %}
+        {% for entretien in entretiens %}
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="entity-card">
+            <div class="project-card clickable-card">
+              <div class="entity-header">
+                <i class="fas fa-handshake entity-icon"></i>
+                <h5 class="entity-title clickable-title text-white" onclick="window.location='{{ path('app_entretien_show_front', {'idEntretien': entretien.idEntretien , 'idCandidature': candidature.idCandidature}) }}'">
+                  Entretien {{ entretien.type.value }}
+                </h5>
+                <span class="badge 
+                  {% if entretien.statut.value == 'Planifié' %}badge-primary
+                  {% elseif entretien.statut.value == 'Terminé' %}badge-success
+                  {% elseif entretien.statut.value == 'Annulé' %}badge-danger
+                  {% elseif entretien.statut.value == 'Reporté' %}badge-secondary
+                  {% else %}badge-secondary{% endif %} badge-position">
+                  {{ entretien.statut.value }}
+                </span>
+              </div>
+              <div class="entity-body">
+                <div class="project-meta">
+                  <i class="fas fa-calendar-day"></i>
+                  <span>{{ entretien.date ? entretien.date|date('d/m/Y') : 'Non définie' }}</span>
+                </div>
+                
+                <div class="project-meta">
+                  <i class="fas fa-clock"></i>
+                  <span>{{ entretien.heure ? entretien.heure|date('H:i') : 'Non définie' }}</span>
+                </div>
+                
+                <hr>
+                
+                <div class="project-meta">
+                  <i class="fas fa-tag"></i>
+                  <span>Type: {{ entretien.type.value }}</span>
+                </div>
+                
+                {% if entretien.type.value == 'En_ligne' %}
+                  <div class="project-meta">
+                    <i class="fas fa-video"></i>
+                    {% if entretien.lienmeet %}
+                      <a href="{{ entretien.lienmeet }}" target="_blank">Lien Meet</a>
+                    {% else %}
+                      <span>N/A</span>
+                    {% endif %}
+                  </div>
+                {% else %}
+                  <div class="project-meta">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>{{ entretien.localisation ?? 'Non spécifié' }}</span>
+                  </div>
+                {% endif %}
+              </div>
+              <div class="entity-footer d-flex justify-content-end">
+                <a href="{{ path('app_evaluation_front_for_entretien', {'idEntretien': entretien.idEntretien}) }}" 
+                   class="btn btn-outline-dark btn-sm">
+                  <i class="fas fa-clipboard-check"></i> Évaluation
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="col-12">
+          <div class="no-entretiens">
+            <i class="fas fa-calendar-times"></i>
+            <h4>Aucun entretien programmé</h4>
+            <p class="text-muted">Vous n'avez pas d'entretiens prévus pour le moment.</p>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+
+    {% if entretiens is not empty %}
+        <div class="navigation mt-4">
+            {{ knp_pagination_render(entretiens) }}
+        </div>
+    {% endif %}
+
+    
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+// Initialisation des tooltips Bootstrap si nécessaire
+$(document).ready(function(){
+  $('[data-bs-toggle="tooltip"]').tooltip();
+  
+  // Empêcher la propagation du clic sur les boutons
+  $('.entity-footer a').click(function(e) {
+    e.stopPropagation();
+  });
+});
+</script>
+{% endblock %}

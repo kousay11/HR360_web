@@ -1,0 +1,209 @@
+{% extends 'baseRH.html.twig' %}
+
+{% block title %}Détails du Quiz - {{ evaluation.titreEva }}{% endblock %}
+{% block heading %}Détails du Quiz{% endblock %}
+
+{% block css %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<style>
+    .quiz-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .question-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        background: white;
+    }
+    .question-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .question-number {
+        background: #4e73df;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-weight: bold;
+    }
+    .question-text {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin: 0;
+    }
+    .question-description {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+    .answers-container {
+        margin-left: 45px;
+    }
+    .answer-option {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        border-radius: 5px;
+        transition: all 0.3s;
+    }
+    .correct-answer {
+        background-color: #d4edda;
+        border-left: 4px solid #28a745;
+    }
+    .answer-letter {
+        display: inline-block;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        background: #f8f9fa;
+        color: #495057;
+        text-align: center;
+        line-height: 25px;
+        margin-right: 10px;
+        font-weight: bold;
+    }
+    .quiz-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    .quiz-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    .quiz-actions {
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid quiz-container">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h1 class="h4 m-0 font-weight-bold text-primary">Quiz: {{ evaluation.titreEva }}</h1>
+            <div class="badge badge-primary">Score: <span id="score-display">0</span>/10</div>
+        </div>
+        <div class="card-body">
+            <form id="quiz-form" action="{{ path('app_evaluation_submit_quiz', {'idEvaluation': evaluation.idEvaluation}) }}" method="POST">
+                
+                {% for question in evaluation.questions %}
+                <div class="question-card" id="question-{{ loop.index0 }}">
+                    <div class="question-header">
+                        <div class="question-number">{{ loop.index }}</div>
+                        <h3 class="h5 mb-0 text-gray-800">{{ question.question }}</h3>
+                    </div>
+                    
+                    {% if question.description is defined and question.description %}
+                        <p class="text-muted mb-3">{{ question.description }}</p>
+                    {% endif %}
+                    
+                    <div class="answers-container">
+                        {% set letters = ['A', 'B', 'C', 'D', 'E', 'F'] %}
+                        {% for key, answer in question.answers %}
+                            {% if answer %}
+                            <div class="answer-option">
+                                <input class="form-check-input" type="radio" 
+                                       name="answers[{{ loop.parent.loop.index0 }}]" 
+                                       id="q{{ loop.parent.loop.index0 }}_a{{ loop.index0 }}" 
+                                       value="{{ key }}" required>
+                                <label class="answer-label ml-2" for="q{{ loop.parent.loop.index0 }}_a{{ loop.index0 }}">
+                                    <span class="font-weight-bold">{{ letters[loop.index0] }}.</span> {{ answer }}
+                                </label>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary submit-btn">
+                        <i class="fas fa-paper-plane"></i> Soumettre le quiz
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+$(document).ready(function() {
+    $('#quiz-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        const $form = $(this);
+        const $submitBtn = $form.find('button[type="submit"]');
+        $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Envoi en cours...');
+
+        // Construction des réponses
+        const answers = {};
+        $('input[type="radio"]:checked').each(function() {
+            const name = $(this).attr('name');
+            const match = name.match(/answers\[(\d+)\]/);
+            if (match) {
+                answers[match[1]] = $(this).val();
+            }
+        });
+
+        // Envoyer les données via AJAX
+        $.ajax({
+            url: $form.attr('action'),
+            method: 'POST',
+            data: $form.serialize(),
+            dataType: 'json'
+        })
+        .done(function(response) {
+            if (response.success) {
+                // Afficher le résultat avec SweetAlert
+                Swal.fire({
+                    title: 'Résultats du Quiz',
+                    html: `Vous avez obtenu un score de <b>${response.score}/10</b>.<br>
+                           ${response.commentaire}`,
+                    icon: response.score >= 5 ? 'success' : 'error',
+                    showCancelButton: false,
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false
+                }).then(() => {
+                    // Rediriger vers la liste des évaluations de l'entretien
+                    if (response.redirectToEntretien) {
+                        window.location.href = response.redirectToEntretien;
+                    } else {
+                        window.location.href = "{{ path('app_evaluation_index') }}";
+                    }
+                });
+                
+                // Mettre à jour le score affiché
+                $('#score-display').text(response.score);
+            } else {
+                Swal.fire('Erreur', response.message || 'Une erreur est survenue', 'error');
+                $submitBtn.prop('disabled', false).html('Soumettre');
+            }
+        })
+        .fail(function(xhr) {
+            console.error("Erreur AJAX:", xhr.responseText);
+            Swal.fire('Erreur', 'Échec de communication avec le serveur', 'error');
+            $submitBtn.prop('disabled', false).html('<i class="fas fa-paper-plane"></i> Soumettre');
+        });
+    });
+});
+</script>
+{% endblock %}

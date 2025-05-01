@@ -23,6 +23,8 @@ use Symfony\Component\HttpClient\HttpClient;
 use Psr\Log\LoggerInterface;
 
 
+
+
 #[Route('/candidatureBack')]
 final class CandidatureBackController extends AbstractController
 {
@@ -218,6 +220,8 @@ public function analyseCandidature(Request $request, LoggerInterface $logger): J
         ]);
     }
 }
+
+
 
 private function getResultMessage(int $score): string
 {

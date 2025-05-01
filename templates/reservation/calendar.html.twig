@@ -1,0 +1,82 @@
+{% extends 'baseRH.html.twig' %}
+
+{% block title %}Calendrier de Disponibilité{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+    <h1>Calendrier de {{ ressource.nom }}</h1>
+    <pre>{{ events }}</pre>
+
+    <div id="calendar"></div>
+    <canvas id="myChart" width="400" height="400" style="display:none;"></canvas>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+
+        // Initialise FullCalendar
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'fr',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: {{ events|raw }},
+            datesRender: function(info) {
+                // Afficher le calendrier après son rendu
+                calendar.render();
+
+                // Initialiser le graphique après que le calendrier est prêt
+                setTimeout(function() {
+                    // Utiliser MutationObserver pour attendre que le canvas soit présent dans le DOM
+                    const canvasElement = document.getElementById('myChart');
+                    if (canvasElement) {
+                        var observer = new MutationObserver(function(mutationsList, observer) {
+                            // Vérifier si le canvas est visible avant d'initialiser le graphique
+                            if (canvasElement.style.display !== 'none') {
+                                var ctx = canvasElement.getContext('2d');
+                                var myChart = new Chart(ctx, {
+                                    type: 'bar',
+                                    data: {
+                                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                                        datasets: [{
+                                            label: 'Exemple de données',
+                                            data: [12, 19, 3, 5, 2],
+                                            borderWidth: 1
+                                        }]
+                                    },
+                                    options: {
+                                        scales: {
+                                            y: {
+                                                beginAtZero: true
+                                            }
+                                        }
+                                    }
+                                });
+                                observer.disconnect(); // Déconnecte l'observateur après l'initialisation
+                            }
+                        });
+
+                        // Observer les changements dans le DOM
+                        observer.observe(canvasElement, { attributes: true });
+                    }
+                }, 200);
+            }
+        });
+
+        // Afficher le calendrier après son initialisation
+        calendar.render();
+    });
+    </script>
+{% endblock %}

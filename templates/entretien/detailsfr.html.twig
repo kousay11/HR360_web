@@ -1,0 +1,80 @@
+{% extends 'baseCAN.html.twig' %}
+
+{% block title %}Détails de l'entretien #{{ entretien.idEntretien }}{% endblock %}
+
+
+{% block index %}
+    <!-- Begin Page Content -->
+    <div class="container-fluid mt-4"> <!-- Ajout de mt-4 pour descendre le contenu -->
+
+        <!-- Page Heading avec marge en bas -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-5"> <!-- mb-5 au lieu de mb-4 -->
+            <h1 class="h3 mb-0 text-gray-800">Détails de l'entretien</h1>
+            <div class="btn-group">
+                <a href="{{ path('app_entretien_front', {'idCandidature': idCandidature}) }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+                    <i class="fas fa-arrow-left fa-sm text-white-50 mr-2"></i>Retour à la liste
+                </a>
+            </div>
+        </div>
+
+        <!-- Content Row centré -->
+        <div class="row justify-content-center"> <!-- Ajout de justify-content-center -->
+            <div class="col-lg-8 col-xl-6"> <!-- Réduction de la largeur max avec col-xl-6 -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Informations principales</h6>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped table-hover mx-auto"> <!-- Ajout de mx-auto -->
+                            <tbody>
+                                <tr>
+                                    <th><i class="fas fa-calendar-alt mr-2 text-secondary"></i>Date</th>
+                                    <td>{{ entretien.date ? entretien.date|date('d/m/Y') : 'Non définie' }}</td>
+                                </tr>
+                                <tr>
+                                    <th><i class="fas fa-clock mr-2 text-secondary"></i>Heure</th>
+                                    <td>{{ entretien.heure ? entretien.heure|date('H:i') : 'Non définie' }}</td>
+                                </tr>
+                                <tr>
+                                    <th><i class="fas fa-clipboard-list mr-2 text-secondary"></i>Type</th>
+                                    <td>{{ entretien.type.value }}</td>
+                                </tr>
+                                <tr>
+                                    <th><i class="fas fa-info-circle mr-2 text-secondary"></i>Statut</th>
+                                    <td>
+                                        <span class="badge 
+                                            {% if entretien.statut.value == 'Planifié' %}bg-primary text-white
+                                            {% elseif entretien.statut.value == 'Terminé' %}bg-success text-white
+                                            {% elseif entretien.statut.value == 'Annulé' %}bg-danger text-white
+                                            {% elseif entretien.statut.value == 'Reporté' %}bg-secondary text-white
+                                            {% else %}bg-dark text-white
+                                            {% endif %} py-2 px-3">
+                                            <i class="fas fa-circle mr-1"></i>{{ entretien.statut.value }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th><i class="fas fa-video mr-2 text-secondary"></i>Lien Meet</th>
+                                    <td>
+                                        {% if entretien.lienmeet %}
+                                            <a href="{{ entretien.lienmeet }}" target="_blank" class="btn btn-sm btn-info">
+                                                <i class="fas fa-video mr-2"></i>Rejoindre la réunion
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">Non spécifié</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th><i class="fas fa-map-marker-alt mr-2 text-secondary"></i>Localisation</th>
+                                    <td>{{ entretien.localisation ? entretien.localisation : 'Non spécifiée' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.container-fluid -->
+{% endblock %}

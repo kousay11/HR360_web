@@ -133,6 +133,38 @@ public function setImage(?string $image): self
     $this->image = $image;
     return $this;
 }
+private ?string $qrPath = null;
+
+public function getQrPath(): ?string
+{
+    return $this->qrPath;
+}
+
+public function setQrPath(?string $qrPath): self
+{
+    $this->qrPath = $qrPath;
+    return $this;
+}
+
+// Add this method to your Ressource entity class
+public function isAvailable(\DateTimeInterface $startDate = null, \DateTimeInterface $endDate = null): bool
+{
+    // If no dates provided, just check the general availability status
+    if ($startDate === null || $endDate === null) {
+        return $this->etat === 'disponible';
+    }
+
+    // Check for conflicting reservations if dates are provided
+    foreach ($this->getReservations() as $reservation) {
+        if ($reservation->conflictsWith($startDate, $endDate)) {
+            return false;
+        }
+    }
+    
+    return $this->etat === 'disponible';
+}
+
+
 
 
 

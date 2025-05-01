@@ -1,0 +1,18 @@
+{% extends 'baseRH.html.twig' %}
+
+{% block title %}Détails de la Formation{% endblock %}
+
+{% block body %}
+<h2>Détails de la formation</h2>
+
+<ul>
+    <li><strong>Titre :</strong> {{ formation.titre }}</li>
+    <li><strong>Description :</strong> {{ formation.description }}</li>
+    <li><strong>Durée :</strong> {{ formation.duree }} jours</li>
+    <li><strong>Date :</strong> {{ formation.dateFormation }}</li>
+    <li><strong>Favori :</strong> {{ formation.isIsFavorite ? 'Oui' : 'Non' }}</li>
+</ul>
+
+<a href="{{ path('app_formation_edit', {'id': formation.id}) }}">✏ Modifier</a> |
+<a href="{{ path('app_formation_index') }}">⬅ Retour</a>
+{% endblock %}

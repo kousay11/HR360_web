@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email envoyé - HR360</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('front/css/login.css') }}">
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="auth-form-container">
+                    <div class="auth-message">
+                        <div class="auth-header">
+                            <h2 class="auth-title">Email envoyé</h2>
+                            <div class="auth-subtitle">
+                                <i class="fas fa-check-circle text-success"></i>
+                                Un email contenant le lien de réinitialisation a été envoyé.
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <p>
+                                Si l'email ne vous parvient pas, vérifiez vos spams ou 
+                                <a href="{{ path('app_forgot_password_request') }}">essayez à nouveau</a>.
+                            </p>
+                            <p class="mt-3">
+                                Le lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
+                            </p>
+                        </div>
+
+                        <div class="auth-footer">
+                            <a href="{{ path('app_login') }}" class="auth-link">
+                                <i class="fas fa-arrow-left"></i> Retour à la connexion
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
