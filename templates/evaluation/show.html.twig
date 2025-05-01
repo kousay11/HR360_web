@@ -39,8 +39,8 @@
                             </div>
                             <div class="col-md-6 text-right">
                                 <div class="h5">Décision: 
-                                    <span class="badge badge-{{ evaluation.commentaire == 'ACCEPTÉ' ? 'success' : 'danger' }}">
-                                        {{ evaluation.commentaire }}
+                                    <span class="badge badge-{{ evaluation.commentaire.value == 'ACCEPTÉ' ? 'success' : 'danger' }}">
+                                        {{ evaluation.commentaire.value }}
                                     </span>
                                 </div>
                             </div>

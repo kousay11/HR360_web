@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\Commentaire;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -31,21 +32,10 @@ class Evaluation
     private ?float $noteTechnique = null;
 
     #[ORM\Column(name:'noteSoftSkills', type: 'float')]
-    #[Assert\NotBlank(message: "La note soft skills est obligatoire")]
-    #[Assert\Range(
-        min: 0,
-        max: 20,
-        notInRangeMessage: "La note soft skills doit être entre {{ min }} et {{ max }}"
-    )]
     private ?float $noteSoftSkills = null;
 
-    #[ORM\Column(type: 'string', length: 50, nullable: false)]
-    #[Assert\NotBlank(message: "Le commentaire est obligatoire")]
-    #[Assert\Length(
-        max: 50,
-        maxMessage: "Le commentaire ne peut pas dépasser {{ limit }} caractères"
-    )]
-    private ?string $commentaire = null;
+    #[ORM\Column(type: 'string', enumType: Commentaire::class , options: ["default" => "EN_ATTENTE"])]
+    private ?Commentaire $commentaire = null;
 
     #[ORM\Column(name:'dateEvaluation', type: 'datetime', nullable: false)]
     #[Assert\NotBlank(message: "La date d'évaluation est obligatoire")]
@@ -73,10 +63,13 @@ class Evaluation
     #[Assert\NotNull(message: "L'entretien associé est obligatoire")]
     private ?Entretien $entretien = null;
 
-    public function __construct()
-    {
-        $this->dateEvaluation = new \DateTime('now', new \DateTimeZone('Africa/Tunis'));
-    }
+    // Dans le constructeur, initialisez le commentaire à EN_ATTENTE
+public function __construct()
+{
+    $this->dateEvaluation = new \DateTime('now', new \DateTimeZone('Africa/Tunis'));
+    $this->commentaire = Commentaire::EN_ATTENTE; // Ajoutez cette ligne
+    $this->scorequiz = 0 ;
+}
 
     public function getIdEvaluation(): ?int
     {
@@ -122,14 +115,14 @@ class Evaluation
         return $this;
     }
 
-    public function getCommentaire(): ?string
+    public function getCommentaire(): ?Commentaire
     {
         return $this->commentaire;
     }
 
-    public function setCommentaire(string $commentaire): self
+    public function setCommentaire(?Commentaire $commentaire): self
     {
-        $this->commentaire = $commentaire;
+        $this->commentaire = $commentaire ?? Commentaire::EN_ATTENTE;
         return $this;
     }
 
@@ -153,24 +146,52 @@ class Evaluation
     }
 
     public function setScorequiz(?int $scorequiz): self
-    {
-        $this->scorequiz = $scorequiz;
-        if ($scorequiz !== null) {
-            $this->commentaire = $scorequiz > 7 ? 'ACCEPTÉ' : 'REFUSÉ';
+{
+    $this->scorequiz = $scorequiz;
+    if ($scorequiz !== null) {
+        $this->commentaire = $scorequiz > 7 ? Commentaire::ACCEPTE : Commentaire::REFUSE;
+    } else {
+        $this->commentaire = Commentaire::EN_ATTENTE;
+    }
+    return $this;
+}
+
+public function getQuestions(): array
+{
+    if ($this->questions === null) {
+        return [];
+    }
+    
+    $decoded = json_decode($this->questions, true);
+    
+    foreach ($decoded as &$question) {
+        if (!isset($question['correctAnswers'])) {
+            $question['correctAnswers'] = [];
         }
-        return $this;
+        
+        foreach ($question['correctAnswers'] as $key => $value) {
+            if (is_string($value)) {
+                $question['correctAnswers'][$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            }
+        }
     }
+    
+    return $decoded;
+}
 
-    public function getQuestions(): ?string
-    {
-        return $this->questions;
+public function setQuestions(?array $questions): self
+{
+    if ($questions) {
+        foreach ($questions as &$question) {
+            if (!isset($question['correctAnswers'])) {
+                $question['correctAnswers'] = [];
+            }
+        }
     }
-
-    public function setQuestions(?string $questions): self
-    {
-        $this->questions = $questions;
-        return $this;
-    }
+    
+    $this->questions = $questions ? json_encode($questions) : null;
+    return $this;
+}
 
     public function getEntretien(): ?Entretien
     {

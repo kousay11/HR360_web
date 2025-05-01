@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Entretien;
 use App\Entity\Evaluation;
+use App\Enum\Commentaire;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -11,6 +12,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+
 
 
 
@@ -46,13 +50,6 @@ class EvaluationType extends AbstractType
                 'empty_data' => 0.0
 
             ])
-            ->add('commentaire', null, [
-                'attr' => [
-                    'class' => 'form-control',
-                    'rows' => 3
-                ],
-                'label' => 'Commentaire'
-            ])
             ->add('dateEvaluation', DateTimeType::class, [
                 'widget' => 'single_text',
                 'html5' => false,
@@ -61,15 +58,6 @@ class EvaluationType extends AbstractType
                     'data-timezone' => 'Africa/Tunis'
                 ],
                 'label' => 'Date et heure'
-            ])
-            ->add('scorequiz', IntegerType::class, [
-                'attr' => [
-                    'class' => 'form-control',
-                    'min' => 0,
-                    'max' => 10
-                ],
-                'label' => 'Score Quiz (/10)',
-                'required' => false
             ]);
             
 

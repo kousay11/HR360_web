@@ -15,17 +15,48 @@ use App\Enum\TypeEnt; // Add this
 use App\Service\GoogleMeetService; // Add this
 use App\Entity\Candidature;
 use App\Repository\CandidatureRepository;
+use Knp\Component\Pager\PaginatorInterface;
 
 #[Route('/entretien')]
 final class EntretienController extends AbstractController
 {
-    #[Route('/candidature/{idCandidature}', name: 'app_entretien_index', methods: ['GET'])]
+    /*#[Route('/candidature/{idCandidature}', name: 'app_entretien_index', methods: ['GET'])]
     public function index(EntretienRepository $entretienRepository, int $idCandidature, CandidatureRepository $candidatureRepository): Response
     {
         $candidature = $candidatureRepository->find($idCandidature);
         return $this->render('entretien/index.html.twig', [
             'candidature' => $candidature,
             'entretiens' => $candidature->getEntretiens()
+        ]);
+    }*/
+
+
+    #[Route('/candidature/{idCandidature}', name: 'app_entretien_index', methods: ['GET'])]
+    public function index(
+        EntretienRepository $entretienRepository, 
+        int $idCandidature, 
+        CandidatureRepository $candidatureRepository,
+        Request $request
+    ): Response {
+        $candidature = $candidatureRepository->find($idCandidature);
+        $localisation = $request->query->get('localisation', '');
+        $order = $request->query->get('order', 'ASC');
+        $type = $request->query->get('type', '');
+        
+        $entretiens = $entretienRepository->findByType($idCandidature, $type, $order);
+        
+        if ($localisation !== '') {
+            $entretiens = array_filter($entretiens, function($entretien) use ($localisation) {
+                return stripos($entretien->getLocalisation() ?? '', $localisation) !== false;
+            });
+        }
+        
+        return $this->render('entretien/index.html.twig', [
+            'candidature' => $candidature,
+            'entretiens' => $entretiens,
+            'localisation' => $localisation,
+            'order' => $order,
+            'selectedType' => $type
         ]);
     }
 
@@ -36,7 +67,7 @@ public function indexfront(EntretienRepository $entretienRepository): Response
         'entretiens' => $entretienRepository->findAll(),
     ]);
 }*/
-
+/*
 #[Route('/entfront/{idCandidature}/{page}', name: 'app_entretien_front', defaults: ['page' => 1], methods: ['GET'])]
 public function indexfront(
     EntretienRepository $entretienRepository, 
@@ -74,6 +105,39 @@ public function indexfront(
         'page' => $page,
         'totalPages' => $totalPages,
         'idCandidature' => $idCandidature
+    ]);
+}*/
+
+
+
+#[Route('/entfront/{idCandidature}', name: 'app_entretien_front', methods: ['GET'])]
+public function indexfront(
+    EntretienRepository $entretienRepository,
+    CandidatureRepository $candidatureRepository,
+    PaginatorInterface $paginator,
+    int $idCandidature,
+    Request $request
+): Response {
+    $candidature = $candidatureRepository->find($idCandidature);
+    if (!$candidature) {
+        throw $this->createNotFoundException('Candidature non trouvée');
+    }
+
+    $query = $entretienRepository->createQueryBuilder('e')
+        ->andWhere('e.candidature = :candidature')
+        ->setParameter('candidature', $candidature)
+        ->orderBy('e.date', 'ASC')
+        ->getQuery();
+
+    $entretiens = $paginator->paginate(
+        $query,
+        $request->query->getInt('page', 1), // Numéro de page
+        3 // Limite par page
+    );
+
+    return $this->render('entretien/entfront.html.twig', [
+        'entretiens' => $entretiens,
+        'candidature' => $candidature,
     ]);
 }
 

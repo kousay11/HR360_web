@@ -5,21 +5,49 @@
 
 {% block css %}
     {{ parent() }}
+    {% import "evaluation/star_rating.html.twig" as starRating %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="{{ asset('back/css/project-card.css') }}" rel="stylesheet">
     <style>
-        /* Styles supplémentaires pour les boutons */
-        .action-buttons .btn {
-            padding: 5px 8px;
-            font-size: 0.75rem;
-            width: 80px; /* Largeur fixe pour tous les boutons */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .action-buttons .btn i {
-            margin-right: 3px;
-            font-size: 0.7rem;
-        }
+       /* Modifiez ou ajoutez ces styles dans votre bloc CSS */
+
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap; /* Permet aux boutons de passer à la ligne si nécessaire */
+    gap: 5px; /* Espacement entre les boutons */
+    justify-content: center; /* Centre les boutons horizontalement */
+}
+
+.action-buttons .btn {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+    min-width: 80px; /* Largeur minimale au lieu de largeur fixe */
+    flex: 1 1 auto; /* Permet aux boutons de s'adapter */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap; /* Empêche le texte de passer à la ligne */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Ajoute des points de suspension si le texte est trop long */
+}
+
+/* Ajustez la taille des icônes si nécessaire */
+.action-buttons .btn i {
+    margin-right: 3px;
+    font-size: 0.7rem;
+}
+
+/* Ajustez la hauteur de la carte si nécessaire */
+.project-card {
+    min-height: 380px; /* Ajustez cette valeur selon vos besoins */
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card-footer {
+    margin-top: auto; /* Pousse le footer vers le bas */
+    padding: 10px;
+}
         .btn-info {
             background-color: var(--info) !important;
             color: white !important;
@@ -67,6 +95,8 @@
 {% endblock %}
 
 {% block body %}
+{% import "evaluation/star_rating.html.twig" as starRating %}
+
     <!-- Begin Page Content -->
     <div class="container-fluid">
 
@@ -100,8 +130,8 @@
         <div class="row evaluation-cards">
             {% for evaluation in evaluations %}
                 <div class="col-md-6 col-lg-4 evaluation-card">
-                    <div class="project-card clickable-card" onclick="window.location='{{ path('app_evaluation_show', {'idEvaluation': evaluation.idEvaluation}) }}'">
-                        <div class="project-card-header">
+                    <div class="project-card clickable-card" >
+                        <div class="project-card-header" onclick="window.location='{{ path('app_evaluation_show', {'idEvaluation': evaluation.idEvaluation}) }}'">
                             <div class="project-icon">
                                 <i class="fas fa-clipboard-check"></i>
                             </div>
@@ -116,10 +146,10 @@
                             <div class="project-meta">
                                 <i class="fas fa-comment"></i>
                                 <span class="status-badge 
-                                    {% if evaluation.commentaire == 'ACCEPTÉ' %}status-active
+                                    {% if evaluation.commentaire.value == 'ACCEPTÉ' %}status-active
                                     {% else %}status-expired
                                     {% endif %}">
-                                    {{ evaluation.commentaire }}
+                                    {{ evaluation.commentaire.value }}
                                 </span>
                             </div>
                             
@@ -160,23 +190,50 @@
                                     {{ evaluation.scorequiz }}/10
                                 </span>
                             </div>
-                        </div>
-                        <div class="project-card-footer">
-                            <div class="action-buttons">
-                                <a href="{{ path('app_evaluation_edit', {'idEvaluation': evaluation.idEvaluation}) }}" 
-                                   class="btn btn-sm btn-modify" title="Modifier">
-                                    <i class="fas fa-edit"></i> Modifier
-                                </a>
-                                <form method="post" action="{{ path('app_evaluation_delete', {'idEvaluation': evaluation.idEvaluation}) }}" 
-                                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette évaluation ?');"
-                                      class="d-inline">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evaluation.idEvaluation) }}">
-                                    <button class="btn btn-sm btn-delete" title="Supprimer">
-                                        <i class="fas fa-trash"></i> Supprimer
-                                    </button>
-                                </form>
+                            <div class="mt-2">
+                                {{ starRating.displayStars(evaluation.scorequiz, 10, 5) }}
                             </div>
                         </div>
+                       <div class="project-card-footer">
+    <div class="action-buttons">
+        {% if evaluation.questions|length > 0 %}
+            <a href="{{ path('app_evaluation_quiz', {'idEvaluation': evaluation.idEvaluation}) }}" 
+               class="btn btn-success btn-sm">
+                <i class="fas fa-play"></i> Quiz
+            </a>
+        {% endif %}
+        
+        <a href="{{ path('app_evaluation_add_quiz', {'idEvaluation': evaluation.idEvaluation}) }}" 
+           class="btn btn-primary btn-sm">
+            <i class="fas fa-question-circle"></i> Ajout Quiz
+        </a>
+        
+        {% if evaluation.questions|length > 0 %}
+            <form method="post" action="{{ path('app_evaluation_clear_quiz', {'idEvaluation': evaluation.idEvaluation}) }}" 
+                  class="d-inline" 
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer le quiz ?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('clear_quiz' ~ evaluation.idEvaluation) }}">
+                <button class="btn btn-danger btn-sm">
+                    <i class="fas fa-trash"></i> Supp Quiz
+                </button>
+            </form>
+        {% endif %}
+        
+        <a href="{{ path('app_evaluation_edit', {'idEvaluation': evaluation.idEvaluation}) }}" 
+           class="btn btn-info btn-sm">
+            <i class="fas fa-edit"></i> Modifier
+        </a>
+        
+        <form method="post" action="{{ path('app_evaluation_delete', {'idEvaluation': evaluation.idEvaluation}) }}" 
+              class="d-inline"
+              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette évaluation ?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evaluation.idEvaluation) }}">
+            <button class="btn btn-danger btn-sm">
+                <i class="fas fa-trash-alt"></i> Supp Eva
+            </button>
+        </form>
+    </div>
+</div>
                     </div>
                 </div>
             {% else %}

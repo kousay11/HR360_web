@@ -1,0 +1,167 @@
+{% extends 'baseCAN.html.twig' %}
+
+{% block title %}Quiz - {{ evaluation.titreEva }}{% endblock %}
+
+{% block css %}
+{{ parent() }}
+<style>
+    /* Styles similaires à show_quiz.html.twig avec un design plus moderne */
+    .quiz-container { max-width: 800px; margin: 0 auto; }
+    .question-card { 
+        background: #fff; border-radius: 15px; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        padding: 20px; margin-bottom: 25px;
+    }
+    .question-number {
+        background: #4e73df; color: white;
+        width: 40px; height: 40px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem; margin-right: 15px;
+    }
+    .answer-option {
+        padding: 12px; margin: 8px 0;
+        border: 1px solid #e0e0e0; border-radius: 8px;
+        transition: all 0.3s;
+    }
+    .answer-option:hover { background-color: #f8f9fa; }
+</style>
+{% endblock %}
+
+{% block index %}
+<div class="quiz-container">
+    <div class="card shadow">
+        <div class="card-header py-3">
+            <div class="quiz-header">
+                <h1 class="h3 mb-0 text-gray-800">Quiz: {{ evaluation.titreEva }}</h1>
+                <div class="quiz-score">Score: <span id="score-display">0</span>/10</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <form id="quiz-form-front" action="{{ path('quiz_submit_evaluation') }}" method="POST">
+                <input type="hidden" name="evaluation_id" value="{{ evaluation.idEvaluation }}">
+                
+                {% for question in evaluation.questions %}
+                <div class="question-card" id="question-{{ loop.index0 }}">
+                    <div class="question-header">
+                        <div class="question-number">{{ loop.index }}</div>
+                        <h3 class="h5 mb-0">{{ question.question }}</h3>
+                    </div>
+                    
+                    {% if question.description is defined and question.description %}
+                        <p class="text-muted mb-3">{{ question.description }}</p>
+                    {% endif %}
+                    
+                    <div class="answers">
+                        {% set letters = ['A', 'B', 'C', 'D', 'E', 'F'] %}
+                        {% for key, answer in question.answers %}
+                            {% if answer %}
+                            <div class="answer-option">
+                                <input type="radio" name="answers[{{ loop.parent.loop.index0 }}]" 
+                                       id="q{{ loop.parent.loop.index0 }}_a{{ loop.index0 }}" 
+                                       value="{{ key }}" required>
+                                <label for="q{{ loop.parent.loop.index0 }}_a{{ loop.index0 }}" class="d-flex align-items-center">
+                                    <span class="answer-letter">{{ letters[loop.index0] }}</span>
+                                    <span>{{ answer }}</span>
+                                </label>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary submit-btn">
+                        <i class="fas fa-paper-plane"></i> Soumettre le quiz
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Résultats -->
+    <div class="modal fade" id="quizResultModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header text-white" id="resultModalHeader">
+                    <h5 class="modal-title">Résultats du Quiz</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="fas fa-poll modal-icon" id="resultModalIcon"></i>
+                    <h3 class="modal-statut mb-3" id="resultModalStatut"></h3>
+                    <p class="modal-score" id="resultModalScore"></p>
+                    <p class="modal-message text-muted" id="resultModalMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <a href="{{ path('app_evaluation_front') }}" class="btn btn-primary">
+                        Retour aux évaluations
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+$(document).ready(function() {
+    const $form = $('#quiz-form-front');
+    
+    $form.on('submit', function(e) {
+        e.preventDefault();
+        const $submitBtn = $form.find('.submit-btn');
+        $submitBtn.prop('disabled', true)
+                 .html('<i class="fas fa-spinner fa-spin"></i> Envoi en cours...');
+
+        // ... (vérification des réponses comme avant) ...
+
+        $.ajax({
+            url: $form.attr('action'),
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                evaluation_id: {{ evaluation.idEvaluation }},
+                answers: answers
+            }),
+            dataType: 'json'
+        })
+        .done(function(response) {
+    if (!response.success) {
+        throw new Error(response.message || 'Erreur lors de la soumission');
+    }
+
+    Swal.fire({
+        title: 'Quiz soumis!',
+        html: `Votre score: <b>${response.score}/10</b><br>
+               Réponses correctes: ${response.correctCount}/${response.totalQuestions}`,
+        icon: 'success',
+        confirmButtonText: 'OK',
+        allowOutsideClick: false
+    }).then(() => {
+        // Nouvelle méthode de redirection
+        if (response.redirectUrl) {
+            // Créer un formulaire temporaire pour forcer une navigation complète
+            const form = document.createElement('form');
+            form.method = 'GET';
+            form.action = response.redirectUrl;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+})
+        .fail(function(jqXHR) {
+            // ... (gestion des erreurs comme avant) ...
+        })
+        .always(() => {
+            $submitBtn.prop('disabled', false)
+                     .html('<i class="fas fa-paper-plane"></i> Soumettre');
+        });
+    });
+});
+</script>
+{% endblock %}

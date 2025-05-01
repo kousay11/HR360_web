@@ -11,6 +11,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Entity\QuizQuestion;
+use App\Service\QuizApiService;
+use App\Enum\Commentaire;
 
 #[Route('/evaluation')]
 final class EvaluationController extends AbstractController
@@ -211,6 +214,115 @@ public function indexForEntretienfront(Entretien $entretien, EvaluationRepositor
     return $this->render('evaluation/evafront.html.twig', [
         'evaluations' => $evaluations,
         'entretien' => $entretien,
+    ]);
+}
+
+////////////////
+
+#[Route('/{idEvaluation}/add-quiz', name: 'app_evaluation_add_quiz', methods: ['GET', 'POST'])]
+    public function addQuiz(
+        Request $request,
+        Evaluation $evaluation,
+        QuizApiService $quizApiService,
+        EntityManagerInterface $entityManager
+    ): Response {
+        if ($request->isMethod('POST')) {
+            $category = $request->request->get('category');
+            $difficulty = $request->request->get('difficulty');
+            $limit = $request->request->get('limit', 10);
+
+            try {
+                $questions = $quizApiService->fetchQuizQuestions($category, $difficulty, $limit);
+                
+                $storableQuestions = [];
+                foreach ($questions as $question) {
+                    $questionData = [
+                        'question' => $question->getQuestion(),
+                        'answers' => $question->getAnswers(),
+                        'correctAnswers' => $question->getCorrectAnswers(),
+                        'category' => $question->getCategory(),
+                        'difficulty' => $question->getDifficulty()
+                    ];
+                    
+                    if ($question->getDescription()) {
+                        $questionData['description'] = $question->getDescription();
+                    }
+                    if ($question->getExplanation()) {
+                        $questionData['explanation'] = $question->getExplanation();
+                    }
+                    if ($question->getTip()) {
+                        $questionData['tip'] = $question->getTip();
+                    }
+                    
+                    $storableQuestions[] = $questionData;
+                }
+                
+                $evaluation->setQuestions($storableQuestions);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Quiz ajouté avec succès à l\'évaluation');
+                // Rediriger vers la liste des évaluations de l'entretien
+            if ($evaluation->getEntretien()) {
+                return $this->redirectToRoute('app_evaluation_index_for_entretien', [
+                    'idEntretien' => $evaluation->getEntretien()->getIdEntretien()
+                ]);
+            }
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de la récupération du quiz: '.$e->getMessage());
+            }
+        }
+
+        return $this->render('evaluation/add_quiz.html.twig', [
+            'evaluation' => $evaluation,
+            'categories' => [
+                'Linux', 'Bash', 'PHP', 'Docker', 'MySQL', 
+                'WordPress', 'HTML', 'JavaScript', 'CSS'
+            ],
+            'difficulties' => ['Easy', 'Medium', 'Hard']
+        ]);
+    }
+
+    #[Route('/{idEvaluation}/clear-quiz', name: 'app_evaluation_clear_quiz', methods: ['POST'])]
+    public function clearQuiz(
+        Evaluation $evaluation,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $evaluation->setQuestions([]);
+        $evaluation->setScorequiz(0);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Quiz supprimé de l\'évaluation');
+        return $this->redirectToRoute('app_evaluation_index_for_entretien', [
+            'idEntretien' => $evaluation->getEntretien()->getIdEntretien()
+        ]);
+    }
+
+    #[Route('/{idEvaluation}/quiz', name: 'app_evaluation_quiz', methods: ['GET'])]
+    public function showQuiz(Evaluation $evaluation): Response {
+        if (!$evaluation->getQuestions()) {
+            $this->addFlash('warning', 'Cette évaluation n\'a pas de quiz associé');
+            return $this->redirectToRoute('app_evaluation_show', [
+                'idEvaluation' => $evaluation->getIdEvaluation()
+            ]);
+        }
+
+        return $this->render('evaluation/show_quiz.html.twig', [
+            'evaluation' => $evaluation
+        ]);
+    }
+
+    #[Route('/{idEvaluation}/quiz-front', name: 'app_evaluation_quiz_front', methods: ['GET', 'POST'])]
+public function showQuizFront(Request $request, Evaluation $evaluation): Response 
+{
+    if (!$evaluation->getQuestions()) {
+        $this->addFlash('warning', 'Cette évaluation n\'a pas de quiz associé');
+        return $this->redirectToRoute('app_evaluation_front_for_entretien', [
+            'idEntretien' => $evaluation->getEntretien()->getIdEntretien()
+        ]);
+    }
+    
+    return $this->render('evaluation/show_quizFront.html.twig', [
+        'evaluation' => $evaluation
     ]);
 }
 

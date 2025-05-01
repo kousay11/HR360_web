@@ -1,0 +1,32 @@
+{% macro displayStars(score, maxScore = 10, maxStars = 5) %}
+    {% set starValue = (score / maxScore) * maxStars %}
+    {% set fullStars = starValue|round(0, 'floor') %}
+    {% set hasHalfStar = starValue - fullStars >= 0.5 %}
+    
+    <div class="star-rating">
+        {% for i in 1..maxStars %}
+            {% if i <= fullStars %}
+                <i class="fas fa-star text-warning"></i>
+            {% elseif i == fullStars + 1 and hasHalfStar %}
+                <i class="fas fa-star-half-alt text-warning"></i>
+            {% else %}
+                <i class="far fa-star text-warning"></i>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+<style>
+.star-rating {
+    display: inline-flex;
+    align-items: center;
+    font-size: 1.2rem;
+}
+.star-rating i {
+    margin-right: 2px;
+}
+.score-text {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+</style> 

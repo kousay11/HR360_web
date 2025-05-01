@@ -27,6 +27,12 @@
         .btn-info:hover {
             background-color: #3a7bd0 !important;
         }
+        .search-form {
+            margin-left: 15px;
+        }
+        .search-form .form-control {
+            width: 200px;
+        }
     </style>
 {% endblock %}
 
@@ -40,6 +46,31 @@
 
                 <i class="fas fa-plus fa-sm text-white-50 mr-2"></i>Créer un nouvel entretien
             </a>
+            <form method="get" action="{{ path('app_entretien_index', {'idCandidature': candidature.idCandidature}) }}" class="search-form ml-3">
+            <div class="input-group">
+                <input type="text" name="localisation" class="form-control bg-light border-0 small" placeholder="Rechercher par localisation..." value="{{ app.request.query.get('localisation') }}">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search fa-sm"></i>
+                    </button>
+                </div>
+                <a href="{{ path('app_entretien_index', {'idCandidature': candidature.idCandidature, 'order': order == 'ASC' ? 'DESC' : 'ASC', 'localisation': app.request.query.get('localisation')}) }}" 
+                    class="btn btn-outline-primary btn-sm ml-3">
+                    <i class="fas fa-sort-amount-{{ order == 'ASC' ? 'down' : 'up' }}"></i>Trier par date
+                </a>
+                <div class="btn-group ml-3" role="group">
+    <a href="{{ path('app_entretien_index', {'idCandidature': candidature.idCandidature, 'type': selectedType == 'En_ligne' ? '' : 'En_ligne', 'order': order, 'localisation': app.request.query.get('localisation')}) }}" 
+       class="btn btn-outline-primary btn-sm {{ selectedType == 'En_ligne' ? 'active' : '' }}">
+        <i class="fas fa-video"></i> En ligne
+    </a>
+    <a href="{{ path('app_entretien_index', {'idCandidature': candidature.idCandidature, 'type': selectedType == 'Presentiel' ? '' : 'Presentiel', 'order': order, 'localisation': app.request.query.get('localisation')}) }}" 
+       class="btn btn-outline-primary btn-sm {{ selectedType == 'Presentiel' ? 'active' : '' }}">
+        <i class="fas fa-map-marker-alt"></i> Présentiel
+    </a>
+</div>
+            </div>
+        </form>
+    </div>
         </div>
 
         <!-- Cards Section -->
@@ -138,5 +169,7 @@
                 }
             });
         });
+
+        
     </script>
 {% endblock %}

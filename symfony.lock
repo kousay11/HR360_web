@@ -47,6 +47,8 @@
             "ref": "07a97ec434d43b7903c78069a04c92adb6442e52"
         }
     },
+    "knplabs/knp-paginator-bundle": {
+        "version": "v6.8.0"
     "karser/karser-recaptcha3-bundle": {
         "version": "0.2",
         "recipe": {
@@ -197,6 +199,18 @@
             "version": "1.0",
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
+    },
+    "symfony/mercure-bundle": {
+        "version": "0.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "0.3",
+            "ref": "528285147494380298f8f991ee8c47abebaf79db"
+        },
+        "files": [
+            "./config/packages/mercure.yaml"
+        ]
     },
     "symfony/messenger": {
         "version": "6.4",
