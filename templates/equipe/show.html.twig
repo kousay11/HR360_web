@@ -14,7 +14,7 @@
         <a href="{{ path('app_equipe_index') }}" class="btn btn-back">
             <i class="fas fa-arrow-left"></i> Back to list
         </a>
-        <a href="#" class="btn btn-add">
+        <a href="{{ path('workload_calendar', {id: equipe.id}) }}" class="btn btn-add">
                 <i class="fas fa-suitcase"></i> Voir Charge
         </a>
     </div>
