@@ -34,7 +34,7 @@ final class RessourceController extends AbstractController
     
 
     #[Route('/employee', name: 'app_ressource_index_employee', methods: ['GET'])]
-public function indexForEmployees(Request $request, RessourceRepository $ressourceRepository, ReservationRepository $reservationRepository): Response
+public function indexForEmployees(Request $request, RessourceRepository $ressourceRepository, ReservationRepository $reservationRepository, QRCodeService $qrCodeService): Response
 {
     $search = $request->query->get('search');
     $type = $request->query->get('type');
@@ -49,6 +49,12 @@ public function indexForEmployees(Request $request, RessourceRepository $ressour
     $reservedDates = [];
 
     foreach ($ressources as $ressource) {
+        // Remove existing QR code file if it exists
+        $qrCodePath = 'public/uploads/qrcodes/qr_ressource_' . $ressource->getId() . '.png';
+        if (file_exists($qrCodePath)) {
+            unlink($qrCodePath);
+        }
+        $qrCodeService->generateQRCodeForRessource($ressource);
         $reservations = $reservationRepository->findBy(['ressource' => $ressource]);
         $dates = [];
 
@@ -109,7 +115,7 @@ public function new(Request $request, EntityManagerInterface $entityManager, Slu
 
 
                 // Génération QR Code après avoir obtenu l'ID
-        $qrCode = $qrCodeService->generateQRCodeForRessource($ressource);
+        $qrCodeService->generateQRCodeForRessource($ressource);
 
         // Redirection après la soumission du formulaire
         return $this->redirectToRoute('app_ressource_index', [], Response::HTTP_SEE_OTHER);
