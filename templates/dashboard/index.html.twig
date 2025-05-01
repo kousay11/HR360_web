@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 $('#eventTitle').text(event.title);
                 $('#eventDates').html(`
                     <i class="fas fa-clock mr-2"></i>
-                    ${event.start.toLocaleDateString()} - ${event.end?.toLocaleDateString() || ''}
+                    ${event.start.toLocaleDateString()} - ${event.end ? event.end.toLocaleDateString() : ''}
                 `);
                 $('#eventResource').html(`
                     <i class="fas fa-cube mr-2"></i>
@@ -429,6 +429,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
 
+
+document.getElementById('refreshCalendar').addEventListener('click', function () {
+    calendar.refetchEvents();
+    toastr.info('Calendrier mis à jour');
+});
 
         
     </script>

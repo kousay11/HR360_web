@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Reservation;
+use App\Repository\RessourceRepository;
 
 final class DashboardController extends AbstractController
 {
@@ -116,5 +117,28 @@ $start = $reservation->getDateDebut()
             ], 500);
         }
     }
+
+
+
+
+    #[Route('/api/resources', name: 'api_resources')]
+public function getResources(RessourceRepository $repo): JsonResponse
+{
+    return $this->json($repo->findAll(), 200, [], ['groups' => 'calendar']);
+}
+
+#[Route('/calendar/updates', name: 'calendar_updates')]
+public function sseUpdates(ReservationRepository $repo): Response
+{
+    return new Response(
+        $repo->streamUpdates(),
+        200,
+        [
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache',
+            'Connection' => 'keep-alive'
+        ]
+    );
+}
 
 }

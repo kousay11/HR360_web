@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Service\QRCodeService;
 #[Route('/reservation')]
 final class ReservationController extends AbstractController
@@ -286,6 +287,63 @@ public function delete(
 }
 
 
+
+#[Route('/api/events/new', name: 'api_event_new', methods: ['POST'])]
+public function newEvent(Request $request, EntityManagerInterface $em): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
+
+    $reservation = new Reservation();
+    
+    // Conversion des dates
+    try {
+        $startDate = new \DateTime($data['start']);
+        $endDate = new \DateTime($data['end']);
+    } catch (\Exception $e) {
+        return $this->json(['error' => 'Format de date invalide'], 400);
+    }
+
+    $reservation->setDatedebut($startDate);
+    $reservation->setDatefin($endDate);
+    
+    // Gestion de la ressource
+    $ressource = $em->getRepository(Ressource::class)->find($data['resourceId']);
+    if (!$ressource) {
+        return $this->json(['error' => 'Ressource introuvable'], 404);
+    }
+    $reservation->setRessource($ressource);
+
+    // Validation manuelle
+
+    // Vérification des conflits
+    if ($this->hasConflict($reservation, $em)) {
+        return $this->json(['error' => 'Conflit de réservation'], 409);
+    }
+
+    $em->persist($reservation);
+    $em->flush();
+
+    return $this->json([
+        'id' => $reservation->getId(),
+        'message' => 'Réservation créée avec succès'
+    ]);
+}
+
+private function hasConflict(Reservation $newReservation, EntityManagerInterface $em): bool
+{
+    $existingReservations = $em->getRepository(Reservation::class)
+        ->findByRessource($newReservation->getRessource());
+
+    foreach ($existingReservations as $existing) {
+        if ($existing->conflictsWith(
+            $newReservation->getDatedebut(), 
+            $newReservation->getDatefin()
+        )) {
+            return true;
+        }
+    }
+    return false;
+}
 
     
     

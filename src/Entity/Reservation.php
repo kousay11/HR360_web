@@ -92,14 +92,13 @@ class Reservation
     }
 
     // In your Reservation entity
-public function conflictsWith(\DateTimeInterface $startDate, \DateTimeInterface $endDate): bool
-{
-    // Convert all dates to DateTimeImmutable for consistent comparison
-    $newStart = \DateTimeImmutable::createFromInterface($startDate);
-    $newEnd = \DateTimeImmutable::createFromInterface($endDate);
-    $existingStart = \DateTimeImmutable::createFromInterface($this->getDateDebut());
-    $existingEnd = \DateTimeImmutable::createFromInterface($this->getDateFin());
-
-    return $newStart < $existingEnd && $newEnd > $existingStart;
-}
+    public function conflictsWith(\DateTimeInterface $startDate, \DateTimeInterface $endDate): bool
+    {
+        $newStart = \DateTimeImmutable::createFromInterface($startDate);
+        $newEnd = \DateTimeImmutable::createFromInterface($endDate);
+        $existingStart = \DateTimeImmutable::createFromInterface($this->getDatedebut());
+        $existingEnd = \DateTimeImmutable::createFromInterface($this->getDatefin());
+    
+        return $newStart < $existingEnd && $newEnd > $existingStart;
+    }
 }
