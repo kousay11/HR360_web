@@ -74,4 +74,12 @@ public function findOffresExpiringIn(int $days): array
         ->getQuery()
         ->getResult();
 }
+public function findAllWithCandidatures(): array
+{
+    return $this->createQueryBuilder('o')
+        ->leftJoin('o.candidatures', 'c')
+        ->addSelect('c')
+        ->getQuery()
+        ->getResult();
+}
 }

@@ -216,4 +216,29 @@ public function translateDescription(Request $request, DeepTranslateService $tra
         ], 503);
     }
 }
+#[Route('/offre/statistiques', name: 'app_offre_statistiques', methods: ['GET'])]
+public function statistiques(OffreRepository $offreRepository): JsonResponse
+{
+    $stats = [];
+    $offres = $offreRepository->findAllWithCandidatures();
+
+    foreach ($offres as $offre) {
+        $totalCandidatures = $offre->getCandidatures()->count();
+        $candidaturesAvecReponse = $offre->getCandidatures()->filter(
+            fn($c) => $c->getStatut() !== 'En attente'
+        )->count();
+
+        $stats[] = [
+            'titre' => $offre->getTitre(),
+            'totalCandidatures' => $totalCandidatures,
+            'candidaturesAvecReponse' => $candidaturesAvecReponse,
+            'tauxReponse' => $totalCandidatures > 0 
+                ? round(($candidaturesAvecReponse / $totalCandidatures) * 100)
+                : 0,
+            'statut' => $offre->getDateExpiration() > new \DateTime() ? 'Active' : 'Expirée'
+        ];
+    }
+
+    return $this->json($stats);
+}
 }

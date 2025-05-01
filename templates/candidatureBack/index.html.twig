@@ -285,11 +285,11 @@
                                                     data-candidature-id="{{ candidature.idCandidature }}">
                                                 <i class="fas fa-search"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-outline-danger action-btn parse-cv-btn" 
-                                                    title="Analyser le CV" 
-                                                    data-candidature-id="{{ candidature.idCandidature }}">
-                                                <i class="fas fa-file-pdf"></i>
-                                            </button>
+                                           <button class="btn btn-sm btn-outline-success action-btn parse-cv-btn" 
+        title="Analyser les compétences" 
+        data-candidature-id="{{ candidature.idCandidature }}">
+    <i class="fas fa-user-tie"></i>
+</button>
                                              {# Nouveau bouton Entretien#}
         
             <a href="{{ path('app_entretien_index', {'idCandidature': candidature.idCandidature}) }}" 

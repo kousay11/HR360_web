@@ -161,9 +161,267 @@
                 margin-top: 5px;
             }
         }
+        /* Ajoutez ceci dans votre bloc CSS */
+.stat-card {
+    transition: all 0.3s ease;
+    border-width: 2px;
+    border-radius: 10px;
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+#candidaturesChart, #offresChart {
+    width: 100% !important;
+    max-height: 300px;
+}
+
+.modal-header {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-weight: 600;
+    border: none;
+}
+
+.btn-info:hover {
+    background-color: #138496;
+    color: white;
+}
     </style>
 {% endblock %}
+{% block js %}
+    {{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialisation des graphiques
+            let candidaturesChart, offresChart;
+            
+            // Fonction pour récupérer les données depuis le backend
+            async function fetchStats() {
+                try {
+                    const response = await fetch('{{ path("app_offre_statistiques") }}');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    return [];
+                }
+            }
 
+            // Fonction pour compter les offres actives/expirées
+            function countOffres() {
+                let active = 0, expired = 0;
+                
+                document.querySelectorAll('.list-group-item').forEach(item => {
+                    if (item.querySelector('.badge.bg-success')) {
+                        active++;
+                    } else {
+                        expired++;
+                    }
+                });
+                
+                return {
+                    total: active + expired,
+                    active: active,
+                    expired: expired
+                };
+            }
+            
+            // Fonction pour créer le graphique des candidatures
+            async function createCandidaturesChart() {
+                const stats = await fetchStats();
+                const ctx = document.getElementById('candidaturesChart').getContext('2d');
+                
+                if (candidaturesChart) {
+                    candidaturesChart.destroy();
+                }
+                
+                candidaturesChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: stats.map(offre => offre.titre),
+                        datasets: [{
+                            label: 'Nombre de candidatures',
+                            data: stats.map(offre => offre.totalCandidatures),
+                            backgroundColor: 'rgba(78, 115, 223, 0.8)',
+                            borderColor: 'rgba(78, 115, 223, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${context.raw}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Fonction pour créer le graphique des offres
+            function createOffresChart() {
+                const ctx = document.getElementById('offresChart').getContext('2d');
+                const counts = countOffres();
+                
+                if (offresChart) {
+                    offresChart.destroy();
+                }
+                
+                offresChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Actives', 'Expirées'],
+                        datasets: [{
+                            data: [counts.active, counts.expired],
+                            backgroundColor: [
+                                'rgba(40, 167, 69, 0.8)',
+                                'rgba(108, 117, 125, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgba(40, 167, 69, 1)',
+                                'rgba(108, 117, 125, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const value = context.raw;
+                                        const percentage = Math.round((value / total) * 100);
+                                        return `${context.label}: ${value} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Fonction pour remplir le tableau des détails
+            async function populateDetailsTable() {
+                const stats = await fetchStats();
+                const tableBody = document.querySelector('#detailsTable tbody');
+                tableBody.innerHTML = '';
+                
+                stats.forEach(offre => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${offre.titre}</td>
+                        <td>
+                            <span class="badge ${offre.statut === 'Active' ? 'bg-success' : 'bg-secondary'}">
+                                ${offre.statut}
+                            </span>
+                        </td>
+                        <td>${offre.totalCandidatures}</td>
+                        <td>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar ${offre.tauxReponse > 50 ? 'bg-success' : offre.tauxReponse > 25 ? 'bg-warning' : 'bg-danger'}" 
+                                     role="progressbar" 
+                                     style="width: ${offre.tauxReponse}%" 
+                                     aria-valuenow="${offre.tauxReponse}" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                    ${offre.tauxReponse}%
+                                </div>
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+            
+            // Initialisation du modal
+            document.getElementById('statsModal').addEventListener('shown.bs.modal', async function() {
+                const counts = countOffres();
+                
+                // Mettre à jour les cartes de synthèse
+                document.getElementById('totalOffres').textContent = counts.total;
+                document.getElementById('offresActives').textContent = counts.active;
+                document.getElementById('offresExpirees').textContent = counts.expired;
+                
+                // Créer les graphiques et le tableau
+                await createCandidaturesChart();
+                createOffresChart();
+                await populateDetailsTable();
+            });
+            
+            // Nettoyage quand le modal est fermé
+            document.getElementById('statsModal').addEventListener('hidden.bs.modal', function() {
+                if (candidaturesChart) candidaturesChart.destroy();
+                if (offresChart) offresChart.destroy();
+            });
+            
+            // Export PDF
+            document.getElementById('exportStatsBtn').addEventListener('click', function() {
+                // Ici vous pouvez implémenter l'export PDF via jsPDF ou un appel au backend
+                const modalContent = document.querySelector('#statsModal .modal-content');
+                
+                html2canvas(modalContent).then(canvas => {
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = 210; // A4 width in mm
+                    const pageHeight = 295; // A4 height in mm
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
+                    
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                    
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    
+                    pdf.save('statistiques-offres.pdf');
+                });
+            });
+        });
+    </script>
+{% endblock %}
 {% block body %}
 <div class="container py-4">
     <div class="table-container">
@@ -180,6 +438,10 @@
                     <i class="fas fa-clock me-2"></i>Vérifier les offres à expirer
                 </button>
             </form>
+            {# Nouveau bouton Statistiques #}
+        <button type="button" class="btn btn-info ms-2" data-bs-toggle="modal" data-bs-target="#statsModal">
+            <i class="fas fa-chart-bar me-2"></i>Statistiques
+        </button>
         </div>
             
             
@@ -314,6 +576,132 @@
                 </a>
             </div>
         {% endif %}
+    </div>
+</div>
+{# ... après la fermeture de la div container ... #}
+
+<!-- Modal des statistiques -->
+<div class="modal fade" id="statsModal" tabindex="-1" aria-labelledby="statsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="statsModalLabel">
+                    <i class="fas fa-chart-pie me-2"></i>Statistiques des Offres
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-4">
+                    <!-- Carte synthèse -->
+                    <div class="col-md-4">
+                        <div class="card stat-card bg-info bg-opacity-10 border-info">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-info mb-0">Total Offres</h6>
+                                        <h2 class="mb-0" id="totalOffres">0</h2>
+                                    </div>
+                                    <div class="bg-info bg-opacity-25 p-3 rounded">
+                                        <i class="fas fa-briefcase text-info fs-4"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card stat-card bg-success bg-opacity-10 border-success">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-success mb-0">Offres Actives</h6>
+                                        <h2 class="mb-0" id="offresActives">0</h2>
+                                    </div>
+                                    <div class="bg-success bg-opacity-25 p-3 rounded">
+                                        <i class="fas fa-check-circle text-success fs-4"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card stat-card bg-secondary bg-opacity-10 border-secondary">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-secondary mb-0">Offres Expirées</h6>
+                                        <h2 class="mb-0" id="offresExpirees">0</h2>
+                                    </div>
+                                    <div class="bg-secondary bg-opacity-25 p-3 rounded">
+                                        <i class="fas fa-clock text-secondary fs-4"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0">Candidatures par Offre</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="candidaturesChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0">Répartition des Offres</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="offresChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Détails des Candidatures</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm" id="detailsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Offre</th>
+                                                <th>Statut</th>
+                                                <th>Candidatures</th>
+                                                <th>Taux de réponse</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Rempli dynamiquement -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Fermer
+                </button>
+                <button type="button" class="btn btn-primary" id="exportStatsBtn">
+                    <i class="fas fa-file-pdf me-2"></i>Exporter
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
