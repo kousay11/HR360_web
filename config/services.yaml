@@ -9,6 +9,7 @@ parameters:
     images_directory: '%kernel.project_dir%/public/uploads/images'
     recaptcha3_key: '%env(RECAPTCHA3_KEY)%'
     recaptcha3_secret: '%env(RECAPTCHA3_SECRET)%'
+    env(ABSTRACT_API_KEY): '%env(ABSTRACT_API_KEY)%'
 
 services:
     App\Twig\AppExtension:
@@ -42,6 +43,11 @@ services:
         arguments:
             $accountSid: '%env(twilio_account_sid)%'
             $authToken: '%env(twilio_auth_token)%'
+    App\Bundle\EmailVerifierBundle\Service\EmailVerifier:
+        arguments:
+            $apiKey: '%env(ABSTRACT_API_KEY)%'
+        tags:
+            - { name: 'container.service_subscriber' }
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 

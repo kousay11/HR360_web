@@ -11,6 +11,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use App\Bundle\EmailVerifierBundle\Service\EmailVerifier;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+
+
 
 class RegistrationController extends AbstractController
 {
@@ -19,7 +24,8 @@ class RegistrationController extends AbstractController
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
         EntityManagerInterface $entityManager,
-        ParameterBagInterface $params
+        ParameterBagInterface $params,
+        EmailVerifier $emailVerifier
     ): Response {
         $user = new Utilisateur();
         $form = $this->createForm(RegistrationFormType::class, $user);
@@ -27,6 +33,15 @@ class RegistrationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
+                // Vérification de l'email
+                $email = $form->get('email')->getData();
+                $verificationResult = $emailVerifier->verify($email);
+                
+                if (!$verificationResult['is_valid']) {
+                    $this->addFlash('error', 'Adresse email invalide ou non délivrable');
+                    return $this->redirectToRoute('app_register');
+                }
+
                 // Gestion de l'image
                 $imageFile = $form->get('image')->getData();
                 if ($imageFile) {
@@ -60,5 +75,34 @@ class RegistrationController extends AbstractController
         return $this->render('auth/register.html.twig', [
             'registrationForm' => $form->createView(),
         ]);
+    }
+
+
+    #[Route('/api/verify-email', name: 'verify_email', methods: ['POST'])]
+    public function verifyEmail(
+        Request $request, 
+        EmailVerifier $emailVerifier
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'] ?? '';
+    
+        if (empty($email)) {
+            return $this->json(['valid' => false, 'error' => 'Email required']);
+        }
+    
+        try {
+            $result = $emailVerifier->verify($email);
+            return $this->json([
+                'valid' => $result['is_valid'],
+                'message' => $result['is_valid'] 
+                    ? 'Email valide' 
+                    : 'Email invalide ou non délivrable'
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'valid' => false,
+                'error' => 'Erreur de vérification'
+            ]);
+        }
     }
 }

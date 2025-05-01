@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription - HR360</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('front/css/register.css') }}">
-</head>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Inscription - HR360</title>
+		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+		<link rel="stylesheet" href="{{ asset('front/css/register.css') }}">
+	</head>
 
-<body>
-    <div class="register-wrapper">
-        <div class="register-container">
-            <div class="register-card">
-                <div class="register-form-container">
-                    {{ form_start(registrationForm, {
+	<body>
+		<div class="register-wrapper">
+			<div class="register-container">
+				<div class="register-card">
+					<div class="register-form-container">
+						{{ form_start(registrationForm, {
                         'action': path('app_register'),
                         'method': 'POST',
                         'attr': {
@@ -24,160 +24,204 @@
                         }
                     }) }}
 
-                    <h2 class="register-title">Inscription</h2>
+						<h2 class="register-title">Inscription</h2>
 
-                    {% for flashError in app.flashes('error') %}
-                        <div class="alert alert-danger">{{ flashError }}</div>
-                    {% endfor %}
+						{% for flashError in app.flashes('error') %}
+							<div class="alert alert-danger">{{ flashError }}</div>
+						{% endfor %}
 
-                    <div class="form-group">
-                        {{ form_label(registrationForm.nom, null, {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(registrationForm.nom, {
+						<div class="form-group">
+							{{ form_label(registrationForm.nom, null, {'label_attr': {'class': 'form-label'}}) }}
+							{{ form_widget(registrationForm.nom, {
                             'attr': {
                                 'class': 'form-input' ~ (registrationForm.nom.vars.errors|length ? ' is-invalid' : ''),
                                 'placeholder': 'Votre nom'
                             }
                         }) }}
-                        <div class="invalid-feedback">
-                            {{ form_errors(registrationForm.nom) }}
-                        </div>
-                    </div>
+							<div class="invalid-feedback">
+								{{ form_errors(registrationForm.nom) }}
+							</div>
+						</div>
 
-                    <div class="form-group">
-                        {{ form_label(registrationForm.prenom, null, {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(registrationForm.prenom, {
+						<div class="form-group">
+							{{ form_label(registrationForm.prenom, null, {'label_attr': {'class': 'form-label'}}) }}
+							{{ form_widget(registrationForm.prenom, {
                             'attr': {
                                 'class': 'form-input' ~ (registrationForm.prenom.vars.errors|length ? ' is-invalid' : ''),
                                 'placeholder': 'Votre prénom'
                             }
                         }) }}
-                        <div class="invalid-feedback">
-                            {{ form_errors(registrationForm.prenom) }}
-                        </div>
-                    </div>
+							<div class="invalid-feedback">
+								{{ form_errors(registrationForm.prenom) }}
+							</div>
+						</div>
 
-                    <div class="form-group">
-                        {{ form_label(registrationForm.email, null, {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(registrationForm.email, {
-                            'attr': {
-                                'class': 'form-input' ~ (registrationForm.email.vars.errors|length ? ' is-invalid' : ''),
-                                'placeholder': 'Votre email'
-                            }
-                        }) }}
-                        <div class="invalid-feedback">
-                            {{ form_errors(registrationForm.email) }}
-                        </div>
-                    </div>
+                        <div class="form-group">
+                            {{ form_label(registrationForm.email, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(registrationForm.email, {
+                                'attr': {
+                                    'class': 'form-input' ~ (registrationForm.email.vars.errors|length ? ' is-invalid' : ''),
+                                    'placeholder': 'Votre email',
+                                    'data-email-verify': path('verify_email')   
+                                }
+                            }) }}
 
-                    <div class="form-group">
-                        {{ form_label(registrationForm.plainPassword.first, null, {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(registrationForm.plainPassword.first, {
+                            <div class="invalid-feedback">
+                                {{ form_errors(registrationForm.email) }}
+                            </div>
+                            <div id="email-verify-feedback" class="email-feedback mt-2 small" style="display:none;"></div>
+                        </div>
+
+						<div class="form-group">
+							{{ form_label(registrationForm.plainPassword.first, null, {'label_attr': {'class': 'form-label'}}) }}
+							{{ form_widget(registrationForm.plainPassword.first, {
                             'attr': {
                                 'class': 'form-input' ~ (registrationForm.plainPassword.first.vars.errors|length ? ' is-invalid' : ''),
                                 'placeholder': 'Mot de passe'
                             }
-                        }) }}
-                        <div class="invalid-feedback">
-                            {{ form_errors(registrationForm.plainPassword.first) }}
-                        </div>
-                    </div>
+                        }) 
+                        }}
+							<div class="invalid-feedback">
+								{{ form_errors(registrationForm.plainPassword.first) }}
+							</div>
+						</div>
 
-                    <div class="form-group">
-                        {{ form_label(registrationForm.plainPassword.second, null, {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(registrationForm.plainPassword.second, {
+						<div class="form-group">
+							{{ form_label(registrationForm.plainPassword.second, null, {'label_attr': {'class': 'form-label'}}) }}
+							{{ form_widget(registrationForm.plainPassword.second, {
                             'attr': {
                                 'class': 'form-input' ~ (registrationForm.plainPassword.second.vars.errors|length ? ' is-invalid' : ''),
                                 'placeholder': 'Confirmez le mot de passe'
                             }
                         }) }}
-                        <div class="invalid-feedback">
-                            {{ form_errors(registrationForm.plainPassword.second) }}
-                        </div>
-                    </div>
+							<div class="invalid-feedback">
+								{{ form_errors(registrationForm.plainPassword.second) }}
+							</div>
+						</div>
 
-                    <div class="form-group">
-                        {{ form_label(registrationForm.image, null, {'label_attr': {'class': 'form-label'}}) }}
-                        <div class="file-upload-wrapper">
-                            {{ form_widget(registrationForm.image, {
+						<div class="form-group">
+							{{ form_label(registrationForm.image, null, {'label_attr': {'class': 'form-label'}}) }}
+							<div class="file-upload-wrapper">
+								{{ form_widget(registrationForm.image, {
                                 'attr': {
                                     'class': 'form-file-input' ~ (registrationForm.image.vars.errors|length ? ' is-invalid' : ''),
                                     'accept': 'image/*'
                                 }
                             }) }}
 
-                            <label for="{{ registrationForm.image.vars.id }}" class="file-upload-label">
-                                <i class="fas fa-upload"></i>
-                                <span>Choisir une image</span>
-                            </label>
-                            
-                            <div class="image-preview-wrapper">
-                                {% if registrationForm.image.vars.data %}
-                                    <img id="image-preview" src="{{ asset('uploads/images/' ~ registrationForm.image.vars.data) }}" alt="Aperçu" class="image-preview">
-                                {% else %}
-                                    <img id="image-preview" src="#" alt="Aperçu" class="image-preview" style="display:none;">
-                                {% endif %}
-                                <span id="file-name" class="file-name"></span>
-                            </div>
-                        </div>
-                        <small class="file-upload-help">Formats acceptés: JPG, PNG, GIF (max. 2MB)</small>
-                        <div class="invalid-feedback">
-                            {{ form_errors(registrationForm.image) }}
-                        </div>
-                    </div>
+								<label for="{{ registrationForm.image.vars.id }}" class="file-upload-label">
+									<i class="fas fa-upload"></i>
+									<span>Choisir une image</span>
+								</label>
 
-                    <div class="form-group">
-                        {{ form_label(registrationForm.competence, null, {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(registrationForm.competence, {
+								<div class="image-preview-wrapper">
+									{% if registrationForm.image.vars.data %}
+										<img id="image-preview" src="{{ asset('uploads/images/' ~ registrationForm.image.vars.data) }}" alt="Aperçu" class="image-preview">
+									{% else %}
+										<img id="image-preview" src="#" alt="Aperçu" class="image-preview" style="display:none;">
+									{% endif %}
+									<span id="file-name" class="file-name"></span>
+								</div>
+							</div>
+							<small class="file-upload-help">Formats acceptés: JPG, PNG, GIF (max. 2MB)</small>
+							<div class="invalid-feedback">
+								{{ form_errors(registrationForm.image) }}
+							</div>
+						</div>
+
+						<div class="form-group">
+							{{ form_label(registrationForm.competence, null, {'label_attr': {'class': 'form-label'}}) }}
+							{{ form_widget(registrationForm.competence, {
                             'attr': {
                                 'class': 'form-input' ~ (registrationForm.competence.vars.errors|length ? ' is-invalid' : ''),
                                 'placeholder': 'Décrivez vos compétences',
                                 'rows': 3
                             }
                         }) }}
-                        <div class="invalid-feedback">
-                            {{ form_errors(registrationForm.competence) }}
-                        </div>
-                    </div>
+							<div class="invalid-feedback">
+								{{ form_errors(registrationForm.competence) }}
+							</div>
+						</div>
 
-                    <div class="form-group">
-                        <button type="submit" class="submit-button">S'inscrire</button>
-                    </div>
+						<div class="form-group">
+							<button type="submit" class="submit-button">S'inscrire</button>
+						</div>
 
-                    <div class="form-footer">
-                        <p>Déjà inscrit ? <a href="{{ path('app_login') }}" class="footer-link">Connectez-vous</a></p>
-                    </div>
-                    {{ form_end(registrationForm) }}
-                </div>
-            </div>
-        </div>
-    </div>
+						<div class="form-footer">
+							<p>Déjà inscrit ?
+								<a href="{{ path('app_login') }}" class="footer-link">Connectez-vous</a>
+							</p>
+						</div>
+						{{ form_end(registrationForm) }}
+					</div>
+				</div>
+			</div>
+		</div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const fileInput = document.getElementById('{{ registrationForm.image.vars.id }}');
-            const imagePreview = document.getElementById('image-preview');
-            const fileNameSpan = document.getElementById('file-name');
+		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+                const fileInput = document.getElementById('{{ registrationForm.image.vars.id }}');
+                const imagePreview = document.getElementById('image-preview');
+                const fileNameSpan = document.getElementById('file-name');
 
-            if (fileInput) {
-                fileInput.addEventListener('change', function(event) {
-                    const file = event.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            imagePreview.src = e.target.result;
-                            imagePreview.style.display = 'block';
-                        };
-                        reader.readAsDataURL(file);
+                if (fileInput) {
+                fileInput.addEventListener('change', function (event) {
+                const file = event.target.files[0];
+                if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
 
-                        fileNameSpan.textContent = file.name;
-                        fileNameSpan.style.display = 'block';
+                fileNameSpan.textContent = file.name;
+                fileNameSpan.style.display = 'block';
+                } else {
+                imagePreview.style.display = 'none';
+                fileNameSpan.style.display = 'none';
+                }
+                });
+                }
+    const emailInput = document.querySelector('[data-email-verify]');
+    const emailFeedback = document.getElementById('email-verify-feedback');
+    if (emailInput) {
+        emailInput.addEventListener('blur', function() {
+            const email = this.value.trim();
+            if (email.length > 3 && email.includes('@')) {
+                emailFeedback.style.display = 'block';
+                emailFeedback.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Vérification en cours...';
+                
+                fetch(emailInput.dataset.emailVerify, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ email: email })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network error');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.valid) {
+                        emailFeedback.innerHTML = `<i class="fas fa-check-circle text-success"></i> ${data.message}`;
                     } else {
-                        imagePreview.style.display = 'none';
-                        fileNameSpan.style.display = 'none';
+                        emailFeedback.innerHTML = `<i class="fas fa-times-circle text-danger"></i> ${data.message || data.error}`;
                     }
+                })
+                .catch(error => {
+                    emailFeedback.innerHTML = `<i class="fas fa-exclamation-triangle text-warning"></i> Service temporairement indisponible`;
                 });
             }
         });
-    </script>
-</body>
+    }
+                });
+
+    
+
+
+		</script>
+	</body>
 </html>
