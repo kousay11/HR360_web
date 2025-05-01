@@ -18,6 +18,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use App\Service\RessourceSimilarityService;
 use App\Entity\Notification;
 use App\Entity\Reservation;
+use App\Service\QRCodeService;
 #[Route('/ressource')]
 final class RessourceController extends AbstractController
 {
@@ -73,7 +74,7 @@ public function indexForEmployees(Request $request, RessourceRepository $ressour
 
 
 #[Route('/new', name: 'app_ressource_new', methods: ['GET', 'POST'])]
-public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, ?int $ressourceId = null, QRCodeService $qrCodeService): Response
 {
     $ressource = new Ressource();
     $form = $this->createForm(RessourceType::class, $ressource);
@@ -105,6 +106,10 @@ public function new(Request $request, EntityManagerInterface $entityManager, Slu
         // Sauvegarder la ressource dans la base de données
         $entityManager->persist($ressource);
         $entityManager->flush();
+
+
+                // Génération QR Code après avoir obtenu l'ID
+        $qrCode = $qrCodeService->generateQRCodeForRessource($ressource);
 
         // Redirection après la soumission du formulaire
         return $this->redirectToRoute('app_ressource_index', [], Response::HTTP_SEE_OTHER);

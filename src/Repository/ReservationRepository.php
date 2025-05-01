@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Reservation;
+use App\Entity\Ressource;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Utilisateur;
@@ -120,6 +121,32 @@ public function getMostRequestedResource(): ?array
         ->getQuery()
         ->getOneOrNullResult();
 }
+
+
+// src/Repository/ReservationRepository.php
+
+public function findDatesByRessourceId(Ressource $ressourceId): string
+{
+    $results = $this->createQueryBuilder('r')
+        ->select('r.datedebut, r.datefin')
+        ->where('r.ressource = :id_ressource')
+        ->setParameter('id_ressource', $ressourceId)
+        ->orderBy('r.datedebut', 'ASC')
+        ->getQuery()
+        ->getResult();
+
+    $formattedDates = [];
+
+    foreach ($results as $row) {
+        $start = $row['datedebut']->format('Y-m-d');
+        $end = $row['datefin']->format('Y-m-d');
+        $formattedDates[] = "$start vers $end\n";
+
+    }
+
+    return implode(', ', $formattedDates);
+}
+
 
 
 }

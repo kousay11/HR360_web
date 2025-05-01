@@ -9,22 +9,40 @@ use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
 use Endroid\QrCode\Writer\PngWriter;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use App\Repository\ReservationRepository;
 
 class QRCodeService
 {
     private $params;
-
-    public function __construct(ParameterBagInterface $params)
+    private $reservationRepository;
+    public function __construct(ParameterBagInterface $params, ReservationRepository $reservationRepository)
     {
         $this->params = $params;
+        $this->reservationRepository = $reservationRepository;
     }
 
     public function generateQRCodeForRessource(Ressource $ressource): void
     {
-        $data = "Ressource: ".$ressource->getNom()." | ID: ".$ressource->getId();
+
+        $dates = $this->reservationRepository->findDatesByRessourceId($ressource);
+
+
+        $data = "📌 RESSOURCE RÉSERVÉE 📌\n".
+        "📛 Nom : ".$ressource->getNom()."\n".
+        "📂 Type : ".$ressource->getType()."\n".
+        "📌 État : ".$ressource->getEtat()."\n".
+        "💰 Prix : ".$ressource->getPrix()." DT\n".
+        "📅 Réservations :\n".$dates;
+
+
+
+
+
+
+
         
         $projectDir = $this->params->get('kernel.project_dir');
-        $qrDirectory = $projectDir.'/public/qrcodes/';
+        $qrDirectory = $projectDir.'/public/uploads/qrcodes/';
         $filename = "qr_ressource_" . $ressource->getId() . ".png";
         $filesystem = new Filesystem();
         if (!$filesystem->exists($qrDirectory)) {
