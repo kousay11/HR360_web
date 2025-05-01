@@ -73,8 +73,6 @@ class Formation
     }
 
     #[ORM\Column(type: 'integer', nullable: false)]
-    #[Assert\NotBlank(message: "La durée est obligatoire")]
-    #[Assert\Positive(message: "La durée doit être un nombre positif")]
     #[Assert\Range(
         min: 1,
         max: 1000,

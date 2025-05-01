@@ -21,4 +21,5 @@ class EquipeRepository extends ServiceEntityRepository
         ->getQuery()
         ->getResult();
 }
+
 }

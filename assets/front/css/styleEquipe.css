@@ -690,3 +690,31 @@
 .fas {
     margin-right: 8px;
 }
+
+.btn-report {
+    background-color: #6c757d;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-report:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+.btn-report:disabled {
+    background-color: #a0a0a0;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-report i {
+    margin-right: 8px;
+}

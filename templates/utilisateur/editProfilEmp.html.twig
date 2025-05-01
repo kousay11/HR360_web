@@ -72,6 +72,17 @@
 			background-color: #ffe0d6;
 		}
 
+<<<<<<< HEAD
+=======
+		.is-invalid {
+			border-color: #dc3545;
+		}
+		.invalid-feedback {
+			color: #dc3545;
+			font-size: 0.875em;
+		}
+
+>>>>>>> 9a1b6a58042439e1fc2768126078923952617fce
 		@media(max-width: 768px) {
 			.edit-profile-card {
 				padding: 1.5rem;
@@ -92,6 +103,7 @@
 							<img src="{{ user.image ? asset('uploads/images/' ~ user.image) : asset('uploads/images/default-avatar.png') }}" class="profile-preview-img" id="imagePreview" alt="Photo de profil actuelle">
 						</div>
 
+<<<<<<< HEAD
 						{{ form_start(form) }}
 						<div class="row">
 							<div class="col-md-6 mb-3">
@@ -101,11 +113,33 @@
 							<div class="col-md-6 mb-3">
 								{{ form_label(form.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
 								{{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+=======
+						{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+						<div class="row">
+							<div class="col-md-6 mb-3">
+								{{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+								{{ form_widget(form.prenom, {
+                                    'attr': {
+                                        'class': 'form-control' ~ (form.prenom.vars.errors|length ? ' is-invalid' : '')
+                                    }
+                                }) }}
+								<div class="invalid-feedback">{{ form_errors(form.prenom) }}</div>
+							</div>
+							<div class="col-md-6 mb-3">
+								{{ form_label(form.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+								{{ form_widget(form.nom, {
+                                    'attr': {
+                                        'class': 'form-control' ~ (form.nom.vars.errors|length ? ' is-invalid' : '')
+                                    }
+                                }) }}
+								<div class="invalid-feedback">{{ form_errors(form.nom) }}</div>
+>>>>>>> 9a1b6a58042439e1fc2768126078923952617fce
 							</div>
 						</div>
 
 						<div class="mb-3">
 							{{ form_label(form.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+<<<<<<< HEAD
 							{{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
 						</div>
 
@@ -127,6 +161,53 @@
 							{{ form_widget(form.image, {'attr': {'class': 'form-control', 'onchange': 'previewImage(this)'}}) }}
 						</div>
 
+=======
+							{{ form_widget(form.email, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.email.vars.errors|length ? ' is-invalid' : '')
+                                }
+                            }) }}
+							<div class="invalid-feedback">{{ form_errors(form.email) }}</div>
+						</div>
+
+
+						<div class="mb-4">
+							{{ form_label(form.image, 'Changer la photo de profil', {'label_attr': {'class': 'form-label'}}) }}
+							{{ form_widget(form.image, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.image.vars.errors|length ? ' is-invalid' : ''),
+                                    'onchange': 'previewImage(this)'
+                                }
+                            }) }}
+							<div class="invalid-feedback">{{ form_errors(form.image) }}</div>
+						</div>
+
+						<div id="salaireField" style="display: none;">
+							{{ form_label(form.salaire) }}
+							{{ form_widget(form.salaire, {
+									'attr': {
+										'class': 'form-control' ~ (form.salaire.vars.errors|length ? ' is-invalid' : '')
+									}
+								}) }}
+							<div class="invalid-feedback">
+								{{ form_errors(form.salaire) }}
+							</div>
+						</div>
+
+						<div id="posteField" style="display: none;">
+							{{ form_label(form.poste) }}
+							{{ form_widget(form.poste, {
+										'attr': {
+											'class': 'form-control' ~ (form.poste.vars.errors|length ? ' is-invalid' : '')
+										}
+									}) }}
+							<div class="invalid-feedback">
+								{{ form_errors(form.poste) }}
+							</div>
+						</div>
+
+
+>>>>>>> 9a1b6a58042439e1fc2768126078923952617fce
 						<div class="d-flex justify-content-between">
 							<a href="{{ path('app_employe_profil') }}" class="btn btn-cancel">
 								<i class="fas fa-times mr-2"></i>

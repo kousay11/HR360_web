@@ -52,9 +52,8 @@ final class ReservationController extends AbstractController
         if ($ressource) {
             $reservation->setRessource($ressource);
         }
-
         $utilisateur = $this->getUser();
-        if ($utilisateur) {
+        if($utilisateur){
             $reservation->setUtilisateur($utilisateur);
         }
 
