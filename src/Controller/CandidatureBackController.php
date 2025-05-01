@@ -116,58 +116,65 @@ public function exportPdf(
     }
 
     #[Route('/{idCandidature}/edit', name: 'app_candidatureBack_edit', methods: ['GET', 'POST'])]
-public function edit(
-    Request $request, 
-    Candidature $candidature, 
-    EntityManagerInterface $entityManager,
-    EmailService $emailService
-): Response {
-    // Avant de traiter le formulaire, on garde le statut initial
-    $ancienStatut = $candidature->getStatut();
-
-    // Création et traitement du formulaire
-    $form = $this->createForm(CandidatureOtherType::class, $candidature);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Nouveau statut après soumission
-        $nouveauStatut = $candidature->getStatut();
-
-        // Mettre à jour la date de modification
-        $candidature->setDateModification(new \DateTime());
-
-        // Sauvegarder dans la base de données
-        $entityManager->flush();
-
-        // Si le statut a changé, on envoie l'email
-        if ($ancienStatut !== $nouveauStatut) {
-            $utilisateur = $candidature->getUtilisateur();
-            $email = $utilisateur?->getEmail(); // null-safe
-            
-            if ($email) {
-                $emailSent = $emailService->sendStatusUpdateEmail($email, $nouveauStatut);
-            
-                $this->addFlash(
-                    $emailSent ? 'success' : 'warning',
-                    $emailSent 
-                        ? 'Statut mis à jour et email envoyé'
-                        : 'Statut mis à jour mais échec d\'envoi d\'email'
-                );
+    public function edit(
+        Request $request, 
+        Candidature $candidature, 
+        EntityManagerInterface $entityManager,
+        EmailService $emailService,
+        LoggerInterface $logger
+    ): Response {
+        $ancienStatut = $candidature->getStatut();
+        $logger->info("Début de modification - Ancien statut: {$ancienStatut}");
+    
+        $form = $this->createForm(CandidatureOtherType::class, $candidature);
+        $form->handleRequest($request);
+    
+        if ($form->isSubmitted() && $form->isValid()) {
+            $nouveauStatut = $candidature->getStatut();
+            $logger->info("Formulaire soumis - Nouveau statut: {$nouveauStatut}");
+    
+            $candidature->setDateModification(new \DateTime());
+            $entityManager->flush();
+            $logger->info("Candidature mise à jour en base de données");
+    
+            if ($ancienStatut !== $nouveauStatut) {
+                $logger->info("Statut modifié - Début du processus d'envoi d'email");
+                
+                $iduser = $candidature->getiduser();
+                $email = $iduser?->getEmail();
+                
+                if ($email) {
+                    $logger->info("Email du candidat trouvé: {$email}");
+                    $emailSent = $emailService->sendStatusUpdateEmail($email, $nouveauStatut);
+                    
+                    if ($emailSent) {
+                        $logger->info("Email envoyé avec succès à {$email}");
+                    } else {
+                        $logger->error("Échec de l'envoi d'email à {$email}");
+                    }
+                    
+                    $this->addFlash(
+                        $emailSent ? 'success' : 'warning',
+                        $emailSent 
+                            ? 'Statut mis à jour et email envoyé'
+                            : 'Statut mis à jour mais échec d\'envoi d\'email'
+                    );
+                } else {
+                    $logger->warning("Aucun email trouvé pour l'utilisateur ID: {$iduser?->getId()}");
+                    $this->addFlash('warning', 'Statut mis à jour mais utilisateur sans email');
+                }
             } else {
-                $this->addFlash('warning', 'Statut mis à jour mais utilisateur sans email');
+                $logger->info("Statut inchangé - Pas d'email à envoyer");
             }
+    
+            return $this->redirectToRoute('app_candidatureBack_index');
         }
-
-        // Redirection après traitement
-        return $this->redirectToRoute('app_candidatureBack_index');
+    
+        return $this->render('candidatureBack/edit.html.twig', [
+            'candidature' => $candidature,
+            'form' => $form->createView(),
+        ]);
     }
-
-    // Affichage du formulaire si non soumis ou invalide
-    return $this->render('candidatureBack/edit.html.twig', [
-        'candidature' => $candidature,
-        'form' => $form->createView(),
-    ]);
-}
 #[Route('/analyse', name: 'app_analyse_candidature', methods: ['POST'])]
 public function analyseCandidature(Request $request, LoggerInterface $logger): JsonResponse
 {

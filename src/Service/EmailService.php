@@ -15,21 +15,35 @@ class EmailService
 
     public function sendStatusUpdateEmail(string $recipient, string $status): bool
     {
+        $this->logger->info("Tentative d'envoi d'email à {$recipient} avec statut {$status}");
+        
         try {
-            $logoPath = 'C:/Users/Dell/Desktop/HR360_web/public/images/logoRH360.png';
+            $logoPath = 'C:/Users/user/OneDrive - ESPRIT/Bureau/ProjetPidev/HR360_web/public/images/logoRH360.png';
+            $this->logger->debug("Chemin du logo: {$logoPath}");
+            
+            if (!file_exists($logoPath)) {
+                $this->logger->error("Fichier logo introuvable: {$logoPath}");
+                throw new \RuntimeException("Logo file not found");
+            }
+    
             $logoCid = 'logoRH360';
-
+            $this->logger->debug("Préparation de l'email...");
+            
             $email = (new Email())
-                ->from('no-reply@votre-domaine.com')
+                ->from('kousaynajar147@gmail.com')
                 ->to($recipient)
                 ->subject("Mise à jour de candidature - $status")
                 ->html($this->generateEmailContent($status, $logoCid))
-                ->embedFromPath($logoPath, $logoCid); // intègre le logo dans le corps de l’email
-
+                ->embedFromPath($logoPath, $logoCid);
+    
+            $this->logger->debug("Email construit, envoi en cours...");
             $this->mailer->send($email);
+            
+            $this->logger->info("Email envoyé avec succès à {$recipient}");
             return true;
         } catch (\Exception $e) {
-            $this->logger->error('Erreur envoi email: ' . $e->getMessage());
+            $this->logger->error("Échec de l'envoi d'email: " . $e->getMessage());
+            $this->logger->error("Stack trace: " . $e->getTraceAsString());
             return false;
         }
     }

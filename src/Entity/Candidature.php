@@ -128,17 +128,17 @@ class Candidature
 
     #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
     #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id', nullable: false)]
-    private ?Utilisateur $utilisateur = null;
+    private ?Utilisateur $iduser = null;
 
-    public function getUtilisateur(): ?Utilisateur
+    public function getiduser(): ?Utilisateur
     {
-        return $this->utilisateur;
+        return $this->iduser;
     }
 
 
-    public function setUtilisateur(?Utilisateur $utilisateur): self
+    public function setiduser(?Utilisateur $iduser): self
     {
-        $this->utilisateur = $utilisateur;
+        $this->iduser = $iduser;
         return $this;
     }
 

@@ -44,7 +44,7 @@ final class CandidatureController extends AbstractController
         $candidature->setDateCandidature(new \DateTime());
         $candidature->setDateModification(new \DateTime());
         $candidature->setStatut('En attente');
-        $candidature->setIduser($this->getUser()); // À remplacer par l'utilisateur connecté
+        $candidature->setiduser($this->getUser()); // À remplacer par l'utilisateur connecté
     
         $form = $this->createForm(CandidatureType::class, $candidature);
         $form->handleRequest($request);
