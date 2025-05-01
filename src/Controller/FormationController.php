@@ -101,46 +101,31 @@ final class FormationController extends AbstractController
         return $this->redirectToRoute('app_formation_index', [], Response::HTTP_SEE_OTHER);
     }
 
+    
     // ----------------- FRONT -----------------
     #[Route('/front', name: 'app_formation_front_index', methods: ['GET'])]
     public function frontIndex(Request $request, FormationRepository $formationRepository): Response
     {
-        $search = $request->query->get('search');
-        $favoritesOnly = $request->query->getBoolean('favorites');
         $page = $request->query->getInt('page', 1);
         $limit = 3;
 
-        // Création de la requête de base
-        $queryBuilder = $formationRepository->createQueryBuilder('f');
+        $criteria = [
+            'search' => $request->query->get('search'),
+            'favorites' => $request->query->getBoolean('favorites'),
+            'min_duration' => $request->query->get('min_duration'),
+            'max_duration' => $request->query->get('max_duration'),
+            'sort' => $request->query->get('sort', 'titre'),
+            'direction' => $request->query->get('direction', 'ASC'),
+        ];
 
-        // Application des filtres
-        if ($search) {
-            $queryBuilder->andWhere('f.titre LIKE :search')
-                ->setParameter('search', '%' . $search . '%');
-        }
-
-        if ($favoritesOnly) {
-            $queryBuilder->andWhere('f.isFavorite = :isFavorite')
-                ->setParameter('isFavorite', true);
-        }
-
-        // Configuration de la pagination
-        $query = $queryBuilder->getQuery();
-        $paginator = new Paginator($query);
-        $total = count($paginator);
-
-        $formations = $query
-            ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit)
-            ->getResult();
+        $result = $formationRepository->searchFrontFormations($criteria, true, $page, $limit);
 
         return $this->render('formation/front/index.html.twig', [
-            'formations' => $formations,
-            'search' => $search,
+            'formations' => $result['results'],
+            'search_params' => $criteria,
             'page' => $page,
-            'total' => $total,
+            'total' => $result['total'],
             'limit' => $limit,
-            'favoritesOnly' => $favoritesOnly
         ]);
     }
 

@@ -28,7 +28,7 @@ class AuthController extends AbstractController
         Request $request
     ): Response {
         if ($this->getUser()) {
-            return $this->redirectToRoute('app_home');
+            return $this->redirectToRoute('app_login');
         }
     
         $error = $authenticationUtils->getLastAuthenticationError();
