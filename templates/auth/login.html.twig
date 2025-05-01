@@ -161,7 +161,7 @@
 
 				// Validation email
 				const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-				if (!email.value) {
+				if (!email.value.trim()) {
 					email.classList.add('is-invalid');
 					emailError.textContent = 'L\'email est obligatoire';
 					isValid = false;
@@ -172,7 +172,7 @@
 				}
 
 				// Validation mot de passe
-				if (!password.value) {
+				if (!password.value.trim()) {
 					password.classList.add('is-invalid');
 					passwordError.textContent = 'Le mot de passe est obligatoire';
 					isValid = false;
@@ -188,7 +188,10 @@
 				const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 				const emailError = document.getElementById('email-error');
 				
-				if (this.value && !emailRegex.test(this.value)) {
+				if (!this.value.trim()) {
+					this.classList.add('is-invalid');
+					emailError.textContent = 'L\'email est obligatoire';
+				} else if (!emailRegex.test(this.value)) {
 					this.classList.add('is-invalid');
 					emailError.textContent = 'Veuillez entrer une adresse email valide';
 				} else {
@@ -199,11 +202,25 @@
 			document.getElementById('inputPassword').addEventListener('input', function() {
 				const passwordError = document.getElementById('password-error');
 				
-				if (!this.value) {
+				if (!this.value.trim()) {
 					this.classList.add('is-invalid');
 					passwordError.textContent = 'Le mot de passe est obligatoire';
 				} else {
 					this.classList.remove('is-invalid');
+				}
+			});
+
+			// Validation au focus out
+			document.getElementById('inputEmail').addEventListener('blur', function() {
+				const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+				const emailError = document.getElementById('email-error');
+				
+				if (!this.value.trim()) {
+					this.classList.add('is-invalid');
+					emailError.textContent = 'L\'email est obligatoire';
+				} else if (!emailRegex.test(this.value)) {
+					this.classList.add('is-invalid');
+					emailError.textContent = 'Veuillez entrer une adresse email valide';
 				}
 			});
 		</script>
