@@ -61,17 +61,25 @@ final class CandidatureController extends AbstractController
         }
     
         // Vérification grammaticale en temps réel si AJAX
-        if ($request->isXmlHttpRequest() && $request->request->has('text')) {
+    if ($request->isXmlHttpRequest() && $request->request->has('text')) {
+        try {
             $text = $request->request->get('text');
             $correctionResult = $grammarCheckerService->checkGrammar($text);
             
             return $this->json([
+                'success' => true,
                 'original' => $text,
                 'correction' => $correctionResult['errors']['correction'] ?? $text,
                 'errors' => $correctionResult['errors']['error'] ?? null,
                 'details' => $correctionResult['errors']['details'] ?? []
             ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
         }
+    }
     
         return $this->render('candidature/new.html.twig', [
             'candidature' => $candidature,
