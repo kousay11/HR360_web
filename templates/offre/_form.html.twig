@@ -16,12 +16,26 @@
                     </div>
 
                     <div class="form-group">
-                        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.description, {'attr': {'class': 'form-control' ~ (form.description.vars.valid ? '' : ' is-invalid'), 'rows': '5'}}) }}
-                        <div class="form-error">
-                            {{ form_errors(form.description) }}
-                        </div>
-                    </div>
+    {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+    
+    <div class="d-flex gap-2 mb-2">
+        <button type="button" class="btn btn-outline-primary" id="generate-description-btn">
+            <i class="fas fa-magic me-2"></i>Générer avec AI
+        </button>
+        <button type="button" class="btn btn-outline-secondary" id="translate-description-btn">
+            <i class="fas fa-language me-2"></i>Traduire en anglais
+        </button>
+        <button type="button" class="btn btn-outline-danger" id="export-pdf-btn">
+            <i class="fas fa-file-pdf me-2"></i>Exporter en PDF
+        </button>
+    </div>
+    
+    {{ form_widget(form.description, {'attr': {'class': 'form-control' ~ (form.description.vars.valid ? '' : ' is-invalid'), 'rows': '5', 'id': 'offre_description'}}) }}
+    
+    <div class="form-error">
+        {{ form_errors(form.description) }}
+    </div>
+</div>
 
                     <div class="form-dates">
                         <div class="form-group">
@@ -208,4 +222,33 @@
             align-items: flex-start;
         }
     }
+ /* Style pour les boutons d'actions */
+#generate-description-btn,
+#translate-description-btn {
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    margin-bottom: 10px;
+}
+
+#translate-description-btn:hover {
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+/* Alignement des boutons */
+.d-flex.gap-2 {
+    gap: 10px;
+}
+#export-pdf-btn {
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    margin-bottom: 10px;
+}
+
+#export-pdf-btn:hover {
+    background-color: #f8f9fa;
+    color: #dc3545;
+}
 </style>

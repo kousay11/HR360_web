@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Connexion - HR360</title>
+		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+		<link rel="stylesheet" href="{{ asset('front/css/login.css') }}">
+		<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+		<style>
+			.grecaptcha-badge {
+				visibility: visible !important;
+				bottom: 70px !important;
+			}
+			.invalid-feedback {
+				color: #dc3545;
+				font-size: 0.875rem;
+				margin-top: 0.25rem;
+				display: none;
+			}
+			.is-invalid {
+				border-color: #dc3545 !important;
+			}
+			.is-invalid + .input-icon + .invalid-feedback {
+				display: block;
+			}
+			/* Styles pour le reCAPTCHA */
+			.recaptcha-container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				margin: 1.5rem 0;
+				width: 100%;
+			}
+			.g-recaptcha {
+				transform-origin: center;
+				-webkit-transform-origin: center;
+			}
+			@media screen and (max-width: 400px) {
+				.g-recaptcha {
+					transform: scale(0.9);
+					-webkit-transform: scale(0.9);
+				}
+			}
+			@media screen and (max-width: 350px) {
+				.g-recaptcha {
+					transform: scale(0.85);
+					-webkit-transform: scale(0.85);
+				}
+			}
+		</style>
+
+	</head>
+	<body>
+		<div class="login-wrapper">
+			<div class="login-container">
+				<div class="login-card">
+					<div class="auth-form-container">
+						<form method="post" action="{{ path('app_login') }}" class="auth-form" novalidate>
+							<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+							<div class="auth-header">
+								<h2 class="auth-title">Connexion</h2>
+								<div class="auth-subtitle">Accédez à votre espace personnel</div>
+							</div>
+
+							{% if error %}
+								<div class="auth-alert alert-danger">
+									<i class="fas fa-exclamation-circle"></i>
+									<span>{{ error.messageKey|trans(error.messageData, 'security') }}</span>
+								</div>
+							{% endif %}
+
+							{% for label, messages in app.flashes %}
+								{% for message in messages %}
+									<div class="auth-alert alert-{{ label == 'error' ? 'danger' : label }}">
+										<i class="fas fa-exclamation-circle"></i>
+										<span>{{ message }}</span>
+									</div>
+								{% endfor %}
+							{% endfor %}
+
+
+							<div class="form-group">
+								<label for="inputEmail" class="form-label">Email</label>
+								<div class="input-wrapper">
+									<input type="email" 
+										name="email" 
+										id="inputEmail" 
+										class="form-input" 
+										value="{{ last_username }}" 
+										placeholder="exemple@email.com" 
+										required>
+									<i class="input-icon fas fa-envelope"></i>
+									<div class="invalid-feedback" id="email-error">Veuillez entrer une adresse email valide</div>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label for="inputPassword" class="form-label">Mot de passe</label>
+								<div class="input-wrapper">
+									<input type="password" 
+										name="password" 
+										id="inputPassword" 
+										class="form-input" 
+										placeholder="••••••••" 
+										required>
+									<i class="input-icon fas fa-lock"></i>
+									<div class="invalid-feedback" id="password-error">Veuillez entrer votre mot de passe</div>
+								</div>
+							</div>
+
+							<div class="form-options">
+								<div class="remember-me">
+									<input type="checkbox" id="remember_me" name="_remember_me">
+									<label for="remember_me">Se souvenir de moi</label>
+								</div>
+								<a href="{{ path('app_forgot_password_request') }}" class="forgot-password">Mot de passe oublié ?</a>
+							</div>
+
+							<div class="recaptcha-container">
+								<div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}" data-callback="enableSubmit"></div>
+							</div>
+
+							<div class="form-group">
+								<button type="submit" class="auth-button" id="submit-button" disabled>
+									<span class="button-text">Connexion</span>
+									<i class="fas fa-arrow-right"></i>
+								</button>
+							</div>
+
+							<div class="auth-footer">
+								<p>Pas encore de compte ?
+									<a href="{{ path('app_register') }}" class="auth-link">S'inscrire</a>
+								</p>
+							</div>
+						</form>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+		<script>
+			function enableSubmit() {
+				document.getElementById('submit-button').disabled = false;
+			}
+
+			document.querySelector('.auth-form').addEventListener('submit', function(e) {
+				e.preventDefault();
+				let isValid = true;
+				const email = document.getElementById('inputEmail');
+				const password = document.getElementById('inputPassword');
+				const emailError = document.getElementById('email-error');
+				const passwordError = document.getElementById('password-error');
+
+				// Réinitialiser les états
+				email.classList.remove('is-invalid');
+				password.classList.remove('is-invalid');
+
+				// Validation email
+				const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+				if (!email.value.trim()) {
+					email.classList.add('is-invalid');
+					emailError.textContent = 'L\'email est obligatoire';
+					isValid = false;
+				} else if (!emailRegex.test(email.value)) {
+					email.classList.add('is-invalid');
+					emailError.textContent = 'Veuillez entrer une adresse email valide';
+					isValid = false;
+				}
+
+				// Validation mot de passe
+				if (!password.value.trim()) {
+					password.classList.add('is-invalid');
+					passwordError.textContent = 'Le mot de passe est obligatoire';
+					isValid = false;
+				}
+
+				if (isValid) {
+					this.submit();
+				}
+			});
+
+			// Validation en temps réel
+			document.getElementById('inputEmail').addEventListener('input', function() {
+				const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+				const emailError = document.getElementById('email-error');
+				
+				if (!this.value.trim()) {
+					this.classList.add('is-invalid');
+					emailError.textContent = 'L\'email est obligatoire';
+				} else if (!emailRegex.test(this.value)) {
+					this.classList.add('is-invalid');
+					emailError.textContent = 'Veuillez entrer une adresse email valide';
+				} else {
+					this.classList.remove('is-invalid');
+				}
+			});
+
+			document.getElementById('inputPassword').addEventListener('input', function() {
+				const passwordError = document.getElementById('password-error');
+				
+				if (!this.value.trim()) {
+					this.classList.add('is-invalid');
+					passwordError.textContent = 'Le mot de passe est obligatoire';
+				} else {
+					this.classList.remove('is-invalid');
+				}
+			});
+
+			// Validation au focus out
+			document.getElementById('inputEmail').addEventListener('blur', function() {
+				const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+				const emailError = document.getElementById('email-error');
+				
+				if (!this.value.trim()) {
+					this.classList.add('is-invalid');
+					emailError.textContent = 'L\'email est obligatoire';
+				} else if (!emailRegex.test(this.value)) {
+					this.classList.add('is-invalid');
+					emailError.textContent = 'Veuillez entrer une adresse email valide';
+				}
+			});
+		</script>
+	</body>
+</html>

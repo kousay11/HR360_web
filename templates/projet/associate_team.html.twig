@@ -11,12 +11,16 @@
     <div class="container">
         <h1>Associate Team to {{ projet.nom }}</h1>
         
-        <form method="post">
+        <form method="post" id="associateForm">
             <div class="form-group">
                 <label for="equipe">Select Team:</label>
                 <select name="equipe" id="equipe" class="form-control" required>
                     {% for equipe in equipes %}
-                        <option value="{{ equipe.id }}">{{ equipe.nom }}</option>
+                        <option value="{{ equipe.id }}" 
+                                data-total-projects="{{ workloads[equipe.id]['totalProjects'] }}"
+                                data-avg-projects="{{ workloads[equipe.id]['averageProjectsPerDay'] }}">
+                            {{ equipe.nom }} (Total Projects: {{ workloads[equipe.id]['totalProjects'] }}, Avg/Day: {{ workloads[equipe.id]['averageProjectsPerDay']|number_format(2) }})
+                        </option>
                     {% endfor %}
                 </select>
             </div>
@@ -25,4 +29,52 @@
             <a href="{{ path('app_projet_show', {'id': projet.id}) }}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="workloadModal" tabindex="-1" role="dialog" aria-labelledby="workloadModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="workloadModalLabel">Team Workload Warning</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Cette équipe pendant la période de ce projet ({{ projet.dateDebut|date('d/m/Y') }} - {{ projet.dateFin|date('d/m/Y') }}) a:</p>
+                    <ul>
+                        <li>Nombre total de projets: <span id="totalProjectsValue"></span></li>
+                        <li>Moyenne de projets par jour: <span id="avgProjectsValue"></span></li>
+                    </ul>
+                    <p>Êtes-vous sûr de continuer ?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmAssociate">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% block javascripts %}
+    <script>
+        document.getElementById('associateForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const selectedOption = document.getElementById('equipe').selectedOptions[0];
+            const totalProjects = parseInt(selectedOption.dataset.totalProjects);
+            
+            if (totalProjects > 0) {
+                document.getElementById('totalProjectsValue').textContent = totalProjects;
+                document.getElementById('avgProjectsValue').textContent = parseFloat(selectedOption.dataset.avgProjects).toFixed(2);
+                const modal = new bootstrap.Modal(document.getElementById('workloadModal'));
+                modal.show();
+            } else {
+                this.submit();
+            }
+        });
+
+        document.getElementById('confirmAssociate').addEventListener('click', function() {
+            document.getElementById('associateForm').submit();
+        });
+    </script>
+    {% endblock %}
 {% endblock %}

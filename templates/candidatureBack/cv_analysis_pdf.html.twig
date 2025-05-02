@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Analyse du CV - {{ candidature.offre.titre ?? 'Candidature' }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        h1 { color: #2c3e50; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .section { margin-bottom: 15px; }
+        .section-title { background-color: #f8f9fa; padding: 5px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        table, th, td { border: 1px solid #ddd; }
+        th, td { padding: 8px; text-align: left; }
+        .footer { margin-top: 30px; font-size: 0.8em; text-align: right; }
+        .alert-danger { color: #721c24; background-color: #f8d7da; padding: 10px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Analyse du CV</h1>
+        <p>Pour l'offre: {{ candidature.offre.titre ?? 'Non spécifiée' }}</p>
+        <p>Date: {{ date|date('d/m/Y H:i') }}</p>
+    </div>
+
+    {# Section Informations personnelles #}
+    <div class="section">
+        <div class="section-title">Informations personnelles</div>
+        {% if analysis.personal_info is not empty %}
+            <table>
+                {% if analysis.personal_info.name is defined %}
+                    <tr>
+                        <th>Nom</th>
+                        <td>{{ analysis.personal_info.name }}</td>
+                    </tr>
+                {% endif %}
+                {% if analysis.personal_info.email is defined %}
+                    <tr>
+                        <th>Email</th>
+                        <td>{{ analysis.personal_info.email }}</td>
+                    </tr>
+                {% endif %}
+                {% if analysis.personal_info.phone is defined %}
+                    <tr>
+                        <th>Téléphone</th>
+                        <td>{{ analysis.personal_info.phone }}</td>
+                    </tr>
+                {% endif %}
+                {% if analysis.personal_info.address is defined %}
+                    <tr>
+                        <th>Adresse</th>
+                        <td>{{ analysis.personal_info.address }}</td>
+                    </tr>
+                {% endif %}
+            </table>
+        {% else %}
+            <p>Aucune information personnelle trouvée</p>
+        {% endif %}
+    </div>
+
+    {# Section Expérience professionnelle #}
+    <div class="section">
+        <div class="section-title">Expérience professionnelle</div>
+        {% if analysis.work_experience is not empty and analysis.work_experience is iterable %}
+            {% for experience in analysis.work_experience %}
+                <div style="margin-bottom: 15px;">
+                    <h4>{{ experience.title ?? 'Poste non spécifié' }}</h4>
+                    <p><strong>Entreprise:</strong> {{ experience.company ?? 'Non spécifiée' }}</p>
+                    <p><strong>Période:</strong> 
+                        {{ experience.start_date ?? 'Non spécifiée' }} 
+                        - 
+                        {{ experience.end_date ?? 'Présent' }}
+                    </p>
+                    {% if experience.description is defined %}
+                        <p>{{ experience.description }}</p>
+                    {% endif %}
+                    {% if not loop.last %}<hr>{% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Aucune expérience professionnelle trouvée</p>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        Généré par RH360 - {{ date|date('d/m/Y H:i') }}
+    </div>
+</body>
+</html>

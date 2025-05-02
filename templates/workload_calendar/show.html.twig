@@ -1,0 +1,275 @@
+{% extends 'baseRH.html.twig' %}
+{% block title %}Charge de l'équipe
+	{{ equipe.nom }}
+{% endblock %}
+
+{% block heading %}
+	Charge de l'équipe
+	{{ equipe.nom }}
+{% endblock %}
+{% block css %}
+	{{ parent() }}
+	<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.min.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid/main.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+	<link href=" {{ asset('front/css/styleEquipe.css') }}" rel="stylesheet">
+	<style>
+		body {
+			font-family: 'Inter', system-ui, sans-serif;
+			-webkit-font-smoothing: antialiased;
+		}
+		.workload-legend {
+			display: flex;
+			gap: 15px;
+			margin: 20px 0;
+		}
+		.legend-item {
+			display: flex;
+			align-items: center;
+		}
+		.legend-color {
+			width: 20px;
+			height: 20px;
+			margin-right: 5px;
+			border: 1px solid #ddd;
+		}
+		/* Modern Calendar Container */
+		#calendar {
+			--fc-border-color: #e2e8f0;
+			--fc-daygrid-event-dot-width: 6px;
+			--fc-today-bg-color: #f0f9ff;
+			margin: 2rem auto;
+			max-width: 700px;
+			font-family: 'Segoe UI', system-ui, sans-serif;
+		}
+
+		/* Header Styling */
+		.fc-header-toolbar {
+			padding: 1rem;
+			margin-bottom: 0.5rem !important;
+			background: white;
+			border-radius: 0.5rem;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+		}
+
+		.fc-toolbar-title {
+			font-size: 1.25rem;
+			font-weight: 600;
+			color: #1e293b;
+		}
+
+		/* Button Styling */
+		.fc-button {
+			background: white !important;
+			color: #4b5563 !important;
+			border: 1px solid #d1d5db !important;
+			box-shadow: none !important;
+			text-transform: capitalize !important;
+			transition: all 0.2s ease;
+		}
+
+		.fc-button:hover {
+			background: #f3f4f6 !important;
+			color: #1e293b !important;
+		}
+
+		.fc-button-active {
+			background: #3b82f6 !important;
+			color: white !important;
+			border-color: #3b82f6 !important;
+		}
+
+		/* Day Header */
+		.fc-col-header-cell {
+			background: #f8fafc;
+			padding: 0.5rem 0;
+		}
+
+		.fc-col-header-cell-cushion {
+			color: #64748b;
+			text-decoration: none !important;
+			font-weight: 500;
+			font-size: 0.85rem;
+		}
+
+		/* Date Cells */
+		.fc-daygrid-day {
+			padding: 2px;
+			transition: transform 0.2s ease;
+		}
+
+		.fc-daygrid-day:hover {
+			transform: scale(1.02);
+			cursor: pointer;
+		}
+
+		.fc-daygrid-day-number {
+			color: #334155;
+			text-decoration: none !important;
+			font-weight: 500;
+			padding: 4px 6px !important;
+		}
+
+		.fc-day-today .fc-daygrid-day-number {
+			color: #3b82f6;
+			font-weight: 600;
+		}
+
+		/* Events */
+		.fc-event {
+			border: none !important;
+			border-radius: 4px !important;
+			padding: 2px 4px !important;
+			margin: 1px 2px !important;
+			font-size: 0.85rem;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+			cursor: pointer;
+			transition: transform 0.2s ease;
+		}
+
+		.fc-event:hover {
+			transform: translateY(-2px);
+		}
+
+		.fc-event-title {
+			font-weight: normal !important;
+		}
+
+		/* Legend */
+		.workload-legend {
+			display: flex;
+			gap: 1rem;
+			margin: 1rem 0;
+			padding: 0.75rem 1rem;
+			background: white;
+			border-radius: 0.5rem;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+		}
+
+		.legend-item {
+			display: flex;
+			align-items: center;
+			font-size: 0.9rem;
+			color: #475569;
+		}
+
+		.legend-color {
+			width: 16px;
+			height: 16px;
+			margin-right: 0.5rem;
+			border-radius: 3px;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-6">
+<br>
+    <div class="flex items-center">
+        <a href="{{ path('app_equipe_show', {id: equipe.id}) }}" class="btn btn-back px-4 py-2">
+            <i class="fas fa-arrow-left mr-2"></i> Back to list
+        </a>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-6" style="margin-top: -50px;">
+        <div id="calendar"></div>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+    {{ parent() }}
+    <!-- Load FullCalendar first -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+    
+    <!-- Load Popper.js (required for Tippy) -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    
+    <!-- Then load Tippy.js -->
+    <script src="https://cdn.jsdelivr.net/npm/tippy.js@6.3.7/dist/tippy-bundle.umd.min.js"></script>
+    
+    <!-- Tippy CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tippy.js@6.3.7/themes/light-border.css">
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Verify Tippy is loaded
+        if (typeof tippy === 'undefined') {
+            console.error('Tippy.js not loaded!');
+            return;
+        }
+
+        const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+            locale: 'fr',
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek'
+            },
+            events: {{ path('workload_events', {id: equipe.id})|json_encode|raw }},
+            eventDisplay: 'block',
+            eventDidMount: (info) => {
+                console.log("Event mounted:", info.event);
+                
+                // Apply color coding
+                if (info.event.backgroundColor) {
+                    info.el.style.backgroundColor = info.event.backgroundColor;
+                    info.el.style.border = 'none';
+                }
+                
+                // Skip if no projects
+                if (!info.event.extendedProps?.projects) return;
+                
+                // Build popup content
+                const projects = info.event.extendedProps.projects;
+                let content = `
+                    <div class="p-2" style="max-width: 300px">
+                        <strong>${info.event.startStr}</strong>
+                        <div class="mt-2 space-y-2">
+                `;
+                
+                projects.forEach(project => {
+                    content += `
+                        <div class="border-b pb-2 last:border-0">
+                            <a href="${project.detailsUrl}" 
+                               class="text-blue-600 hover:underline font-medium">
+                                ${project.name}
+                            </a>
+                            ${project.description ? `
+                            <p class="text-sm text-gray-600 mt-1">
+                                ${project.description}
+                            </p>` : ''}
+                        </div>
+                    `;
+                });
+                
+                content += `</div></div>`;
+                
+                // Initialize tooltip with error handling
+                try {
+                    tippy(info.el, {
+                        content: content,
+                        allowHTML: true,
+                        theme: 'light-border',
+                        interactive: true,
+                        placement: 'auto',
+                        trigger: 'mouseenter', // Changed from 'click' to 'mouseenter'
+                        appendTo: document.body,
+                        animation: 'shift-away', // Added animation
+                        duration: [200, 200], // Animation duration [entry, exit]
+                        onShow(instance) {
+                            // Close other tooltips
+                            document.querySelectorAll('.tippy-box').forEach(el => {
+                                if (el._tippy !== instance) el._tippy?.hide();
+                            });
+                        }
+                    });
+                } catch (e) {
+                    console.error('Tippy initialization failed:', e);
+                }
+            }
+        });
+        
+        calendar.render();
+    });
+    </script>
+{% endblock %}

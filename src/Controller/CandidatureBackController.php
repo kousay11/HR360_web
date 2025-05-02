@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Candidature;
 use App\Entity\Offre;
 use App\Form\CandidatureOtherType;
+use App\Service\CvParserService;
 use App\Repository\CandidatureRepository;
 use App\Repository\OffreRepository;
 use App\Service\EmailService;
@@ -49,11 +50,10 @@ public function exportPdf(
     Request $request,
     ?int $offreId = null,
     ?OffreRepository $offreRepository = null
-): Response
-{
+): Response {
     $pdfOptions = new Options();
     $pdfOptions->set('defaultFont', 'Arial');
-    $pdfOptions->set('isRemoteEnabled', true);
+    $pdfOptions->set('isRemoteEnabled', true); // Autorise le chargement des images externes
     $pdfOptions->set('isHtml5ParserEnabled', true);
 
     $dompdf = new Dompdf($pdfOptions);
@@ -68,16 +68,24 @@ public function exportPdf(
         $title = "Liste de toutes les candidatures";
     }
 
-    // Générer une URL absolue vers l'image publique
-    $logoRelativePath = '/images/logoRH360.png';
-    $logoAbsoluteUrl = $request->getSchemeAndHttpHost() . $logoRelativePath;
-    $logoFilePath = $this->getParameter('kernel.project_dir') . '/public' . $logoRelativePath;
-    $logoExists = file_exists($logoFilePath);
+    // Chemin physique du logo
+    $logoPath = $this->getParameter('kernel.project_dir') . '/public/images/logoRH360.png';
 
+    // Vérification de l'existence et encodage en Base64
+    if (file_exists($logoPath)) {
+        $logoData = base64_encode(file_get_contents($logoPath));
+        $logoUrl = 'data:image/png;base64,' . $logoData;
+        $logoExists = true;
+    } else {
+        $logoUrl = null;
+        $logoExists = false;
+    }
+
+    // Passage au template
     $html = $this->renderView('candidatureBack/pdf.html.twig', [
         'candidatures' => $candidatures,
         'title' => $title,
-        'logo_path' => $logoExists ? $logoAbsoluteUrl : null,
+        'logo_path' => $logoUrl,
         'logo_exists' => $logoExists,
         'offre' => $offreId ? $offre : null
     ]);
@@ -108,55 +116,65 @@ public function exportPdf(
     }
 
     #[Route('/{idCandidature}/edit', name: 'app_candidatureBack_edit', methods: ['GET', 'POST'])]
-public function edit(
-    Request $request, 
-    Candidature $candidature, 
-    EntityManagerInterface $entityManager,
-    EmailService $emailService
-): Response {
-    // Avant de traiter le formulaire, on garde le statut initial
-    $ancienStatut = $candidature->getStatut();
-
-    // Création et traitement du formulaire
-    $form = $this->createForm(CandidatureOtherType::class, $candidature);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Nouveau statut après soumission
-        $nouveauStatut = $candidature->getStatut();
-
-        // Mettre à jour la date de modification
-        $candidature->setDateModification(new \DateTime());
-
-        // Sauvegarder dans la base de données
-        $entityManager->flush();
-
-        // Si le statut a changé, on envoie l'email
-        if ($ancienStatut !== $nouveauStatut) {
-            $emailSent = $emailService->sendStatusUpdateEmail(
-                'kousay.najar@esprit.tn',  // À remplacer plus tard par $candidature->getEmail()
-                $nouveauStatut
-            );
-
-            // Afficher une notification dans l'interface
-            $this->addFlash(
-                $emailSent ? 'success' : 'warning',
-                $emailSent 
-                    ? 'Statut mis à jour et email envoyé'
-                    : 'Statut mis à jour mais échec d\'envoi d\'email'
-            );
+    public function edit(
+        Request $request, 
+        Candidature $candidature, 
+        EntityManagerInterface $entityManager,
+        EmailService $emailService,
+        LoggerInterface $logger
+    ): Response {
+        $ancienStatut = $candidature->getStatut();
+        $logger->info("Début de modification - Ancien statut: {$ancienStatut}");
+    
+        $form = $this->createForm(CandidatureOtherType::class, $candidature);
+        $form->handleRequest($request);
+    
+        if ($form->isSubmitted() && $form->isValid()) {
+            $nouveauStatut = $candidature->getStatut();
+            $logger->info("Formulaire soumis - Nouveau statut: {$nouveauStatut}");
+    
+            $candidature->setDateModification(new \DateTime());
+            $entityManager->flush();
+            $logger->info("Candidature mise à jour en base de données");
+    
+            if ($ancienStatut !== $nouveauStatut) {
+                $logger->info("Statut modifié - Début du processus d'envoi d'email");
+                
+                $iduser = $candidature->getiduser();
+                $email = $iduser?->getEmail();
+                
+                if ($email) {
+                    $logger->info("Email du candidat trouvé: {$email}");
+                    $emailSent = $emailService->sendStatusUpdateEmail($email, $nouveauStatut);
+                    
+                    if ($emailSent) {
+                        $logger->info("Email envoyé avec succès à {$email}");
+                    } else {
+                        $logger->error("Échec de l'envoi d'email à {$email}");
+                    }
+                    
+                    $this->addFlash(
+                        $emailSent ? 'success' : 'warning',
+                        $emailSent 
+                            ? 'Statut mis à jour et email envoyé'
+                            : 'Statut mis à jour mais échec d\'envoi d\'email'
+                    );
+                } else {
+                    $logger->warning("Aucun email trouvé pour l'utilisateur ID: {$iduser?->getId()}");
+                    $this->addFlash('warning', 'Statut mis à jour mais utilisateur sans email');
+                }
+            } else {
+                $logger->info("Statut inchangé - Pas d'email à envoyer");
+            }
+    
+            return $this->redirectToRoute('app_candidatureBack_index');
         }
-
-        // Redirection après traitement
-        return $this->redirectToRoute('app_candidatureBack_index');
+    
+        return $this->render('candidatureBack/edit.html.twig', [
+            'candidature' => $candidature,
+            'form' => $form->createView(),
+        ]);
     }
-
-    // Affichage du formulaire si non soumis ou invalide
-    return $this->render('candidatureBack/edit.html.twig', [
-        'candidature' => $candidature,
-        'form' => $form->createView(),
-    ]);
-}
 #[Route('/analyse', name: 'app_analyse_candidature', methods: ['POST'])]
 public function analyseCandidature(Request $request, LoggerInterface $logger): JsonResponse
 {
@@ -367,6 +385,73 @@ private function generateAnalysisPdf(array $analysisData, Request $request): ?st
         // Logger l'erreur si nécessaire
         return null;
     }
+}
+#[Route('/parse-cv/{idCandidature}', name: 'app_candidature_parse_cv', methods: ['GET'])]
+public function parseCv(Candidature $candidature, CvParserService $cvParserService): JsonResponse
+{
+    $result = $cvParserService->parseCv($candidature->getCv());
+
+    // Si le service a retourné une erreur
+    if (isset($result['error'])) {
+        return $this->json([
+            'success' => false,
+            'error' => $result['error']
+        ], 400);
+    }
+
+    try {
+        // Générer le PDF d'analyse
+        $pdfPath = $this->generateCvAnalysisPdf($result, $candidature);
+
+        return $this->json([
+            'success' => true,
+            'data' => $result,
+            'pdfPath' => $pdfPath
+        ]);
+
+    } catch (\Exception $e) {
+        return $this->json([
+            'success' => false,
+            'error' => 'Erreur lors de la génération du PDF: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+private function generateCvAnalysisPdf(array $analysisData, Candidature $candidature): string
+{
+    $pdfOptions = new Options();
+    $pdfOptions->set('defaultFont', 'Arial');
+    
+    $dompdf = new Dompdf($pdfOptions);
+    
+    // Préparer les données pour le template
+    $templateData = [
+        'analysis' => [
+            'personal_info' => $analysisData['personal_info'] ?? null,
+            'work_experience' => $analysisData['work_experience'] ?? null,
+            // Ajoutez d'autres champs si nécessaire
+        ],
+        'candidature' => $candidature,
+        'date' => new \DateTime()
+    ];
+    
+    $html = $this->renderView('candidatureBack/cv_analysis_pdf.html.twig', $templateData);
+    
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+    
+    $pdfDir = $this->getParameter('kernel.project_dir') . '/public/uploads/pdfs/';
+    if (!file_exists($pdfDir)) {
+        mkdir($pdfDir, 0777, true);
+    }
+    
+    $filename = 'cv_analysis_' . $candidature->getIdCandidature() . '_' . uniqid() . '.pdf';
+    $pdfPath = $pdfDir . $filename;
+    
+    file_put_contents($pdfPath, $dompdf->output());
+    
+    return '/uploads/pdfs/' . $filename;
 }
 
 }

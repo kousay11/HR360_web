@@ -23,7 +23,11 @@ class RegistrationFormType extends AbstractType
     {
         $builder
             ->add('email', EmailType::class, [
-                'attr' => ['class' => 'form-styling', 'placeholder' => 'Email']
+                'attr' => ['class' => 'form-styling', 'placeholder' => 'Email'],
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'L\'email est obligatoire']),
+                    new Assert\Email(['message' => 'Veuillez entrer un email valide']),
+                ]
             ])
             ->add('nom', TextType::class, [
                 'attr' => ['class' => 'form-styling', 'placeholder' => 'Nom']
