@@ -182,47 +182,6 @@
 					this.submit();
 				}
 			});
-
-			// Validation en temps réel
-			document.getElementById('inputEmail').addEventListener('input', function() {
-				const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-				const emailError = document.getElementById('email-error');
-				
-				if (!this.value.trim()) {
-					this.classList.add('is-invalid');
-					emailError.textContent = 'L\'email est obligatoire';
-				} else if (!emailRegex.test(this.value)) {
-					this.classList.add('is-invalid');
-					emailError.textContent = 'Veuillez entrer une adresse email valide';
-				} else {
-					this.classList.remove('is-invalid');
-				}
-			});
-
-			document.getElementById('inputPassword').addEventListener('input', function() {
-				const passwordError = document.getElementById('password-error');
-				
-				if (!this.value.trim()) {
-					this.classList.add('is-invalid');
-					passwordError.textContent = 'Le mot de passe est obligatoire';
-				} else {
-					this.classList.remove('is-invalid');
-				}
-			});
-
-			// Validation au focus out
-			document.getElementById('inputEmail').addEventListener('blur', function() {
-				const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-				const emailError = document.getElementById('email-error');
-				
-				if (!this.value.trim()) {
-					this.classList.add('is-invalid');
-					emailError.textContent = 'L\'email est obligatoire';
-				} else if (!emailRegex.test(this.value)) {
-					this.classList.add('is-invalid');
-					emailError.textContent = 'Veuillez entrer une adresse email valide';
-				}
-			});
 		</script>
 	</body>
 </html>
