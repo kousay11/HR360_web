@@ -1,8 +1,14 @@
 {% extends 'baseRH.html.twig' %}
 
 {% block title %}Liste des Entretiens{% endblock %}
+
 {% block heading %}Gestion des Entretiens{% endblock %}
 
+{% block topbar %}
+    {{ parent() }}
+
+    
+{% endblock %}
 {% block css %}
     {{ parent() }}
     <link href="{{ asset('back/css/project-card.css') }}" rel="stylesheet">
@@ -170,6 +176,47 @@
             });
         });
 
+// Connexion WebSocket
+        const ws = new WebSocket('ws://localhost:8080');
+        
+        ws.onmessage = function(event) {
+            const notification = JSON.parse(event.data);
+            
+            // Mettre à jour le compteur
+            const counter = document.getElementById('notification-counter');
+            counter.textContent = parseInt(counter.textContent) + 1;
+            
+            // Ajouter la nouvelle notification
+            const notificationItems = document.querySelector('.dropdown-list');
+            const newNotification = document.createElement('a');
+            newNotification.className = 'dropdown-item d-flex align-items-center';
+            newNotification.href = `/entretien/${notification.entretien_id}`;
+            
+            newNotification.innerHTML = `
+                <div class="mr-3">
+                    <div class="icon-circle bg-primary">
+                        <i class="fas fa-calendar-alt text-white"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="small text-gray-500">${new Date().toLocaleString()}</div>
+                    <span class="font-weight-bold">${notification.message}</span>
+                </div>
+            `;
+            
+            notificationItems.insertBefore(newNotification, notificationItems.firstChild);
+        };
+        
+        ws.onerror = function(error) {
+            console.error('WebSocket Error:', error);
+        };
+        
+        document.getElementById('alertsDropdown').addEventListener('click', function() {
+            fetch('{{ path('clear_entretien_notifications') }}')
+                .then(() => {
+                    document.getElementById('notification-counter').textContent = '0';
+                });
+        });
         
     </script>
 {% endblock %}

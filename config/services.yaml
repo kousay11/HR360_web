@@ -8,9 +8,16 @@ parameters:
     lettres_directory: '%kernel.project_dir%/public/uploads/lettres'
     images_directory: '%kernel.project_dir%/public/uploads/images'
 
+    notification_storage_dir: '%kernel.project_dir%/var/storage'
 
 services:
     Knp\Component\Pager\PaginatorInterface: '@knp_paginator'
+    App\Command\EntretienReminderCommand:
+        tags:
+            - { name: 'console.command' }
+    App\Service\NotificationStorageService:
+        arguments:
+            $storageDir: '%notification_storage_dir%'
     App\Twig\AppExtension:
         tags: ['twig.extension']
     # default configuration for services in *this* file
