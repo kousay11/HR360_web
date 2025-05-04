@@ -28,22 +28,32 @@ final class UtilisateurController extends AbstractController
 
     
     #[Route('/auth', name: 'app_auth')]
-    public function showAuthPage(AuthenticationUtils $authenticationUtils, Request $request): Response
-    {
+    public function showAuthPage(
+        AuthenticationUtils $authenticationUtils,
+        Request $request,
+        FormFactoryInterface $formFactory // injecter ce service
+    ): Response {
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
-
+    
+        // Formulaire d'inscription
         $user = new Utilisateur();
         $registrationForm = $this->createForm(RegistrationFormType::class, $user);
-
+    
+        // Formulaire de connexion
+        $loginForm = $formFactory->create(LoginType::class, [
+            '_username' => $lastUsername,
+        ]);
+    
         return $this->render('login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
             'registrationForm' => $registrationForm->createView(),
+            'loginForm' => $loginForm->createView(),
         ]);
     }
-
-
+    
+    
     #[Route('/register', name: 'app_register', methods: ['GET', 'POST'])]
     public function register(
         Request $request,
@@ -96,20 +106,11 @@ final class UtilisateurController extends AbstractController
 
 
     #[Route('/login', name: 'app_login', methods: ['GET', 'POST'])]
-    public function login(AuthenticationUtils $authenticationUtils): Response
+    public function login(): Response
     {
-        // Get the login error if there is one
-        $error = $authenticationUtils->getLastAuthenticationError();
-
-        // Last username entered by the user
-        $lastUsername = $authenticationUtils->getLastUsername();
-        
-        
-        return $this->render('login.html.twig', [
-            'last_username' => $lastUsername,
-            'error' => $error
-        ]);
+        return $this->redirectToRoute('app_auth');
     }
+    
 
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
@@ -117,3 +118,4 @@ final class UtilisateurController extends AbstractController
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 }
+	
