@@ -33,7 +33,7 @@ class AuthController extends AbstractController
     
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
-    
+    /*
         if ($request->isMethod('POST')) {
             $recaptchaResponse = $request->request->get('g-recaptcha-response');
             $secret = $params->get('recaptcha3_secret');
@@ -53,7 +53,7 @@ class AuthController extends AbstractController
                 return $this->redirectToRoute('app_login');            
             }
         }
-    
+    */
         return $this->render('auth/login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,

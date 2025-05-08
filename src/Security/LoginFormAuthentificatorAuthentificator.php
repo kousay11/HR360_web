@@ -15,9 +15,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class LoginFormAuthentificatorAuthentificator extends AbstractLoginFormAuthenticator
 {
@@ -25,35 +22,13 @@ class LoginFormAuthentificatorAuthentificator extends AbstractLoginFormAuthentic
 
     public const LOGIN_ROUTE = 'app_login';
 
-    public function __construct(
-        private UrlGeneratorInterface $urlGenerator,
-        private ParameterBagInterface $params,
-        private HttpClientInterface $httpClient
-    ) {
+    public function __construct(private UrlGeneratorInterface $urlGenerator)
+    {
     }
 
     public function authenticate(Request $request): Passport
     {
         $email = $request->getPayload()->getString('email');
-        $recaptchaResponse = $request->getPayload()->getString('g-recaptcha-response');
-
-        if (!$recaptchaResponse) {
-            throw new AuthenticationException('Veuillez valider le reCAPTCHA.');
-        }
-
-        $secret = $this->params->get('recaptcha3_secret');
-        $response = $this->httpClient->request('POST', 'https://www.google.com/recaptcha/api/siteverify', [
-            'body' => [
-                'secret' => $secret,
-                'response' => $recaptchaResponse,
-            ]
-        ]);
-
-        $data = $response->toArray();
-
-        if (!$data['success']) {
-            throw new AuthenticationException('Validation du reCAPTCHA échouée.');
-        }
 
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
 
