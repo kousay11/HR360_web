@@ -4,34 +4,14 @@ parameters:
     cvs_directory: '%kernel.project_dir%/public/uploads/cvs'
     lettres_directory: '%kernel.project_dir%/public/uploads/lettres'
     images_directory: '%kernel.project_dir%/public/uploads/images'
-
-
     notification_storage_dir: '%kernel.project_dir%/var/storage'
-
-services:
-    Knp\Component\Pager\PaginatorInterface: '@knp_paginator'
-    App\Command\EntretienReminderCommand:
-        tags:
-            - { name: 'console.command' }
-    App\Service\NotificationStorageService:
-        arguments:
-            $storageDir: '%notification_storage_dir%'
-    App\Twig\AppExtension:
-        tags: ['twig.extension']
-    # default configuration for services in *this* file
-    App\Form\DataTransformer\StringToDateTimeTransformer: ~
+    qrcodes_directory: '%kernel.project_dir%/public/uploads/qrcodes'
 
     app.together_api_key: '%env(TOGETHER_API_KEY)%'
     app.deep_translate_api_key: '%env(DEEP_TRANSLATE_API_KEY)%'
     app.base_url: '%env(APP_BASE_URL)%'
-    # app.rapidapi_grammar_key: '%env(RAPIDAPI_GRAMMAR_KEY)%'
-    # app.rapidapi_grammar_url: 'https://grammar-checker-api.p.rapidapi.com/v1/check'
-    # app.rapidapi_grammar_host: 'grammar-checker-api.p.rapidapi.com'
-
     recaptcha3_key: '%env(RECAPTCHA3_KEY)%'
     recaptcha3_secret: '%env(RECAPTCHA3_SECRET)%'
-    env(ABSTRACT_API_KEY): '%env(ABSTRACT_API_KEY)%'
-    qrcodes_directory: '%kernel.project_dir%/public/uploads/qrcodes'
     trello_api_key: '6a7939bb3380aa7016622f79c58cde16'
     trello_api_token: 'ATTAd882eb46ac7c80931df7f18f18b551431470e527c82fce94673498351e59116b1A7DD9EE'
 
@@ -40,18 +20,6 @@ services:
         autowire: true
         autoconfigure: true
         public: false
-    # default configuration for services in *this* file
-    App\Form\DataTransformer\StringToDateTimeTransformer: ~        
-
-
-    
-    App\Service\GoogleOAuthService:
-        arguments:
-            $params: '@parameter_bag'
-
-    App\Service\GoogleMeetService:
-        arguments:
-            $googleOAuthService: '@App\Service\GoogleOAuthService'
 
     App\:
         resource: '../src/'
@@ -60,11 +28,29 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    # Configuration explicite pour les services spéciaux
+    Knp\Component\Pager\PaginatorInterface: '@knp_paginator'
+
+    App\Command\EntretienReminderCommand:
+        tags: [ 'console.command' ]
+
+    App\Service\NotificationStorageService:
+        arguments:
+            $storageDir: '%notification_storage_dir%'
+
+    App\Form\DataTransformer\StringToDateTimeTransformer: ~
+
+    App\Service\GoogleOAuthService:
+        arguments:
+            $params: '@parameter_bag'
+
+    App\Service\GoogleMeetService:
+        arguments:
+            $googleOAuthService: '@App\Service\GoogleOAuthService'
+
     App\Twig\AppExtension:
         arguments:
             $projectDir: '%kernel.project_dir%'
-        tags: ['twig.extension']
+        tags: [ 'twig.extension' ]
 
     App\Service\QRCodeService:
         arguments:
@@ -74,21 +60,20 @@ services:
         arguments:
             $accountSid: '%env(twilio_account_sid)%'
             $authToken: '%env(twilio_auth_token)%'
+
     App\Service\DeepTranslateService:
         arguments:
             $apiKey: '%app.deep_translate_api_key%'
-    # App\Service\GrammarCheckerService:
-        # arguments:
-            # $client: '@http_client'
-            # $apiKey: '%app.rapidapi_grammar_key%'
-            # $apiUrl: '%app.rapidapi_grammar_url%'
-            # $apiHost: '%app.rapidapi_grammar_host%'
+
     App\Bundle\EmailVerifierBundle\Service\EmailVerifier:
         arguments:
             $apiKey: '%env(ABSTRACT_API_KEY)%'
-        tags:
-            - { name: 'container.service_subscriber' }
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+        tags: [ 'container.service_subscriber' ]
 
-    
+    # Services commentés mais potentiellement utiles
+    # App\Service\GrammarCheckerService:
+    #     arguments:
+    #         $client: '@http_client'
+    #         $apiKey: '%app.rapidapi_grammar_key%'
+    #         $apiUrl: '%app.rapidapi_grammar_url%'
+    #         $apiHost: '%app.rapidapi_grammar_host%'
