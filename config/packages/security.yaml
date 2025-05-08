@@ -38,3 +38,16 @@ security:
     access_control:
         - { path: ^/admin, roles: RH }
         - { path: ^/profile, roles: Candidat }
+        - { path: ^/projet, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/projetFront, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/equipe, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/formation, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/reservation, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/dashboard, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/employe, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/tache, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/participation, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/offre, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/candidature, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/offreFront, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/notification, roles: IS_AUTHENTICATED_FULLY }
