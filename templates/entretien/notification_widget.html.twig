@@ -1,0 +1,24 @@
+{# templates/entretien/notification_widget.html.twig #}
+<div class="dropdown-menu dropdown-list dropdown-menu-end shadow animated--grow-in" aria-labelledby="alertsDropdown">
+    <h6 class="dropdown-header">
+        Rappels d'entretien
+    </h6>
+    {% if notifications|length > 0 %}
+        {% for notification in notifications %}
+            <a class="dropdown-item d-flex align-items-center" href="{{ path('app_entretien_show', {'idEntretien': notification.entretien_id}) }}">
+                <div class="mr-3">
+                    <div class="icon-circle bg-primary">
+                        <i class="fas fa-calendar-alt text-white"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="small text-gray-500">{{ notification.created_at|date('d/m/Y H:i') }}</div>
+                    <span class="font-weight-bold">{{ notification.message }}</span>
+                </div>
+            </a>
+        {% endfor %}
+        <a class="dropdown-item text-center small text-gray-500" href="{{ path('clear_entretien_notifications') }}">Effacer les notifications</a>
+    {% else %}
+        <div class="dropdown-item text-center small text-gray-500">Aucune notification</div>
+    {% endif %}
+</div>

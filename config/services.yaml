@@ -5,6 +5,22 @@ parameters:
     lettres_directory: '%kernel.project_dir%/public/uploads/lettres'
     images_directory: '%kernel.project_dir%/public/uploads/images'
 
+
+    notification_storage_dir: '%kernel.project_dir%/var/storage'
+
+services:
+    Knp\Component\Pager\PaginatorInterface: '@knp_paginator'
+    App\Command\EntretienReminderCommand:
+        tags:
+            - { name: 'console.command' }
+    App\Service\NotificationStorageService:
+        arguments:
+            $storageDir: '%notification_storage_dir%'
+    App\Twig\AppExtension:
+        tags: ['twig.extension']
+    # default configuration for services in *this* file
+    App\Form\DataTransformer\StringToDateTimeTransformer: ~
+
     app.together_api_key: '%env(TOGETHER_API_KEY)%'
     app.deep_translate_api_key: '%env(DEEP_TRANSLATE_API_KEY)%'
     app.base_url: '%env(APP_BASE_URL)%'
@@ -20,7 +36,6 @@ parameters:
     trello_api_token: 'ATTAd882eb46ac7c80931df7f18f18b551431470e527c82fce94673498351e59116b1A7DD9EE'
 
 services:
-    Knp\Component\Pager\PaginatorInterface: '@knp_paginator'
     _defaults:
         autowire: true
         autoconfigure: true

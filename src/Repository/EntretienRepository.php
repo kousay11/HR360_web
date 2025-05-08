@@ -62,4 +62,21 @@ public function findAllOrderedByDateAndTime(int $idCandidature, string $order = 
         ->getQuery()
         ->getResult();
 }
+
+public function findEntretiensInNext24Hours(): array
+{
+    $now = new \DateTime();
+    $in24Hours = (new \DateTime())->add(new \DateInterval('PT24H'));
+
+    return $this->createQueryBuilder('e')
+        ->where('e.date BETWEEN :now AND :in24Hours')
+        ->andWhere('e.heure IS NOT NULL')
+        ->setParameter('now', $now)
+        ->setParameter('in24Hours', $in24Hours)
+        ->getQuery()
+        ->getResult();
+}
+
+
+
 }
