@@ -11,6 +11,19 @@
         .invalid-feedback { color: #dc3545; font-size: 0.875rem; margin-top: 0.25rem; display: none; }
         .is-invalid { border-color: #dc3545 !important; }
         .is-invalid + .input-icon + .invalid-feedback { display: block; }
+
+
+        	.logo-container {
+				text-align: center;
+				margin-bottom: -3.5rem;
+			}
+
+			.logo-image {
+				width: 120px;
+				height: auto;
+				object-fit: contain;
+			}
+
     </style>
 </head>
 <body>
@@ -19,6 +32,11 @@
             <div class="login-card">
                 <div class="auth-form-container">
                     {{ form_start(requestForm, {'attr': {'class': 'auth-form'}}) }}
+
+                        <div class="logo-container">
+								<img src="{{ asset('front/img/logoRH360.png') }}" alt="HR360 Logo" class="logo-image">
+						</div>
+
                         <div class="auth-header">
                             <h2 class="auth-title">Réinitialisation</h2>
                             <div class="auth-subtitle">Entrez votre email pour recevoir le lien</div>

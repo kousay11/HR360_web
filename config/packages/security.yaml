@@ -38,7 +38,7 @@ security:
     access_control:
         - { path: ^/admin, roles: RH }
         - { path: ^/profile, roles: Candidat }
-        - { path: ^/projet, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/projet, roles: IS_AUTHENTICATED_FULLY}
         - { path: ^/projetFront, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/equipe, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/formation, roles: IS_AUTHENTICATED_FULLY }
@@ -51,3 +51,5 @@ security:
         - { path: ^/candidature, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/offreFront, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/notification, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/evaluation, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/entretien, roles: IS_AUTHENTICATED_FULLY }
