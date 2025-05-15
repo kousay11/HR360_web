@@ -1,8 +1,8 @@
 security:
     password_hashers:
-        App\Entity\Utilisateur:
-            algorithm: auto
-
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+            algorithm: bcrypt
+            cost: 13
     providers:
         app_user_provider:
             entity:
@@ -53,3 +53,4 @@ security:
         - { path: ^/notification, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/evaluation, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/entretien, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/register, roles: PUBLIC_ACCESS }

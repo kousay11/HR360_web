@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -28,8 +29,7 @@ class ResetPasswordController extends AbstractController
     public function __construct(
         private ResetPasswordHelperInterface $resetPasswordHelper,
         private EntityManagerInterface $entityManager
-    ) {
-    }
+    ) {}
 
     /**
      * Display & process form to request a password reset.
@@ -44,14 +44,42 @@ class ResetPasswordController extends AbstractController
             /** @var string $email */
             $email = $form->get('email')->getData();
 
-            return $this->processSendingPasswordResetEmail($email, $mailer, $translator
-);
+            return $this->processSendingPasswordResetEmail(
+                $email,
+                $mailer,
+                $translator
+            );
         }
 
         return $this->render('reset_password/request.html.twig', [
             'requestForm' => $form,
         ]);
     }
+
+    #[Route('/api/reset-password', name: 'api_reset_password', methods: ['POST','GET'])]
+    public function resetPassword(Request $request, UserPasswordHasherInterface $hasher, EntityManagerInterface $em): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $email = $data['email'] ?? '';
+        $newPassword = $data['password'] ?? '';
+
+        if (!$email || !$newPassword) {
+            return new JsonResponse(['success' => false, 'message' => 'Email ou mot de passe manquant'], 400);
+        }
+
+        $user = $em->getRepository(Utilisateur::class)->findOneBy(['email' => $email]);
+
+        if (!$user) {
+            return new JsonResponse(['success' => false, 'message' => 'Utilisateur non trouvé'], 404);
+        }
+
+        $user->setPassword($hasher->hashPassword($user, $newPassword));
+        $em->flush();
+
+        return new JsonResponse(['success' => true, 'message' => 'Mot de passe réinitialisé avec succès']);
+    }
+
 
     /**
      * Confirmation page after a user has requested a password reset.
@@ -162,8 +190,7 @@ class ResetPasswordController extends AbstractController
             ->htmlTemplate('reset_password/email.html.twig')
             ->context([
                 'resetToken' => $resetToken,
-            ])
-        ;
+            ]);
 
         $mailer->send($email);
 

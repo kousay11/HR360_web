@@ -47,6 +47,7 @@ class LoginFormAuthentificatorAuthentificator extends AbstractLoginFormAuthentic
     {
         $user = $token->getUser();
 
+
         if (in_array('RH', $user->getRoles())) {
             return new RedirectResponse($this->urlGenerator->generate('app_dashboard'));
         }

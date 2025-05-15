@@ -14,6 +14,9 @@ use App\Form\LoginType;
 use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Repository\UtilisateurRepository;
 
 
 
@@ -21,7 +24,9 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 class AuthController extends AbstractController
 {
 
-    public function __construct(private HttpClientInterface $httpClient) {}#[Route('/login', name: 'app_login')]
+
+    public function __construct(private HttpClientInterface $httpClient) {}
+    #[Route('/login', name: 'app_login')]
     public function login(
         AuthenticationUtils $authenticationUtils,
         ParameterBagInterface $params,
@@ -30,10 +35,10 @@ class AuthController extends AbstractController
         if ($this->getUser()) {
             return $this->redirectToRoute('app_login');
         }
-    
+
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
-    /*
+        /*
         if ($request->isMethod('POST')) {
             $recaptchaResponse = $request->request->get('g-recaptcha-response');
             $secret = $params->get('recaptcha3_secret');
@@ -60,7 +65,39 @@ class AuthController extends AbstractController
             'recaptcha_site_key' => $params->get('recaptcha3_key'),
         ]);
     }
-    
+
+
+
+
+    #[Route('/api/login', name: 'api_login', methods: ['POST'])]
+    public function apiLogin(
+        Request $request,
+        UtilisateurRepository $utilisateurRepository,
+        UserPasswordHasherInterface $passwordHasher
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'] ?? '';
+        $plainPassword = $data['password'] ?? '';
+
+        $user = $utilisateurRepository->findOneBy(['email' => $email]);
+
+        if (!$user) {
+            return new JsonResponse(['success' => false, 'message' => 'Utilisateur non trouvé'], 404);
+        }
+
+        if (!$passwordHasher->isPasswordValid($user, $plainPassword)) {
+            return new JsonResponse(['success' => false, 'message' => 'Mot de passe incorrect'], 401);
+        }
+
+        return new JsonResponse([
+            'success' => true,
+            'id' => $user->getId(),
+            'role' => $user->getRole(),
+            'nom' => $user->getNom(),
+            'email' => $user->getEmail(),
+        ]);
+    }
+
 
 
     #[Route('/logout', name: 'app_logout')]
